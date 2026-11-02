@@ -12,16 +12,30 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/table@latest/dist/nine-table.umd.js"></script>
 
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            font-size: 14px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        nine-table {
+            width: 90%;
+            height: 80%;
+        }
+    </style>
+
     <script>
-        nine.setup({
-            debug: {
-                enable: true,
-                filter: ["nine-table"],
-            },
-            "nine-table": {
-                //cssFile: "./css/nine-table/_nine-table.css",
-            },
-        });
+
     </script>
 </head>
 
