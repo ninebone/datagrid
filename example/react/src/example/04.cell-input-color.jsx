@@ -1,7 +1,6 @@
-import { useScreen, useState, useEffect, useRef } from 'react';
-
-// 상대 경로 대신 별칭 사용
+import { useEffect, useRef } from 'react';
 import { exampleData } from '../_data/example-data.js';
+import "@ninebone/datagrid";
 
 const InputColor = () => {
 	const DATA_CNT = 100000;
@@ -15,15 +14,17 @@ const InputColor = () => {
 	};
 
 	const selectCode = async () => {
-		setTimeout( () => {
-			tableRef.current.getColorList = (v) => {
-				const rawList = exampleData.generateCommonCode((v > 50) ? "COLOR" : "COLOR2");
-				return rawList.map(item => ({
-					...item,
-					value: item.code // code 값을 복사해서 value 속성 생성
-				}));
-			};
-		}, 300);
+		//setTimeout( () => {
+			tableRef.current.addProvider({
+				getColorList: (v) => {
+					const rawList = exampleData.generateCommonCode((v > 50) ? "COLOR" : "COLOR2");
+					return rawList.map(item => ({
+						...item,
+						value: item.code
+					}));
+				},
+			});
+		//}, 1000);
 	};
 
 	useEffect(() => {
@@ -88,7 +89,7 @@ const InputColor = () => {
 								<option value="#0000ff"/>
 							</datalist>
 						</td>
-						<td data-bind="COLOR2" cell-type="input-color" data-source="host.getColorList(data.REC1)"></td>
+						<td data-bind="COLOR2" cell-type="input-color" data-source="provider.getColorList(data.REC1)"></td>
 					</tr>
 					</tbody>
 				</table>

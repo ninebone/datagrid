@@ -1,19 +1,10 @@
-import { useScreen, useState, useEffect, useRef } from 'react';
-
-// 상대 경로 대신 별칭 사용
+import { useEffect, useRef } from 'react';
 import { exampleData } from '../_data/example-data.js';
+import "@ninebone/datagrid";
 
 const Combo = () => {
 	const DATA_CNT = 100000;
 	const tableRef = useRef(null);
-
-	const selectCode = async () => {
-		setTimeout( () => {
-			tableRef.current.getCommonCode = (group) => {
-				return exampleData.generateCommonCode(group);
-			};
-		});
-	};
 
 	const selectList = (params = {}) => {
 		tableRef.current.loading = true;
@@ -23,7 +14,10 @@ const Combo = () => {
 	};
 
 	useEffect(() => {
-		selectCode();
+		tableRef.current.addProvider({
+			getCommonCode: (group) => exampleData.generateCommonCode(group),
+		});
+
 		selectList();
 	}, []);
 

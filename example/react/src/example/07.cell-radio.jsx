@@ -1,7 +1,6 @@
-import { useScreen, useState, useEffect, useRef } from 'react';
-
-// 상대 경로 대신 별칭 사용
+import { useEffect, useRef } from 'react';
 import { exampleData } from '../_data/example-data.js';
+import "@ninebone/datagrid";
 
 const Radio = () => {
 	const DATA_CNT = 100000;
