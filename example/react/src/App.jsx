@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
 // 1. 특정 폴더 안의 모든 jsx 파일을 한 번에 가져옴 (eager: true)
-const modules = import.meta.glob('./example/*.jsx', { eager: true });
+const modules = import.meta.glob('./views/*.jsx', { eager: true });
 
 // 2. 파일 경로를 가공하여 샘플 리스트 생성
 const samples = Object.keys(modules).map((path) => {
-    const fileName = path.replace('./example/', '').replace('.jsx', '');
+    const fileName = path.replace('./views/', '').replace('.jsx', '');
     return {
         name: fileName,
         Component: modules[path].default,
