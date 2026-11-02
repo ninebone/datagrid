@@ -23,7 +23,7 @@ Tired of heavy, overly complex JavaScript data grids? **Ninelab HTML Table** pre
 
 ![Ninelab HTML Table Demo](//https://raw.githubusercontent.com/ninebone/datagrid/main/assets/demo.gif)
 
-- [Live Demo (Coming Soon)](https://github.com/ninebone/nine-lab)
+- [Live Demo](https://ninebone.github.io/datagrid/)
 
 ### Framework Examples & Input Demos
 - [Vanilla JS Examples](#)
