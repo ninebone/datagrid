@@ -21,8 +21,8 @@ const Overview = () => {
 			renderBadge: (v1, v2, v3) => {
 				const v = (Number(v1) + Number(v2) + Number(v3)) / 3;
 				return v > 50
-					? `<span style="background: #d1e7dd; color: #0f5132;">High</span>`
-					: `<span style="background: #f8d7da; color: #842029;">Low</span>`;
+					? `<span style="width: ${v}%; padding-left: 4px; display: block; background: #d1e7dd; color: #0f5132;">High</span>`
+					: `<span style="width: ${v}%; padding-left: 4px; display: block; background: #f8d7da; color: #842029;">Low</span>`;
 			},
 			renderBadge2: (v, bg) => {
 				return `

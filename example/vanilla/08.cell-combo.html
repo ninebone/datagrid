@@ -12,7 +12,7 @@
 
     <script type="text/javascript" src="_data/example-data.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@latest/dist/nine-table.umd.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@0.0.6/dist/nine-table.umd.js"></script>
 
     <script>
         nine.setup({
@@ -21,7 +21,7 @@
                 filter: ["nine-table"],
             },
             "nine-table": {
-                cssFile: "./css/nine-table/_nine-table.css",
+                //cssFile: "./css/nine-table/_nine-table.css",
             },
         });
     </script>
@@ -73,7 +73,7 @@
                 <td data-bind="REC1" cell-type="input-number"></td>
                 <td data-bind="REC2" cell-type="input-number"></td>
                 <td data-bind="REC3" cell-type="input-number"></td>
-                <td cell-type="combo" data-bind="DEPART" data-source="host.getCommonCode('DEPART')"
+                <td cell-type="combo" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')"
                     key-name="code" value-name="codename"></td>
                 <td cell-type="combo" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;"
                     enable="data.REC1 > 70 ? true : false;">
@@ -87,7 +87,7 @@
                 <td data-bind="REC1" cell-type="input-number" validator="data.REC1 < 50 ? true : false"></td>
                 <td data-bind="REC2" cell-type="input-number" validator="data.REC2 < 50 ? true : false"></td>
                 <td data-bind="REC3" cell-type="input-number"
-                    validator="host.checkNum(data.REC1,data.REC2,data.REC3)"></td>
+                    validator="provider.checkNum(data.REC1,data.REC2,data.REC3)"></td>
                 <td data-bind="REC1" cell-type="input-number" enable="data.REC1 < 50 ? true : false"></td>
                 <td data-bind="REC2" cell-type="input-number" visible="data.REC2 < 50"></td>
             </tr>
@@ -103,12 +103,13 @@
 
     const grd = document.querySelector("nine-table");
 
-    grd.addEventListener("load", () => {
-
-        grd.getCommonCode = (group) => {
+    grd.addProvider({
+        getCommonCode: (group) => {
             return exampleData.generateCommonCode(group);
-        };
+        },
+    });
 
+    grd.addEventListener("load", () => {
         grd.loading = true;
         setTimeout( () => {
             grd.data.set(exampleData.generateRandomData(DATA_CNT));

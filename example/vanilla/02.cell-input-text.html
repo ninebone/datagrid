@@ -12,7 +12,7 @@
 
     <script type="text/javascript" src="_data/example-data.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@datagrid/table@latest/dist/nine-table.umd.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@0.0.6/dist/nine-table.umd.js"></script>
 
     <script>
         nine.setup({
@@ -21,7 +21,7 @@
                 filter: ["nine-table"],
             },
             "nine-table": {
-                cssFile: "./css/nine-table/_nine-table.css",
+                //cssFile: "./css/nine-table/_nine-table.css",
             },
         });
     </script>
@@ -74,7 +74,7 @@
                 <td data-bind="NAME" cell-type="input" max-byte="15"></td>
                 <td data-bind="NAME" cell-type="input" validator="!(nine.getByteLength(data.NAME) > 15)"></td>
                 <td data-bind="NAME" cell-type="input" validator="!data.NAME.includes('i')"></td>
-                <td data-bind="NAME" cell-type="input" validator="host.checkName(data.NAME)"></td>
+                <td data-bind="NAME" cell-type="input" validator="provider.checkName(data.NAME)"></td>
                 <td data-bind="NAME" cell-type="input" enable="data.REC1 < 50 ? true : false"></td>
                 <td data-bind="NAME" cell-type="input" visible="data.REC1 < 50"></td>
             </tr>
@@ -90,11 +90,13 @@
 
     const grd = document.querySelector("nine-table");
 
-    grd.addEventListener("load", () => {
-        grd.checkName = (v) => {
+    grd.addProvider({
+        checkName: (v) => {
             return nine.getByteLength(v) > 15 ? false : true;
-        };
+        },
+    });
 
+    grd.addEventListener("load", () => {
         grd.loading = true;
         setTimeout( () => {
             grd.data.set(exampleData.generateRandomData(DATA_CNT));

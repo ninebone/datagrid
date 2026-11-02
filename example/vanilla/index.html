@@ -12,7 +12,7 @@
     <script type="text/javascript" src="_data/example-data.js"></script>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@latest/dist/nine-table.umd.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@0.0.6/dist/nine-table.umd.js"></script>
 
     <style>
         body {
@@ -93,7 +93,7 @@
             <td cell-type="checkbox" data-bind="CHK1" text-align="right" true-value="남" false-value="여" true-text="남자" false-text="여자"></td>
             <td cell-type="checkbox" data-bind="CHK1" true-value="남" false-value="여" is-radio="true"></td>
             <td cell-type="button" data-bind="DEPART" data-expr="data.REC1 + ':' + data.NAME"></td>
-            <td cell-type="radio" data-bind="DEPART" data-source="host.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+            <td cell-type="radio" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
             <td cell-type="radio" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;" enable="data.REC1 > 70 ? true : false;">
                 <datalist>
                     <option k="A" v="aaa a"/>
@@ -101,7 +101,7 @@
                     <option k="C" v="c c"/>
                 </datalist>
             </td>
-            <td cell-type="combo" data-bind="DEPART" data-source="host.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+            <td cell-type="combo" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
             <td cell-type="combo" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;" enable="data.REC1 > 70 ? true : false;">
                 <datalist>
                     <option k="A" v="aaa a"/>
@@ -184,7 +184,7 @@
             <td cell-type="checkbox" data-bind="CHK1" text-align="right" true-value="남" false-value="여" true-text="남자" false-text="여자"></td>
             <td cell-type="checkbox" data-bind="CHK1" true-value="남" false-value="여" is-radio="true"></td>
             <td cell-type="button" data-bind="DEPART" data-expr="data.REC1 + ':' + data.NAME"></td>
-            <td cell-type="radio" data-bind="DEPART" data-source="host.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+            <td cell-type="radio" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
             <td cell-type="radio" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;" enable="data.REC1 > 70 ? true : false;">
                 <datalist>
                     <option k="A" v="aaa a"/>
@@ -192,7 +192,7 @@
                     <option k="C" v="c c"/>
                 </datalist>
             </td>
-            <td cell-type="combo" data-bind="DEPART" data-source="host.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+            <td cell-type="combo" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
             <td cell-type="combo" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;" enable="data.REC1 > 70 ? true : false;">
                 <datalist>
                     <option k="A" v="aaa a"/>
@@ -275,7 +275,7 @@
             <td cell-type="checkbox" data-bind="CHK1" text-align="right" true-value="남" false-value="여" true-text="남자" false-text="여자"></td>
             <td cell-type="checkbox" data-bind="CHK1" true-value="남" false-value="여" is-radio="true"></td>
             <td cell-type="button" data-bind="DEPART" data-expr="data.REC1 + ':' + data.NAME"></td>
-            <td cell-type="radio" data-bind="DEPART" data-source="host.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+            <td cell-type="radio" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
             <td cell-type="radio" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;" enable="data.REC1 > 70 ? true : false;">
                 <datalist>
                     <option k="A" v="aaa a"/>
@@ -283,7 +283,7 @@
                     <option k="C" v="c c"/>
                 </datalist>
             </td>
-            <td cell-type="combo" data-bind="DEPART" data-source="host.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+            <td cell-type="combo" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
             <td cell-type="combo" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;" enable="data.REC1 > 70 ? true : false;">
                 <datalist>
                     <option k="A" v="aaa a"/>
@@ -314,10 +314,11 @@
 <script>
 
     const grd = document.querySelector("nine-table");
-    grd.addEventListener("load", (event) => {
-        grd.getCommonCode = (group) => {
+
+    grd.addProvider({
+        getCommonCode: (group) => {
             return exampleData.generateCommonCode(group);
-        };
+        },
     });
 
     grd.data.set(exampleData.generateRandomData(10000));

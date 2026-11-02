@@ -12,7 +12,7 @@
 
     <script type="text/javascript" src="_data/example-data.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@latest/dist/nine-table.umd.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@0.0.6/dist/nine-table.umd.js"></script>
 
     <script>
         nine.setup({
@@ -74,14 +74,14 @@
             <tr>
                 <td data-bind="sel" rowSpan="2" cell-type="checkbox"></td>
                 <td data-bind="sel2" rowSpan="2" cell-type="checkbox" is-radio="true"></td>
-                <td data-bind="NAME" rowSpan="2" text-align="center" data-expr="host.renderImage(data.PIC)"
+                <td data-bind="NAME" rowSpan="2" text-align="center" data-expr="provider.renderImage(data.PIC)"
                     html="true"></td>
                 <td data-bind="NAME" rowSpan="2"></td>
                 <td data-expr="'<font color=\'#999\'>' + data.REC1 + '+' + data.REC2 + '+' + data.REC3 + ' (Avg.<font color=\'green\'><b>' + Math.round((data.REC1 + data.REC2 + data.REC3) / 3) + '</b></font>)</font>'"
                     html="true"></td>
 
 
-                <td colSpan="3" cell-type="radio" data-bind="DEPART" data-source="host.getCommonCode('DEPART')"
+                <td colSpan="3" cell-type="radio" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')"
                     key-name="code" value-name="codename"></td>
 
                 <td cell-type="checkbox" data-bind="SEX" true-value="M" false-value="F"></td>
@@ -91,18 +91,18 @@
                 <td data-bind="NAME" cell-type="input" enable="data.REC1 > 30 ? true : false"></td>
                 <td data-bind="COLOR2" cell-type="input-color" enable="data.REC1 > 30 ? true : false;"></td>
 
-                <td rowSpan="2" data-expr="host.renderPieChart(data.REC1,data.REC2,data.REC3,data.REC4,data.REC5)" html="true"></td>
+                <td rowSpan="2" data-expr="provider.renderPieChart(data.REC1,data.REC2,data.REC3,data.REC4,data.REC5)" html="true"></td>
             </tr>
             <tr>
-                <td data-expr="host.renderBadge(data.REC1,data.REC2,data.REC3)" html="true"></td>
+                <td data-expr="provider.renderBadge(data.REC1,data.REC2,data.REC3)" html="true"></td>
 
 
                 <td colSpan="3"
-                    data-expr="host.renderBarChart(data.REC1,data.REC2,data.REC3,data.REC4,data.REC5,data.REC6,data.REC7,data.REC8,data.REC9,data.REC10,data.REC11,data.REC12)"
+                    data-expr="provider.renderBarChart(data.REC1,data.REC2,data.REC3,data.REC4,data.REC5,data.REC6,data.REC7,data.REC8,data.REC9,data.REC10,data.REC11,data.REC12)"
                     html="true"></td>
 
-                <td data-expr="host.renderBadge2(data.REC2, 'red')" html="true"></td>
-                <td data-expr="host.renderBadge2(data.REC3, 'olive')" html="true"></td>
+                <td data-expr="provider.renderBadge2(data.REC2, 'red')" html="true"></td>
+                <td data-expr="provider.renderBadge2(data.REC3, 'olive')" html="true"></td>
 
                 <td colSpan="2" data-bind="BIRTH_DT" cell-type="input-date" date-type="datetime-local"></td>
             </tr>
@@ -169,38 +169,26 @@
 
     const grd = document.querySelector("nine-table");
 
-    grd.addEventListener("load", () => {
-
-        grd.getCommonCode = (group) => {
-            return exampleData.generateCommonCode(group);
-        };
-
-        grd.renderImage = (v) => {
-            return `<img src="./${v}" style="vertical-align:middle; width:58px; height:58px; border-radius:50%;" />`;
-        };
-
-        grd.renderBadge = (v1,v2,v3) => {
+    grd.addProvider({
+        getCommonCode: (group) => exampleData.generateCommonCode(group),
+        renderImage: (v) => `<img src="./${v}" style="vertical-align:middle; width:58px; height:58px; border-radius:50%;" />`,
+        renderBadge: (v1, v2, v3) => {
             const v = (Number(v1) + Number(v2) + Number(v3)) / 3;
-
-            if (v > 50) {
-                return `<span style="display: block; width:${v}%; overflow:visible; padding: 0 4px; background: #d1e7dd; color: #0f5132;">High</span>`;
-            } else {
-                return `<span style="display: block; width:${v}%; overflow:visible; padding: 0 4px; background: #f8d7da; color: #842029;">Low</span>`;
-            }
-        };
-
-        grd.renderBadge2 = (v, bg) => {
+            return v > 50
+                ? `<span style="width: ${v}%; padding: 2px 4px; display: block; background: #d1e7dd; color: #0f5132;">High</span>`
+                : `<span style="width: ${v}%; padding: 2px 4px; display: block; background: #f8d7da; color: #842029;">Low</span>`;
+        },
+        renderBadge2: (v, bg) => {
             return `
-				<div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-					<span style="color: ${bg}; font-weight: 700; min-width: 16px; text-align: right;">${v}</span>
-					<div style="flex: 1; background: #e2e8f0; height: 6px; border-radius: 3px; overflow: hidden;">
-						<div style="width: ${v}%; height: 100%; background: ${bg};"></div>
+					<div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+						<span style="color: ${bg}; font-weight: 700; min-width: 16px; text-align: right;">${v}</span>
+						<div style="flex: 1; background: #e2e8f0; height: 6px; border-radius: 3px; overflow: hidden;">
+							<div style="width: ${v}%; height: 100%; background: ${bg};"></div>
+						</div>
 					</div>
-				</div>
-			`;
-        };
-
-        grd.renderBarChart = (...values) => {
+				`;
+        },
+        renderBarChart: (...values) => {
             const color = '#3b82f6';
             const width = 100;
             const height = 22; // 높이를 고정하여 셀 깨짐 방지
@@ -225,16 +213,15 @@
             const areaData = `${pathData} L ${width} ${height} L 0 ${height} Z`;
 
             return `
-             <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 24px; padding: 0 4px;">
-                 <svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: 22px; overflow: visible;" preserveAspectRatio="none">
-                     <path d="${areaData}" fill="${color}" opacity="0.15" />
-                     <path d="${pathData}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" />
-                 </svg>
-             </div>
-          `;
-        };
-
-        grd.renderPieChart = (...values) => {
+					<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 24px; padding: 0 4px;">
+						<svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: 22px; overflow: visible;" preserveAspectRatio="none">
+							<path d="${areaData}" fill="${color}" opacity="0.15" />
+							<path d="${pathData}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" />
+						</svg>
+					</div>
+			  	`;
+        },
+        renderPieChart: (...values) => {
             const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#6366f1', '#14b8a6', '#f97316', '#a855f7'];
             const size = 56; // 셀 높이에 알맞은 컴팩트한 사이즈
             const center = size / 2;
@@ -246,12 +233,12 @@
 
             if (total === 0) {
                 return `
-                <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 24px;">
-                   <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-                      <circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
-                   </svg>
-                </div>
-             `;
+						<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 24px;">
+						   	<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+							  	<circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
+						   	</svg>
+						</div>
+					`;
             }
 
             let currentAngle = 0;
@@ -286,15 +273,17 @@
             }).join('');
 
             return `
-             <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 56px;">
-                <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-                   <circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
-                   ${paths}
-                </svg>
-             </div>
-          `;
-        };
+					<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 56px;">
+						<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+						   	<circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
+						   	${paths}
+						</svg>
+					</div>
+			  	`;
+        },
+    });
 
+    grd.addEventListener("load", () => {
 
         grd.loading = true;
         setTimeout( () => {

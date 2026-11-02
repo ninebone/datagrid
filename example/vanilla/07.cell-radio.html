@@ -12,7 +12,7 @@
 
     <script type="text/javascript" src="_data/example-data.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@latest/dist/nine-table.umd.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@0.0.6/dist/nine-table.umd.js"></script>
 
     <script>
         nine.setup({
@@ -21,7 +21,7 @@
                 filter: ["nine-table"],
             },
             "nine-table": {
-                cssFile: "./css/nine-table/_nine-table.css",
+                //cssFile: "./css/nine-table/_nine-table.css",
             },
         });
     </script>
@@ -71,13 +71,13 @@
                 <td data-bind="NAME"></td>
 
                 <td data-bind="SEX" text-align="center" style="background: white; filter:brightness(0.98);"></td>
-                <td cell-type="radio" data-bind="SEX" text-align="center" data-source="host.getCommonCode('SEX')" key-name="code" value-name="codename"></td>
+                <td cell-type="radio" data-bind="SEX" text-align="center" data-source="provider.getCommonCode('SEX')" key-name="code" value-name="codename"></td>
 
                 <td data-bind="STATUS" text-align="center" style="background: white; filter:brightness(0.98);"></td>
-                <td cell-type="radio" data-bind="STATUS" text-align="center" data-source="host.getCommonCode('STATUS')" key-name="code" value-name="codename"></td>
+                <td cell-type="radio" data-bind="STATUS" text-align="center" data-source="provider.getCommonCode('STATUS')" key-name="code" value-name="codename"></td>
 
                 <td data-bind="DEPART" text-align="center" style="background: white; filter:brightness(0.98);"></td>
-                <td cell-type="radio" data-bind="DEPART" text-align="center" data-source="host.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+                <td cell-type="radio" data-bind="DEPART" text-align="center" data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
 
 
                 <td data-bind="DEPART1" text-align="center" style="background: white; filter:brightness(0.98);"></td>
@@ -89,11 +89,11 @@
                     </datalist>
                 </td>
 
-                <td cell-type="radio" data-bind="SEX" data-source="host.getCommonCode('SEX')"
+                <td cell-type="radio" data-bind="SEX" data-source="provider.getCommonCode('SEX')"
                     key-name="code" value-name="codename"
                     enable="data.STATUS === 'C' ? true : false"></td>
 
-                <td cell-type="radio" data-bind="SEX" data-source="host.getCommonCode('SEX')"
+                <td cell-type="radio" data-bind="SEX" data-source="provider.getCommonCode('SEX')"
                     key-name="code" value-name="codename"
                     visible="data.STATUS === 'C' ? true : false"></td>
             </tr>
@@ -109,11 +109,13 @@
 
     const grd = document.querySelector("nine-table");
 
-    grd.addEventListener("load", () => {
-        grd.getCommonCode = (group) => {
+    grd.addProvider({
+        getCommonCode: (group) => {
             return exampleData.generateCommonCode(group);
-        };
+        },
+    });
 
+    grd.addEventListener("load", () => {
         grd.loading = true;
         setTimeout( () => {
             grd.data.set(exampleData.generateRandomData(DATA_CNT));
