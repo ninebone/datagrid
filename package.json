@@ -1,6 +1,6 @@
 {
   "name": "@ninebone/table",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Blazing-fast virtualized HTML table for massive datasets with inline editing",
   "keywords": [
     "datagrid",
