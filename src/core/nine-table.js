@@ -70,12 +70,26 @@ export default class NineTable extends HTMLElement {
         }, 100);
     }
 
-
     // 🎯 공통 데이터 & API 접근자
     get shadow() { return this.#shadowRoot; }
     get dataManager() { return this.#dataManager; }
     get data() { return this.#dataManager.data; }
     get row() { return this.#dataManager.row; }
+
+
+    addProvider(methods) {
+        if (!methods || typeof methods !== 'object') return;
+
+        setTimeout(() => {
+            Object.entries(methods).forEach(([name, fn]) => {
+                if (typeof fn === 'function') {
+                    this[name] = fn;
+                }
+            });
+
+            this.rerenderer();
+        });
+    }
 
     setData(records) {
         this.#dataManager.data.set(records);

@@ -1,6 +1,6 @@
-import { useScreen, useState, useEffect, useRef } from 'react';
-
+import { useEffect, useRef } from 'react';
 import { exampleData } from '../_data/example-data.js';
+import "@ninebone/datagrid";
 
 const Renderer = () => {
 	const DATA_CNT = 100000;
@@ -14,19 +14,20 @@ const Renderer = () => {
 	};
 
 	useEffect(() => {
-		tableRef.current.renderBadge = (val) => {
-			if (val > 50) {
-				return `<span style="display: block; box-sizing: border-box; padding: 0 6px; background: #d1e7dd; color: #0f5132; border-radius: 4px;">High</span>`;
-			} else {
-				return `<span style="display: block; box-sizing: border-box; padding: 0 6px; background: #f8d7da; color: #842029; border-radius: 4px;">Low</span>`;
-			}
-		};
-
-		tableRef.current.formatDecimalNumber = (num, decimals = 2) => {
-			if (isNaN(num)) return 0;
-			const factor = Math.pow(10, decimals);
-			return Math.round(num * factor) / factor;
-		}
+		tableRef.current.addProvider?.({
+			renderBadge: (val) => {
+				if (val > 50) {
+					return `<span style="display: block; box-sizing: border-box; padding: 0 6px; background: #d1e7dd; color: #0f5132; border-radius: 4px;">High</span>`;
+				} else {
+					return `<span style="display: block; box-sizing: border-box; padding: 0 6px; background: #f8d7da; color: #842029; border-radius: 4px;">Low</span>`;
+				}
+			},
+			formatDecimalNumber: (num, decimals = 2) => {
+				if (isNaN(num)) return 0;
+				const factor = Math.pow(10, decimals);
+				return Math.round(num * factor) / factor;
+			},
+		});
 
 		selectList();
 	}, []);
@@ -84,8 +85,8 @@ const Renderer = () => {
 						<td data-expr="data.NAME + ' (' + data.AGE + ')'"></td>
 						<td data-expr="'[<b><font color=blue>' + data.AGE + '</font></b>] ' + data.NAME" html="true"></td>
 						<td data-expr="Math.round((data.REC1 + data.REC2 + data.REC3) / 3)"></td>
-						<td data-expr="host.formatDecimalNumber((data.REC1 + data.REC2 + data.REC3) / 3, 2)"></td>
-						<td data-expr="host.renderBadge(data.REC1)" html="true"></td>
+						<td data-expr="provider.formatDecimalNumber((data.REC1 + data.REC2 + data.REC3) / 3, 2)"></td>
+						<td data-expr="provider.renderBadge(data.REC1)" html="true"></td>
 						<td data-bind="REC1" color="data.REC1 < 50 ? 'red' : ''"></td>
 						<td data-bind="REC1" background-color="data.REC1 < 50 ? 'rgba(255,0,0,0.5)' : ''"></td>
 						<td data-bind="REC1" visible="data.REC1 < 50 ? true : false"></td>

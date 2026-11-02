@@ -33,13 +33,14 @@ export class ExprEngine {
             const trimmedExpr = String(expr).trim();
             const compiledExpr = this.rewriteExpr(trimmedExpr);
 
-            if (compiledExpr.includes("data.") || compiledExpr.includes("rowItem.v") || compiledExpr.includes("host.") || compiledExpr.includes("(")) {
+            if (compiledExpr.includes("provider.") || compiledExpr.includes("host.") || compiledExpr.includes("data.") || compiledExpr.includes("rowItem.v") || compiledExpr.includes("(")) {
 
                 let evalFn = this.#exprCache.get(compiledExpr);
 
                 if (!evalFn) {
                     evalFn = new Function('rowItem', 'row', 'host', `
                         const data = rowItem;
+                        const provider = host;
 
                         if (!data && !host) return "";
                         return ${compiledExpr};
@@ -57,7 +58,6 @@ export class ExprEngine {
             if (expr.includes("getCommonCode")) {
                 console.trace("ExprEngine evaluation error:", e);
             } */
-            //console.trace("ExprEngine evaluation error:", e);
             return expr;
         }
     }

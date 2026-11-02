@@ -1,8 +1,6 @@
-import { useScreen, useState, useEffect, useRef } from 'react';
-import { nine, trace } from '@ninebone/util'
-
-// 상대 경로 대신 별칭 사용
+import { useEffect, useRef } from 'react';
 import { exampleData } from '../_data/example-data.js';
+import "@ninebone/datagrid";
 
 const InputText = () => {
 	const DATA_CNT = 100000;
@@ -17,9 +15,11 @@ const InputText = () => {
 
 	useEffect(() => {
 
-		tableRef.current.checkName = (v) => {
-			return nine.getByteLength(v) > 15 ? false : true;
-		};
+		tableRef.current.addProvider({
+			checkName: (v) => {
+				return nine.getByteLength(v) > 15 ? false : true;
+			},
+		});
 
 		selectList();
 	}, []);
@@ -72,7 +72,7 @@ const InputText = () => {
 						<td data-bind="NAME" cell-type="input" max-byte="15"></td>
 						<td data-bind="NAME" cell-type="input" validator="!(nine.getByteLength(data.NAME) > 15)"></td>
 						<td data-bind="NAME" cell-type="input" validator="!data.NAME.includes('i')"></td>
-						<td data-bind="NAME" cell-type="input" validator="host.checkName(data.NAME)"></td>
+						<td data-bind="NAME" cell-type="input" validator="provider.checkName(data.NAME)"></td>
 						<td data-bind="NAME" cell-type="input" enable="data.REC1 < 50 ? true : false"></td>
 						<td data-bind="NAME" cell-type="input" visible="data.REC1 < 50"></td>
 					</tr>

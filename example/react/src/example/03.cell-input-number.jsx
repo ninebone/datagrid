@@ -1,6 +1,6 @@
-import { useScreen, useState, useEffect, useRef } from 'react';
-// 상대 경로 대신 별칭 사용
+import { useEffect, useRef } from 'react';
 import { exampleData } from '../_data/example-data.js';
+import "@ninebone/datagrid";
 
 const InputNumber = () => {
 	const DATA_CNT = 100000;
@@ -15,9 +15,11 @@ const InputNumber = () => {
 
 	useEffect(() => {
 
-		tableRef.current.checkNum = (n1,n2,n3) => {
-			return Number(n1) + Number(n2) + Number(n3) > 100 ? true : false;
-		};
+		tableRef.current.addProvider({
+			checkNum: (n1,n2,n3) => {
+				return Number(n1) + Number(n2) + Number(n3) > 100 ? true : false;
+			},
+		});
 
 		selectList();
 	}, []);
@@ -74,7 +76,7 @@ const InputNumber = () => {
 						<td data-bind="REC3" cell-type="input-number" text-align="right" scale="2"></td>
 						<td data-bind="REC1" cell-type="input-number" validator="data.REC1 < 50 ? true : false"></td>
 						<td data-bind="REC2" cell-type="input-number" validator="data.REC2 < 50 ? true : false"></td>
-						<td data-bind="REC3" cell-type="input-number" validator="host.checkNum(data.REC1,data.REC2,data.REC3)"></td>
+						<td data-bind="REC3" cell-type="input-number" validator="provider.checkNum(data.REC1,data.REC2,data.REC3)"></td>
 						<td data-bind="REC1" cell-type="input-number" enable="data.REC1 < 50 ? true : false"></td>
 						<td data-bind="REC2" cell-type="input-number" visible="data.REC2 < 50"></td>
 					</tr>

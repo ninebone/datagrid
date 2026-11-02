@@ -55,7 +55,6 @@ class CellRadio extends EditableCellElement {
 		if (!dataSource) return;
 
 		this.#dataSource = super.getExprValue(dataSource, this.tr.data, this.tr.dataset.row);
-		trace.log(this.host?.getCommonCode);
 
 		this.#target.replaceChildren();
 
