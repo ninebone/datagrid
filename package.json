@@ -40,7 +40,6 @@
     "build:css": "node scripts/bundle-css.js",
     "build": "vite build && npm run build:css",
     "watch": "vite build --watch",
-    "prepublishOnly": "npm run build",
     "release": "npm version patch && npm publish --access public"
   },
   "peerDependencies": {
