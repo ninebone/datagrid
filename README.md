@@ -1,4 +1,4 @@
-# Ninelab HTML Table (`@ninelab/table`)
+# Ninelab HTML Table (`@ninebone/datagrid`)
 
 > **Blazing-fast performance powered by native HTML tags** — A next-generation table extension supporting 1,000,000+ rows virtual rendering and seamless inline editing out of the box.
 
@@ -42,7 +42,7 @@ npm install @ninebone/datagrid
 
 <html>
 <head>
-    <script type="text/javascript" src="[https://cdn.jsdelivr.net/npm/@ninebone/table@latest/dist/nine-table.umd.js](https://cdn.jsdelivr.net/npm/@ninebone/table@latest/dist/nine-table.umd.js)"></script>
+    <script type="text/javascript" src="[https://cdn.jsdelivr.net/npm/@ninebone/datagrid@latest/dist/nine-table.umd.js](https://cdn.jsdelivr.net/npm/@ninebone/table@latest/dist/nine-table.umd.js)"></script>
 </head>
 <body>
 

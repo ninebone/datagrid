@@ -79,7 +79,7 @@ export class LayoutManager {
         trace.log("Welcome nine-table", __APP_VERSION__);
 
         const cssImports = [
-            `@import "https://cdn.jsdelivr.net/npm/@ninebone/table@${__APP_VERSION__}/dist/css/nine-table.css";`,
+            `@import "https://cdn.jsdelivr.net/npm/@ninebone/datagrid@${__APP_VERSION__}/dist/css/nine-table.css";`,
         ];
 
         if (nine["nine-table"] && nine["nine-table"].cssFile) {

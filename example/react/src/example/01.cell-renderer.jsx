@@ -1,7 +1,5 @@
 import { useScreen, useState, useEffect, useRef } from 'react';
-import { nine, trace } from '@ninebone/util'
-import { NINE_TABLE } from '@ninebone/table'
-// 상대 경로 대신 별칭 사용
+
 import { exampleData } from '../_data/example-data.js';
 
 const Renderer = () => {
