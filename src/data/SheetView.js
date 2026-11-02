@@ -5,11 +5,11 @@ import {Grouping} from "@/data/Grouping.js";
 export class SheetView {
 	#sheet;
 	#host;
-	#sortingColumns = []; // 정렬 규칙 [{ colname, asc, expr-func }]
-	#filterRules = [];    // 필터 규칙
-	#viewIndexes = [];    // 필터링 및 소팅이 반영된 유효 데이터 인덱스 버퍼
+	#sortingColumns = [];
+	#filterRules = [];
+	#viewIndexes = [];
 
-	#cachedVisibleRecords = null; // 💡 [추가] 캐싱된 유효 레코드 배열
+	#cachedVisibleRecords = null;
 
 	constructor(sheet) {
 		this.#sheet = sheet;
@@ -18,11 +18,8 @@ export class SheetView {
 		this.refresh();
 	}
 
-	/**
-	 * 🎯 [시트 뷰 전용 배열 조회] - 캐시 적용으로 성능 대폭 개선
-	 */
 	getArray = (at, colnm) => {
-		// 💡 캐시가 없거나 비어있을 때만 가져옴 (보통 refresh에서 갱신됨)
+
 		if (!this.#cachedVisibleRecords) {
 			const records = this.#host.data.getArray();
 			this.#cachedVisibleRecords = this.#viewIndexes.map(idx => records[idx]);
@@ -47,7 +44,6 @@ export class SheetView {
 	};
 
 	count = () => {
-		// 💡 캐시가 없거나 비어있을 때만 가져옴 (보통 refresh에서 갱신됨)
 		if (!this.#cachedVisibleRecords) {
 			const records = this.#host.data.getArray();
 			this.#cachedVisibleRecords = this.#viewIndexes.map(idx => records[idx]);
@@ -88,15 +84,10 @@ export class SheetView {
 		return t;
 	};
 
-	/**
-	 * 🎯 유효 데이터 또는 정렬/필터 변경 시에만 실행되는 뷰 버퍼 재계산
-	 */
-		// SheetView.refresh() 내부 예시
 	refresh = () => {
 
 		this.#cachedVisibleRecords = null;
 
-		// 1. 필터 적용
 		const rawRecords = this.#host.data.getArray();
 		let indices = [];
 		rawRecords.forEach((record, i) => {
@@ -106,7 +97,6 @@ export class SheetView {
 			indices.push(i);
 		});
 
-		// 2. 정렬 적용
 		if (this.#sortingColumns.length > 0) {
 			indices = this.#applySorting(indices, rawRecords);
 		}
@@ -114,17 +104,11 @@ export class SheetView {
 		this.#viewIndexes = indices;
 		const validRecords = indices.map(idx => rawRecords[idx]);
 
-		//trace.log(this.#sheet.sourceTable);
-		//const isGrouped = this.#sheet.sourceTable?.querySelector("tbody tr[grouping='true']") ? true : false;
-		//trace.log("#######", isGrouped, this.#sheet.grouping?.columns);
 		const groupColumns = this.#sheet.grouping?.columns || [];
 		if (groupColumns.length > 0) {
-			//this.#sheet.grouping.apply();
 			const groupResult = Grouping.apply(validRecords, groupColumns, this.#host.data.getHostFields());
-			//const groupResult = Grouping.apply(validRecords);
-			this.#cachedVisibleRecords = groupResult.renderItems; // 최종 렌더링 아이템
 
-			//trace.log("2.============================", groupColumns, this.#cachedVisibleRecords);
+			this.#cachedVisibleRecords = groupResult.renderItems; // 최종 렌더링 아이템
 
 			this.#sheet.grouping.setGroupMap(groupResult.groupMap); // 자식 매핑 공유
 		} else {
@@ -151,7 +135,6 @@ export class SheetView {
 
 
 	#applySorting = (indices, validRecords) => {
-		trace.log(new Date());
 
 		const fields = typeof this.#host.data.getHostFields === 'function' ? this.#host.data.getHostFields() : [];
 
@@ -169,12 +152,10 @@ export class SheetView {
 				const expr = rule.expr; // 💡 등록된 expr 수식
 				let valA, valB;
 
-				// 💡 1. expr 수식이 존재하면 ExprEngine으로 연산된 결과값을 가져옴
 				if (expr) {
 					valA = this.#host.exprEngine.evaluate(expr, a, idxA);
 					valB = this.#host.exprEngine.evaluate(expr, b, idxB);
 				} else {
-					// 2. 일반 바인딩 필드인 경우 원시 배열에서 추출
 					if (rule.colIndex >= 0 && a.v && b.v) {
 						valA = a.v[rule.colIndex];
 						valB = b.v[rule.colIndex];
@@ -207,7 +188,5 @@ export class SheetView {
 
 			return idxA - idxB;
 		});
-
-		trace.log(new Date());
 	};
 }

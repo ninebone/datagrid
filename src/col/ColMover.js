@@ -1,6 +1,5 @@
 // ui/col/ColMover.js
 import { trace } from "@nopeer";
-import { TableCompiler } from "@/layout/core/TableCompiler.js";
 
 export class ColMover {
     #sheet;
@@ -455,8 +454,6 @@ export class ColMover {
 
     moveColumn(fromColIndex, toColIndex) {
 
-        trace.log(this.#sheet.sourceTable.cloneNode(true));
-
         const colgroup = this.#sheet.sourceTable.querySelector('colgroup');
         const targetCol = colgroup.querySelector(`col[data-col="${toColIndex}"]`);
 
@@ -477,7 +474,6 @@ export class ColMover {
             }
         });
 
-        // 2. 테이블 행(tr) 내부의 셀(th, td) 순서 동기화
         ['thead', 'tbody', 'tfoot'].forEach(group => {
             this.#sheet.sourceTable.querySelectorAll(`${group} tr`).forEach(tr => {
                 const cells = Array.from(tr.children);

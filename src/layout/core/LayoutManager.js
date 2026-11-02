@@ -68,16 +68,6 @@ export class LayoutManager {
             return sheetTag + splitterTag;
         }).join('');
 
-        // 1. 공통 파일명 배열 정의
-
-
-        const cssFiles = [
-            'layout', 'nine-table-sheet', 'nine-table-vscrollbar', 'nine-table-hscrollbar', 'table', 'col-resize', 'sorting', 'fitering', 'col-expand',
-            'host', 'cell-combo', 'cell-selection'
-        ];
-
-        trace.log("Welcome nine-table", __APP_VERSION__);
-
         const cssImports = [
             `@import "https://cdn.jsdelivr.net/npm/@ninebone/datagrid@${__APP_VERSION__}/dist/css/nine-table.css";`,
         ];
@@ -107,10 +97,6 @@ export class LayoutManager {
             <nine-table-footer></nine-table-footer>
         `;
 
-        /**
-         * <div class="nine-tab-bar">${tabsHtml}</div>
-         *                         <div class="sheets-counter">Total : <span id="row-count">0</span></div>
-         */
         this.#host.shadowRoot.querySelectorAll('nine-table-sheet').forEach(($el, idx) => {
 
             if (rawTables[idx]) {

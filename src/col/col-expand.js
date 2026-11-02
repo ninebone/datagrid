@@ -1,5 +1,5 @@
 // ui/col/col-expand.js
-import { TableCompiler, COLLAPSED_WIDTH } from "@/layout/core/TableCompiler.js";
+import { COLLAPSED_WIDTH } from "@/layout/core/TableCompiler.js";
 
 export class ColExpand extends HTMLElement {
     #sheet;
@@ -45,9 +45,6 @@ export class ColExpand extends HTMLElement {
         }
     };
 
-    /**
-     * 🎯 원래 너비(dataset.expandWidth)로 복구
-     */
     expand = () => {
         if (!this.#sheet?.colResizer || !this.#cell) return;
         const colIndex = parseInt(this.#cell.dataset.col, 10);
@@ -94,7 +91,6 @@ export class ColExpand extends HTMLElement {
         this.#cell.setAttribute('collapsed', 'true');
         this.#cell.style.color = 'transparent';
 
-        // 🎯 colSpan이 1이면 16px(COLLAPSED_WIDTH)을 그대로 적용, 2 이상이면 균등 분할
         if (colSpan === 1) {
             this.#sheet.colResizer.setColumnWidth(colIndex, COLLAPSED_WIDTH);
         } else {

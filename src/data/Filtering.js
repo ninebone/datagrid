@@ -1,9 +1,6 @@
 import { NINE_TABLE } from '@/core/constants.js';
 import { trace } from "@nopeer";
 
-/**
- * 🎯 [필터 패널 커스텀 엘리먼트 Light DOM 버전]
- */
 export class NineTableFilterPanel extends HTMLElement {
 	#sheet;
 	#host;
@@ -139,13 +136,11 @@ export class NineTableFilterPanel extends HTMLElement {
 			const fieldIdx = bindKey ? fields.indexOf(bindKey) : -1;
 			const activeSelectedVals = activeFilters[filterKey] || [];
 
-			// 1. Map을 이용한 O(N) 고속 유니크 추출 (DATA는 bind/원시값, DATA2는 expr 연산 결과)
 			const uniqueMap = new Map();
 			for (let i = 0; i < filteredRecords.length; i++) {
 				const record = filteredRecords[i];
 				if (!record) continue;
 
-				// DATA 기준이 될 원시 값 (bind가 있으면 필드 인덱스에서, 없으면 expr 결과)
 				let rawVal = undefined;
 				if (fieldIdx >= 0 && record.v) {
 					rawVal = record.v[fieldIdx];
@@ -155,7 +150,6 @@ export class NineTableFilterPanel extends HTMLElement {
 					rawVal = exprEngine.evaluate(exprKey, record, i);
 				}
 
-				// DATA2에 출력될 화면 표시 값 (expr 수식 연산 결과, 없으면 rawVal)
 				let displayVal = rawVal;
 				if (exprKey && exprEngine) {
 					displayVal = exprEngine.evaluate(exprKey, record, i);
@@ -171,13 +165,10 @@ export class NineTableFilterPanel extends HTMLElement {
 
 			const uniqueList = [...uniqueMap.values()];
 
-			// 2. 출력값(v2) 기준 정렬
-			// 2. 출력값(v2) 기준 정렬 (숫자와 문자열 분기 처리)
 			uniqueList.sort((a, b) => {
 				const valA = a.v2;
 				const valB = b.v2;
 
-				// 빈 값이나 null 처리를 위한 안전 장치
 				if (valA === valB) return 0;
 				if (valA === undefined || valA === null || valA === '') return 1;
 				if (valB === undefined || valB === null || valB === '') return -1;
@@ -185,7 +176,6 @@ export class NineTableFilterPanel extends HTMLElement {
 				const numA = Number(valA);
 				const numB = Number(valB);
 
-				// 둘 다 유효한 숫자일 경우 숫자 크기 비교
 				const isNumA = !isNaN(numA);
 				const isNumB = !isNaN(numB);
 
@@ -193,7 +183,6 @@ export class NineTableFilterPanel extends HTMLElement {
 					return numA - numB;
 				}
 
-				// 그 외의 경우는 문자열(localeCompare) 비교
 				return String(valA).localeCompare(String(valB));
 			});
 			activeSelectedVals.sort((a, b) => { return a > b ? 1 : -1; });
@@ -201,7 +190,7 @@ export class NineTableFilterPanel extends HTMLElement {
 			return uniqueList.map(o => ({
 				LVL: 2,
 				DATA: o.v,  // 필터링 비교용 값
-				DATA2: (o.v2 === "" || o.v2 === null || o.v2 === undefined) ? '<span class="empty-value">(empty)</span>' : o.v2, // 화면 출력용 값
+				DATA2: (o.v2 === "" || o.v2 === null || o.v2 === undefined) ? '<span class="empty-value">(empty)</span>' : o.v2,
 				COLNM: filterKey,
 				CHK: activeSelectedVals.length === 0 || activeSelectedVals.nineBinarySearch(o.v) >= 0 ? "Y" : "N"
 			}));
@@ -281,13 +270,10 @@ export class NineTableFilterPanel extends HTMLElement {
 				const val = data2Idx >= 0 && record.v ? record.v[data2Idx] : "";
 				const textVal = String(val).replace(/<[^>]*>?/gm, '').toLowerCase();
 
-				// 💡 expr 연산 결과가 담긴 DATA2 텍스트와 검색어 비교
 				if (textVal.includes(query)) {
 					matchedValues.push(val);
 				}
 			});
-
-			trace.log(matchedValues);
 
 			this.#view.filtering.set({
 				DATA2: [...new Set(matchedValues)]
@@ -367,7 +353,6 @@ export class NineTableFilterButton extends HTMLElement {
 	};
 
 	#onClick = (e) => {
-		trace.log(e);
 
 		e.preventDefault();
 		e.stopPropagation();
@@ -375,8 +360,6 @@ export class NineTableFilterButton extends HTMLElement {
 		const panel = this.#sheet.querySelector("nine-table-filter-panel");
 		const cell = this.closest("th, td");
 		const col = cell.dataset.col;
-
-		//trace.log(panel, cell, col, panel.currentCol, panel.classList.contains('active'));
 
 		if (panel && panel.currentCol === col && panel.classList.contains('active')) {
 			panel.close();
@@ -437,13 +420,9 @@ export class Filtering {
 		this.#sheet.querySelectorAll("nine-table-filter-button").forEach(btn => {
 			btn.updateFilteredState();
 		});
-
-		trace.log(`🔄 [NineTableFiltering] Filter cleared for ${colnm || 'all'}`);
 	}
 
 	set = (oFilter) => {
-
-		trace.log(oFilter);
 
 		let jsonFilter = Array.isArray(oFilter)
 			? Object.fromEntries(Object.keys(oFilter[0]).map(k => [k, [...new Set(oFilter.map(item => item[k]))]]))
@@ -475,7 +454,6 @@ export class Filtering {
 			return;
 		}
 
-		// 💡 필터 규칙 빌드 (targetKey가 bind인지 expr 수식인지 판별)
 		const filterRules = Object.entries(this.#filters).map(([targetKey, allowedValues]) => {
 			const isExpr = targetKey.includes("data.") || targetKey.includes("host.") || targetKey.includes("rowItem.v");
 			return {

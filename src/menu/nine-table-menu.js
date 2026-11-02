@@ -1,5 +1,3 @@
-// ui/menu/nine-table-menu.js (수정본)
-
 import { trace } from "@nopeer";
 import { ColFixManager } from "@/col/ColFixManager.js";
 
@@ -16,8 +14,6 @@ export class ContextMenu extends HTMLElement {
         }
 
         if (!this.#tableHost) return;
-
-        //this.#tableHost.addEventListener('contextmenu', this.#onContextMenu);
     }
 
     #onContextMenu = (e) => {
@@ -34,9 +30,6 @@ export class ContextMenu extends HTMLElement {
         this.openMenu(e.clientX, e.clientY, targetCell, targetTable);
     };
 
-    /**
-     * 🎯 우클릭이 발생한 대상 시트(NineTableSheet) 구하기
-     */
     #getTargetSheet(targetCell) {
         return targetCell?.closest('nine-table-sheet') || this.#tableHost.activeSheet || this.#tableHost;
     }
@@ -207,17 +200,12 @@ export class ContextMenu extends HTMLElement {
         const targetSheet = this.#getTargetSheet(targetCell);
         this.#syncMenuStates(targetSheet);
 
-        // 🎯 targetCell을 3번째 인자로 전달하여 셀 우측선 정렬
         this.#panel.openAt(x, y);
     }
 
-    /**
-     * 🎯 메뉴 항목 활성화 체크 표시(✓) 동기화
-     */
     #syncMenuStates(targetSheet) {
         if (!this.#panel || !targetSheet) return;
 
-        // 🎯 클릭된 개별 시트의 filtering 상태 검사
         const isFiltering = targetSheet.filtering?.isFiltering?.() || false;
         this.#panel.toggleItemState('filtering', 'on', isFiltering);
 
@@ -239,8 +227,6 @@ export class ContextMenu extends HTMLElement {
         this.dispatchEvent(customEvent);
 
         const baseCol = parseInt(targetCell.dataset.col, 10);
-
-        // 🎯 클릭된 셀의 소속 시트 인스턴스 타겟팅
         const targetSheet = this.#getTargetSheet(targetCell);
 
         switch (menuId) {

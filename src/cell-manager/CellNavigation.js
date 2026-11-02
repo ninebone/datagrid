@@ -12,7 +12,6 @@ export class CellNavigation {
 		this.#host = sheet.getRootNode().host;
 
 		this.#initEvents();
-		trace.log("🎯 [CellNavigation] Initialized (Diagnostic Logging Restored)");
 	}
 
 	get currentCell() {
@@ -26,9 +25,8 @@ export class CellNavigation {
 		cell.focus({ preventScroll: true });
 
 		this.#currentTr = cell.closest("tr");
-		const matrixRow = parseInt(this.#currentTr.dataset.matrixRow, 10);//this.#getMatrixRowFromTr(this.#currentTr);
+		const matrixRow = parseInt(this.#currentTr.dataset.matrixRow, 10);
 
-		//trace.log(`📌 [setCurCell] Active set -> dataRow: ${cell.dataset.index}, subrow: ${cell.closest('tr')?.dataset.subrow}, matrixRow: ${matrixRow}, col: ${cell.dataset.col}`);
 		this.#sheet.selection.setFocus(matrixRow, this.#currentCell.dataset.col);
 	}
 
@@ -159,7 +157,6 @@ export class CellNavigation {
 		}
 
 		if (!this.#currentCell || !this.#currentTr) {
-			trace.log("⚠️ [moveCell] currentCell or currentTr is missing!");
 			return;
 		}
 

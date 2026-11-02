@@ -2,14 +2,14 @@
 
 export class MenuPanel extends HTMLElement {
     #onCallback;
-    #closeHandler = null; // 🎯 이벤트 누수 방지용 리스너 참조
+    #closeHandler = null;
 
     constructor() {
         super();
     }
 
     connectedCallback() {
-        // 🎯 [보정 1] 패널 자체의 기본 레이아웃 스타일은 element style로 직접 지정
+
         this.style.position = 'fixed';
         this.style.display = 'none';
         this.style.zIndex = '99999';
@@ -32,15 +32,11 @@ export class MenuPanel extends HTMLElement {
         this.#bindClickEvents();
     }
 
-    /**
-     * 🎯 패널의 우측선과 targetCell의 우측선을 일치시키는 포지셔닝
-     */
     openAt(x, y, targetCell = null) {
         this.style.display = 'block';
 
         if (targetCell) {
             const cellRect = targetCell.getBoundingClientRect();
-            // 셀의 오른쪽 경계선 좌표
             const cellRightX = cellRect.right;
 
             requestAnimationFrame(() => {
@@ -48,15 +44,12 @@ export class MenuPanel extends HTMLElement {
                 if (!wrapper) return;
                 const panelWidth = wrapper.getBoundingClientRect().width;
 
-                // 패널 우측선을 셀 우측선에 맞춤 (Left = cellRight - panelWidth)
                 let calculatedLeft = cellRightX - panelWidth;
 
-                // 뷰포트 왼쪽 밖으로 벗어나는 예외 처리
                 if (calculatedLeft < 0) {
-                    calculatedLeft = cellRect.left; // 공간이 부족하면 셀 좌측선에 맞춤
+                    calculatedLeft = cellRect.left;
                 }
 
-                // 뷰포트 아래쪽 벗어남 처리
                 const panelHeight = wrapper.getBoundingClientRect().height;
                 let calculatedTop = y;
                 if (y + panelHeight > window.innerHeight) {
@@ -67,7 +60,6 @@ export class MenuPanel extends HTMLElement {
                 this.style.top = `${calculatedTop}px`;
             });
         } else {
-            // 기본 마우스 클릭 좌표 기반 (Fallback)
             this.style.left = `${x}px`;
             this.style.top = `${y}px`;
 
@@ -85,7 +77,6 @@ export class MenuPanel extends HTMLElement {
             });
         }
 
-        // 바깥 클릭 핸들러 등록
         if (this.#closeHandler) {
             window.removeEventListener('pointerdown', this.#closeHandler);
         }

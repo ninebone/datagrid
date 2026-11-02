@@ -185,12 +185,8 @@ export class CellElement extends BasicCellElement {
 					return this.getGroupExprValue(expr, this.#tr.data, row, this.#cell);
 				} else {
 					return this.#host.exprEngine.evaluate(expr, this.#tr.data, row);
-
-					//return this.getExprValue(expr, this.#tr.data, row, this.#cell);
 				}
 			} catch (e) {
-				//console.trace(e);
-				//console.error("Expr evaluation error:", expr, e);
 				return defaultValue;
 			}
 		}

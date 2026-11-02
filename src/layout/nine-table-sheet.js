@@ -1,5 +1,3 @@
-// NineTableSheet.js (필터 버튼 레이아웃 및 패딩 스타일 완벽 통합본)
-
 import { trace } from "@nopeer";
 import './nine-table-hscrollbar.js';
 import './nine-table-vscrollbar.js';
@@ -13,7 +11,7 @@ import { ColMover } from "@/col/ColMover.js";
 import { ColFixManager } from "@/col/ColFixManager.js";
 
 import { Filtering } from "@/data/Filtering.js";
-import {Grouping, GroupingManager} from "@/data/Grouping.js";
+import { GroupingManager } from "@/data/Grouping.js";
 import { Sorting } from "@/data/Sorting.js";
 import { SheetView } from "@/data/SheetView.js";
 
@@ -118,7 +116,6 @@ export class NineTableSheet extends HTMLElement {
     refreshLayout() {
 
         requestAnimationFrame(() => {
-            trace.log("*************************", this.classList, this.#source.table);
 
             if (!this.classList.contains('active') || !this.#source.table) return;
 
@@ -139,13 +136,9 @@ export class NineTableSheet extends HTMLElement {
     }
 
     #adjustOverlay = () => {
-        // 3분할된 영역 중 중앙(body) 또는 좌측 영역의 thead를 타겟팅하여 높이 측정
         const $thead = this.querySelector('.ng-container-body thead');
         const $overlay = this.querySelector('.nodata-overlay');
         $overlay.style.top = `${$thead.offsetHeight}px`;
-
-        trace.log("***************************************", $thead);
-        trace.log($thead.offsetHeight);
     }
 
     get view() {
@@ -173,12 +166,10 @@ export class NineTableSheet extends HTMLElement {
     };
 
     #autoFit = (enable = true) => {
-        trace.log("***************** autoFit", this);
 
         const container = this.querySelector('.ng-sheet-body .ng-container-body');
         if (!container) return;
 
-        //const tables = container.querySelectorAll('table');
         const firstColgroup = this.querySelector('.ng-container-body table colgroup');
         if (!firstColgroup) return;
 
@@ -190,7 +181,6 @@ export class NineTableSheet extends HTMLElement {
             let totalOriginalWidth = 0;
             const colList = [];
 
-            // 1단계: 접힌 컬럼(16px 고정)과 일반 컬럼을 분리해서 수집
             firstColgroup.querySelectorAll('col').forEach(col => {
                 const globalColIndex = col.getAttribute('data-col');
                 const headerCell = this.querySelector(`thead th[data-col="${globalColIndex}"]`);
@@ -198,25 +188,18 @@ export class NineTableSheet extends HTMLElement {
 
                 if (isCollapsed) {
                     colList.unshift({ globalColIndex, width: 16, isCollapsed: true });
-                    trace.log(`[AutoFit Col] Index ${globalColIndex}: COLLAPSED (forced 16px)`);
                 } else {
                     const w = parseInt(col.getAttribute('width'), 10) || 100;
                     colList.push({ globalColIndex, width: w, isCollapsed: false });
                     totalOriginalWidth += w;
-                    trace.log(`[AutoFit Col] Index ${globalColIndex}: NORMAL (original width: ${w}px)`);
                 }
             });
 
-            trace.log(`[AutoFit] Total Original Width of Normal Cols: ${totalOriginalWidth}px`);
-
-            // 접힌 컬럼들이 차지하는 총 너비 계산
             const collapsedTotalWidth = colList
                 .filter(c => c.isCollapsed)
                 .reduce((sum, c) => sum + c.width, 0);
 
-            // 남은 컨테이너 너비를 펼쳐진 컬럼들에게만 배분 (오류 수정)
             const availableWidth = Math.max(0, containerWidth - collapsedTotalWidth);
-            trace.log(`[AutoFit] Collapsed Total Width: ${collapsedTotalWidth}px | Available Width for Normal Cols: ${availableWidth}px`);
 
             if (totalOriginalWidth > 0 && colList.length > 0) {
                 let allocatedTotal = 0;
@@ -226,7 +209,6 @@ export class NineTableSheet extends HTMLElement {
                         return { globalColIndex: item.globalColIndex, remainder: 0, width: 16 };
                     }
 
-                    // 연산자 오류 수정 (* 와 - 추가)
                     const exactWidth = (item.width * availableWidth) / totalOriginalWidth;
                     const baseWidth = Math.max(30, Math.floor(exactWidth));
                     allocatedTotal += baseWidth;
@@ -237,9 +219,7 @@ export class NineTableSheet extends HTMLElement {
                     };
                 });
 
-                // 잔여 픽셀 보정 (오류 수정)
                 let remainderPixels = availableWidth - allocatedTotal;
-                trace.log(`[AutoFit] Initial Allocated Total: ${allocatedTotal}px | Remainder Pixels to distribute: ${remainderPixels}`);
 
                 const uncollapsedCols = calculatedCols.filter(c => !colList.find(item => item.globalColIndex === c.globalColIndex)?.isCollapsed);
 
@@ -256,18 +236,7 @@ export class NineTableSheet extends HTMLElement {
                     }
                 }
 
-                const finalSumWidth = calculatedCols.reduce((sum, c) => sum + c.width, 0);
-                trace.log(`[AutoFit Verification] Target Container Width: ${containerWidth}px | Sum of All Calculated Cols: ${finalSumWidth}px`);
-
-                if (containerWidth !== finalSumWidth) {
-                    trace.log(`⚠️ [AutoFit Mismatch Warning!] 오차 발생: ${containerWidth - finalSumWidth}px 차이가 납니다.`);
-                } else {
-                    trace.log(`✅ [AutoFit Success] 완벽하게 일치합니다!`);
-                }
-
-                // 최종 적용
                 calculatedCols.forEach(({ globalColIndex, width }) => {
-                    trace.log(`[AutoFit Apply] Col Index ${globalColIndex} -> ${width}px`);
                     this.#colResizer?.setColumnWidth(globalColIndex, width, 'body');
                 });
             }
@@ -295,17 +264,12 @@ export class NineTableSheet extends HTMLElement {
             }
         };
 
-
-        //trace.log("---------", this, this.sourceTable.cloneNode(true));
         this.#renderSplitContainers();
-        //trace.log("---------", this, this.sourceTable.cloneNode(true));
 
         this.#updateContainerWidths();
-        //trace.log("---------", this, this.sourceTable.cloneNode(true));
 
         this.#syncHeaderAndFooterHeights();
-        //trace.log("---------", this, this.sourceTable.cloneNode(true));
-        //
+
         this.#initRowHoverEvent();
 
         ['left', 'body', 'right'].forEach(type => {
@@ -321,9 +285,6 @@ export class NineTableSheet extends HTMLElement {
             };
         });
 
-        //trace.log("---------", this, this.sourceTable.cloneNode(true));
-        //trace.log("********1", this.#source.table)
-
         this.#rowManager.initialize();
 
         if (this.isAutoFitCol) {
@@ -332,7 +293,6 @@ export class NineTableSheet extends HTMLElement {
             this.querySelector('nine-table-hscrollbar').refresh();
         }
 
-        //this.#grouping = new GroupingManager(this);
         this.#grouping.initialize();
 
         this.loaded = true;
@@ -340,7 +300,6 @@ export class NineTableSheet extends HTMLElement {
 
 
     #updateContainerWidths = () => {
-        const isAutoFit = this.isAutoFitCol;
 
         ['left', 'right', 'body'].forEach(type => {
             const containers = this.querySelectorAll(`.ng-container-${type}`);
@@ -359,19 +318,11 @@ export class NineTableSheet extends HTMLElement {
                 const tables = container.querySelectorAll('table');
                 if (type === 'body') {
                     container.style.flex = `1`;
-                    tables.forEach(tbl => {
-                        //tbl.style.width = isAutoFit ? `100%` : `${width}px`;
-                        //tbl.style.minWidth = isAutoFit ? `100%` : `${width}px`;
-                    });
                 } else {
                     container.style.flex = `0 0 ${width}px`;
                     container.style.width = `${width}px`;
                     container.style.minWidth = `${width}px`;
                     container.style.maxWidth = `${width}px`;
-                    tables.forEach(tbl => {
-                        //tbl.style.width = `${width}px`;
-                        //tbl.style.minWidth = `${width}px`;
-                    });
                 }
             });
         });
@@ -414,17 +365,6 @@ export class NineTableSheet extends HTMLElement {
         return this.#rowManager.getRowHeight();
     };
 
-    /**
-     * this.#elements = {
-     *             mainBody: this.querySelector('.ng-sheet-body .ng-container-body'),
-     *             hscrollbar: this.querySelector('nine-table-hscrollbar'),
-     *             vscrollbar: this.querySelector('nine-table-vscrollbar'),
-     *             content: this.querySelector('.ng-sheet-body .ng-sheet-body-content'),
-     *             scrollHolder: this.querySelector('.ng-sheet-body .ng-virtual-height-holder'),
-     *         }
-     * @returns {*}
-     */
-
     getViewHeight = () => {
 
         const viewHeight = this.#elements.content.offsetHeight || 0;
@@ -438,7 +378,6 @@ export class NineTableSheet extends HTMLElement {
 
     isLastRow = () => {
 
-        // 1. 시트(뷰포트) 엘리먼트와 마지막 tr 찾기
         const sheet = this.querySelector('.ng-sheet-body');
         const tbody = this.querySelector(".ng-container-body tbody.body");
 
@@ -447,9 +386,6 @@ export class NineTableSheet extends HTMLElement {
         const sheetBottom = sheet.getBoundingClientRect().bottom;
         const tbodyBottom = tbody.getBoundingClientRect().bottom;
 
-        trace.log(sheetBottom, tbodyBottom, offsetHeight);
-
-        // 💡 tbody의 하단이 sheet의 하단보다 위에 있는지(안 보이는지/덜 채워졌는지) 확인
         return (sheetBottom - offsetHeight) >= tbodyBottom;
     };
 
@@ -502,29 +438,15 @@ export class NineTableSheet extends HTMLElement {
 
             <div class="nodata-overlay">Data Not Found</div>
 
-            <!-- [Grid Row 1, Col 2] 세로 스크롤바 -->
             <nine-table-vscrollbar></nine-table-vscrollbar>
-
-            <!-- [Grid Row 2, Col 1] 가로 스크롤바 -->
             <nine-table-hscrollbar></nine-table-hscrollbar>
-
-            <!-- [Grid Row 2, Col 2] 우하단 엣지 -->
             <div class="scroll-edge"></div>
             
-            <!-- 리사이저 및 드래그 패널들 -->
             <nine-table-col-resizer-panel></nine-table-col-resizer-panel>
-            <!--
-            <div class="ng-col-resizer-panel">
-                <div class="resizer-overlay">
-                    <span class="size-badge">0px</span>
-                </div>
-            </div> ->
             
             <div class="ng-col-mover-grip"></div>
             <div class="ng-col-mover-indi"></div>
         `;
-
-        //let fixedHeight = this.#sheet.querySelector('.ng-container-body thead').offsetHeight + this.#sheet.querySelector('.ng-container-body tfoot').offsetHeight;
 
         this.#elements = {
             mainBody: this.querySelector('.ng-sheet-body .ng-container-body'),
@@ -533,44 +455,33 @@ export class NineTableSheet extends HTMLElement {
             content: this.querySelector('.ng-sheet-body .ng-sheet-body-content'),
             scrollHolder: this.querySelector('.ng-sheet-body .ng-virtual-height-holder'),
         }
-        trace.log("444*****************");
     };
 
     #syncHeaderAndFooterHeights = () => {
-        trace.log("**********************", "#syncHeaderAndFooterHeights");
 
-        //requestAnimationFrame(() => {
-        //    requestAnimationFrame(() => {
-                const leftTable = this.querySelector('.ng-container-left table');
-                const bodyTable = this.querySelector('.ng-container-body table');
-                const rightTable = this.querySelector('.ng-container-right table');
+        const leftTable = this.querySelector('.ng-container-left table');
+        const bodyTable = this.querySelector('.ng-container-body table');
+        const rightTable = this.querySelector('.ng-container-right table');
 
-                // 1. 헤더(thead) 행 높이 싱크 (인덱스 행 제외)
-                const leftHeaderRows = Array.from(leftTable.querySelectorAll('thead tr:not(.col-indicator-rowgroup)'));
-                const bodyHeaderRows = Array.from(bodyTable.querySelectorAll('thead tr:not(.col-indicator-rowgroup)'));
-                const rightHeaderRows = Array.from(rightTable.querySelectorAll('thead tr:not(.col-indicator-rowgroup)'));
+        const leftHeaderRows = Array.from(leftTable.querySelectorAll('thead tr:not(.col-indicator-rowgroup)'));
+        const bodyHeaderRows = Array.from(bodyTable.querySelectorAll('thead tr:not(.col-indicator-rowgroup)'));
+        const rightHeaderRows = Array.from(rightTable.querySelectorAll('thead tr:not(.col-indicator-rowgroup)'));
 
-                this.#applyMaxHeights(leftHeaderRows, bodyHeaderRows, rightHeaderRows);
+        this.#applyMaxHeights(leftHeaderRows, bodyHeaderRows, rightHeaderRows);
 
-                // 2. 푸터(tfoot) 행 높이 싱크
-                const leftFooterRows = Array.from(leftTable.querySelectorAll('tfoot tr'));
-                const bodyFooterRows = Array.from(bodyTable.querySelectorAll('tfoot tr'));
-                const rightFooterRows = Array.from(rightTable.querySelectorAll('tfoot tr'));
+        const leftFooterRows = Array.from(leftTable.querySelectorAll('tfoot tr'));
+        const bodyFooterRows = Array.from(bodyTable.querySelectorAll('tfoot tr'));
+        const rightFooterRows = Array.from(rightTable.querySelectorAll('tfoot tr'));
 
-                this.#applyMaxHeights(leftFooterRows, bodyFooterRows, rightFooterRows);
-        //    });
-        //});
+        this.#applyMaxHeights(leftFooterRows, bodyFooterRows, rightFooterRows);
     };
 
-// 공통 최대 높이 적용 헬퍼 메서드
     #applyMaxHeights = (leftRows, bodyRows, rightRows) => {
-        /** 바닐라에서 setTimeout 없으면 높이계산이 가끔 안됨 */
+
         setTimeout(() => {
             const maxRows = Math.max(leftRows.length, bodyRows.length, rightRows.length);
 
-            trace.log(this.#host);
             for (let i = 0; i < maxRows; i++) {
-                trace.log(maxRows);
 
                 const heights = [
                     leftRows[i]?.getBoundingClientRect().height || 0,
@@ -578,8 +489,6 @@ export class NineTableSheet extends HTMLElement {
                     rightRows[i]?.getBoundingClientRect().height || 0
                 ];
                 const maxHeight = Math.max(...heights);
-
-                trace.log(heights, maxHeight);
 
                 if (maxHeight > 0) {
                     if (leftRows[i]) leftRows[i].style.height = `${maxHeight}px`;
@@ -596,7 +505,6 @@ export class NineTableSheet extends HTMLElement {
 
         let activeRowIndex = null;
 
-        // 마우스 진입 (모든 컨테이너 탐색)
         bodyViewport.addEventListener('mouseover', (e) => {
             const tr = e.target.closest('tr');
             if (!tr || !tr.dataset.row && tr.dataset.row !== '0') return;
@@ -605,18 +513,15 @@ export class NineTableSheet extends HTMLElement {
             if (activeRowIndex === rowIndex) return;
             activeRowIndex = rowIndex;
 
-            // 좌측, 본문, 우측 컨테이너에서 동일한 data-row를 가진 tr들을 모두 찾아 .hover 부여
             bodyViewport.querySelectorAll(`tr[data-row="${rowIndex}"]`).forEach($tr => {
                 $tr.classList.add('hover');
             });
         });
 
-        // 마우스 이탈
         bodyViewport.addEventListener('mouseout', (e) => {
             const tr = e.target.closest('tr');
             if (!tr) return;
 
-            // 현재 영역을 완전히 벗어났을 때만 전체 hover 제거
             const relatedTarget = e.relatedTarget;
             if (tr.contains(relatedTarget)) return;
 

@@ -77,9 +77,6 @@ export class NineTableHScrollBar extends HTMLElement {
         const bodyWidth = body.clientWidth;
         const tableWidth = table.scrollWidth;
 
-        //trace.log(bodyWidth, tableWidth, bodyWidth);
-
-        // 🎯 [순수 클래스 연동] 인라인 스타일 조작 없이 오직 클래스 토글만 수행
         const needsHScroll = (bodyWidth !== 0 && tableWidth > bodyWidth);
         this.#owner.classList.toggle('hscroll-visible', needsHScroll);
 

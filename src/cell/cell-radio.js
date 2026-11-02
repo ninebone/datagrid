@@ -3,7 +3,7 @@ import { EditableCellElement } from "./core/CellElement.js";
 
 class CellRadio extends EditableCellElement {
 	#target;
-	#radioList;
+	#radioList = [];
 	#dataSource = [];
 
 	constructor() {
@@ -11,7 +11,6 @@ class CellRadio extends EditableCellElement {
 	}
 
 	connectedCallback() {
-
 		super.connectedCallback();
 
 		this.#renderer();
@@ -49,13 +48,12 @@ class CellRadio extends EditableCellElement {
 	};
 
 	#rendererRadio = () => {
-trace.log("rendererRadio");
-		//if (!this.sheet || !this.cell) return;
 
 		const dataSource = this.cell.getAttribute("data-source");
 		if (!dataSource) return;
 
 		this.#dataSource = super.getExprValue(dataSource, this.tr.data, this.tr.dataset.row);
+		//trace.log(this.#dataSource, this.host?.getCommonCode);
 
 		this.#target.replaceChildren();
 
@@ -67,19 +65,15 @@ trace.log("rendererRadio");
 				const codeVal = v[this.#keyName] !== undefined ? v[this.#keyName] : '';
 				const nameVal = v[this.#valueName] !== undefined ? v[this.#valueName] : '';
 
-				// <label> 생성
 				const label = document.createElement('label');
 
-				// <input type="radio" value="..."> 생성
 				const input = document.createElement('input');
 				input.type = 'radio';
 				input.value = codeVal;
 
-				// <span>텍스트</span> 생성 (textContent를 써야 XSS 방어 및 안전합니다)
 				const span = document.createElement('span');
 				span.textContent = nameVal;
 
-				// 조립
 				label.appendChild(input);
 				label.appendChild(span);
 				fragment.appendChild(label);
@@ -87,7 +81,10 @@ trace.log("rendererRadio");
 
 			this.#target.appendChild(fragment);
 
+
 			this.#radioList = Array.from(this.querySelectorAll("input"));
+
+
 
 			this.#radioList.forEach($el => {
 				$el.addEventListener("change", (e) => {
@@ -126,7 +123,6 @@ trace.log("rendererRadio");
 	};
 
 	#validate = () => {
-		//if (!super.cell) return;
 
 		if (this.value === null || this.value === undefined || this.value === "" || !Array.isArray(this.#dataSource)) {
 			return;

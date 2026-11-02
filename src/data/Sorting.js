@@ -1,6 +1,5 @@
 // ui/data/Sorting.js (또는 정렬 관련 소스)
 import { trace } from "@nopeer";
-import { TableCompiler } from "@/layout/core/TableCompiler.js";
 
 export class Sorting {
 	#sheet;
@@ -28,7 +27,6 @@ export class Sorting {
 
 				if (["INPUT","CELL-CHECKBOX"].includes(e.target.tagName)) return;
 
-				// 🎯 [수정] 줄바꿈으로 깨져있던 마이너스 연산자를 한 줄로 정상 복구
 				if (e.offsetX <= 2 || e.offsetX >= cell.offsetWidth - 2) return;
 
 				const host = this.#sheet.getRootNode().host;
@@ -38,14 +36,11 @@ export class Sorting {
 					try {
 						this.#handleSort(e, cell);
 					} finally {
-						// 🎯 3. 작업이 끝나면 무조건 로딩바 끄기
 						host.loading = false;
 					}
-				}); // 또는 requestAnimationF
+				});
 			});
 		});
-
-		trace.log("🎯 [NineTableSorting] Initialized");
 	}
 
 	#handleSort(e, cell) {
@@ -59,14 +54,13 @@ export class Sorting {
 		if (!sourceTable) return;
 
 		let colName = null;
-		let exprVal = null; // 💡 expr 속성 수집용 변수
+		let exprVal = null;
 
-		// 1. 🎯 데이터 바인딩 키(colName) 및 expr 탐지
 		sourceTable.querySelectorAll(`tbody [data-col="${colIndex}"]`).forEach($td => {
 			if ($td.dataset.bind) {
 				colName = $td.dataset.bind;
 			}
-			// 💡 셀에 선언된 expr 식 추출
+
 			if ($td.dataset.expr) {
 				exprVal = $td.dataset.expr;
 			}
@@ -85,7 +79,6 @@ export class Sorting {
 			m => (m.colIndex === colIndex && m.subRowIndex === subRowIndex) || m.colName === colName
 		);
 
-		// 정렬 규칙 추가 시 expr 속성(`expr`) 함께 저장
 		const ruleData = {
 			colIndex,
 			subRowIndex,
@@ -119,20 +112,15 @@ export class Sorting {
 
 	#applySorting() {
 		if (!this.#sheet.view) {
-			console.warn("⚠️ [NineTableSorting] Sheet view (SheetView) is not initialized.");
 			return;
 		}
 
 		this.#sheet.view.setSorting(this.#columns);
 		this.#syncHeaderUI();
 		this.#sheet.invalidate();
-		//this.#sheet.rowManager?.refresh(true);
-
-		trace.log("🔄 [NineTableSorting] Sorting applied via RowManager.refresh(true)");
 	}
 
 	#syncHeaderUI() {
-		// 기존 UI 클래스 초기화
 		this.#sheet.querySelectorAll('thead th, thead td').forEach(el => {
 			el.classList.remove('asc', 'desc');
 		});
@@ -141,7 +129,6 @@ export class Sorting {
 			return;
 		}
 
-		// 🎯 [핵심] tr[data-subrow] + [data-col] 조합으로 정밀 타겟팅
 		this.#columns.forEach(colRule => {
 			const { colIndex, subRowIndex, asc } = colRule;
 
@@ -157,8 +144,6 @@ export class Sorting {
 				});
 			}
 		});
-
-		//TableCompiler.decompile(this.#sheet);
 	}
 
 	restore() {

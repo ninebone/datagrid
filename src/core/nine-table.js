@@ -14,6 +14,10 @@ export default class NineTable extends HTMLElement {
     constructor() {
         super();
 
+        if (["NINE-TABLE"].includes(this.tagName)) {
+            trace.log("Welcome nine-table", __APP_VERSION__);
+        }
+
         this.#shadowRoot = this.attachShadow({ mode: 'open' });
         this.#dataManager = new ngDataManager(this);
     }
@@ -30,17 +34,14 @@ export default class NineTable extends HTMLElement {
             this.#layoutManager = new LayoutManager(this);
 
             this.#dispatchLoad();
-            //this.dispatchEvent(new CustomEvent('load', { bubbles: true, detail: { target: this } }));
         });
     }
 
     disconnectedCallback() {
-        trace.log('NineTable disconnected.');
+        //trace.log('NineTable disconnected.');
     }
 
     #dispatchLoad = () => {
-        // 🎯 2. 변수명 오타 수정 (#sheetCnt -> #templateCnt)
-        //trace.log("*********************** template count:", this.#templateCnt);
 
         let checkCount = 0;
         const maxChecks = 50; // 최대 5초 대기 (100ms * 50)
@@ -49,7 +50,6 @@ export default class NineTable extends HTMLElement {
             checkCount++;
 
             const sheets = this.shadow.querySelectorAll('nine-table-sheet');
-            //trace.log("Current mounted sheets:", sheets.length);
 
             if (checkCount >= maxChecks) {
                 clearInterval(checkTimer);
@@ -60,8 +60,6 @@ export default class NineTable extends HTMLElement {
                 sheets.forEach($sheet => {
                     if ($sheet.loaded) loadSheetCnt++;
                 });
-
-                //trace.log('Checking sheet loaded status:', loadSheetCnt, '/', this.#templateCnt);
 
                 if (loadSheetCnt >= this.#templateCnt) {
                     clearInterval(checkTimer);
@@ -88,16 +86,11 @@ export default class NineTable extends HTMLElement {
         this.activeSheet?.invalidate();
     }
 
-    // 🎯 섀도우 돔 내부에서 로딩바 요소를 안전하게 캐싱
-
 
     set loading(val) {
         if (this.#layoutManager) this.#layoutManager.loading = val;
     }
 
-    /**
-     * 랜더링 이후에 생기는 data-source 처리기능
-     */
     rerenderer() {
 
         this.activeSheet?.querySelectorAll("tbody.body th,tbody.body td").forEach(($cell) => {
@@ -109,7 +102,6 @@ export default class NineTable extends HTMLElement {
         })
     }
 
-    // 시트 제어 API
     sheet = (idOrIndex) => {
         if (idOrIndex === null || idOrIndex < 0) return this.activeSheet;
         const sheets = Array.from(this.shadow.querySelectorAll('nine-table-sheet'));
@@ -136,7 +128,6 @@ export default class NineTable extends HTMLElement {
             const dataSource = el.getAttribute('data-source');
             if (!dataSource) return;
 
-            // 💡 [수정] 뒤에 여멀림 괄호 '('가 오는 형태만 매칭하여 'DEPART' 같은 파라미터는 배제!
             const matches = dataSource.matchAll(/(?:host\.)?([a-zA-Z0-9_$]+)\s*\(/g);
             for (const match of matches) {
                 const name = match[1];
@@ -146,7 +137,6 @@ export default class NineTable extends HTMLElement {
             }
         });
 
-        // 추출된 메서드 이름별로 NineTable 인스턴스에 동적 세터 생성
         extractedMethodNames.forEach(methodName => {
             let internalValue = null;
 
@@ -154,8 +144,6 @@ export default class NineTable extends HTMLElement {
                 set: (newValue) => {
                     internalValue = newValue;
 
-                    // 값이 대입되는 순간 그리드 자동 갱신
-                    //this.refresh();
                     this.rerenderer();
                 },
                 get: () => internalValue,
@@ -186,7 +174,6 @@ if (!customElements.get('nine-table')) {
 if (!customElements.get('nine-table-simple')) {
     customElements.define('nine-table-simple', class extends NineTable {
         connectedCallback() {
-            // simple 태그로 생성되면 자동으로 mode="simple" 속성 부여
             this.setAttribute('theme', 'simple');
 
             super.connectedCallback();

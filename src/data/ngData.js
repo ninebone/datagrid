@@ -26,14 +26,12 @@ export class ngData {
 	#defaultHeight = [];
 
 	static META_INDEX = {
-		FILTER: 0, // 멀티뷰 필터 통과 여부 (true/false)
-		// ── 추후 확장 예시 ──
+		FILTER: 0,
 		// GROUP: 1,
 		// SELECT: 2,
 		// EXPAND: 3
 	};
 
-	// 🎯 행 상태 정의 상수 내재화
 	static ROW_STATE = {
 		EMPTY: 'EMPTY',
 		NORMAL: 'NORMAL',
@@ -49,18 +47,11 @@ export class ngData {
 	}
 
 
-
-	/**
-	 * 🎯 [내부 공통] 삭제되지 않은 유효 레코드 목록 반환 (중복 제거 및 캡슐화)
-	 */
 	#getValidRecords = () => {
 		const rawRecords = this.#parent.rawRecords || [];
 		return rawRecords.filter(o => !o.__ng?.deleted);
 	};
 
-	/**
-	 * 🎯 유효 데이터 행 개수 반환 (속성 및 메서드 형태 모두 지원)
-	 */
 	get count() {
 		return this.length;
 	}
@@ -69,12 +60,6 @@ export class ngData {
 		return this.length;
 	};
 
-	/**
-	 * 🎯 [내부 엔진/고성능용] 변환 오버헤드 없이 순수 데이터(v 배열 등) 그대로 반환
-	 * - data.getArray() : 유효한 전체 내부 레코드 배열 반환
-	 * - data.getArray(at) : 특정 행의 내부 레코드 객체({ v: [...] }) 반환
-	 * - data.getArray(at, colnm) : 특정 행의 특정 컬럼 원시 값 반환
-	 */
 	getArray = (at, colnm) => {
 		const validRecords = this.#getValidRecords();
 
@@ -92,32 +77,22 @@ export class ngData {
 			return (idx >= 0) ? targetRecord.v[idx] : null;
 		}
 
-		return targetRecord; // { v: [...], __ng: {...} } 원본 형태 반환
+		return targetRecord;
 	};
 
 	setArray = (rowIndex, colIndex, value) => {
-		//trace.log(rowIndex, colnm, value)
 		const validRecords = this.#getValidRecords();
 		const rowData = validRecords[rowIndex];
 
 		const oldValue = rowData.v[colIndex];
 		if (oldValue !== value && rowData.__ng.rowState !== ngData.ROW_STATE.INSERT) {
-			// 변경 전 값 보존 우선 주석처리
-			//rowData.o[colIndex] = value;
 			rowData.__ng.rowState = ngData.ROW_STATE.UPDATE;
 		}
 
 		rowData.v[colIndex] = value;
-		//trace.log(rowData, COL_IDX);
 	};
 
 
-	/**
-	 * 🎯 [외부 개발자/비즈니스 로직용] 개발자가 활용하기 편한 JSON 객체 형태로 변환하여 반환
-	 * - data.get() : 전체 유효 데이터를 JSON 객체 배열로 변환
-	 * - data.get(at) : 특정 행을 JSON 객체로 변환
-	 * - data.get(at, colnm) : 특정 컬럼 값 반환
-	 */
 	get = (at, colnm) => {
 		const validRecords = this.#getValidRecords();
 
@@ -138,9 +113,6 @@ export class ngData {
 		return this.#conv(targetRecord);
 	};
 
-	/**
-	 * 🎯 [저장/서버 전송용] 삭제된 행을 포함한 전체 원본 배열 반환
-	 */
 	getAll = () => {
 		return this.#parent.rawRecords || [];
 	};
@@ -167,8 +139,6 @@ export class ngData {
 	}
 	set source(v) {
 		this.set(v);
-		//this.clear();
-		//this.add(v, false);
 	}
 
 	#invalidate = () => {
@@ -330,7 +300,7 @@ export class ngData {
 	};
 
 	setValue = (rowIndex, colnm, value) => {
-		//trace.log(rowIndex, colnm, value)
+
 		rowIndex = parseInt(rowIndex, 10);
 		const fields = this.getHostFields();
 		const COL_IDX = fields.indexOf(colnm);
@@ -349,7 +319,6 @@ export class ngData {
 		}
 
 		rowData.v[COL_IDX] = value;
-		//trace.log(rowData, COL_IDX);
 	};
 
 	#conv = (arr) => {

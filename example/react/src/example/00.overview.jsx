@@ -14,6 +14,7 @@ const Overview = () => {
 	};
 
 	useEffect(() => {
+
 		tableRef.current.getCommonCode = (group) => {
 			return exampleData.generateCommonCode(group);
 		};
@@ -129,13 +130,13 @@ const Overview = () => {
 			}).join('');
 
 			return `
-             <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 56px;">
-                <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-                   <circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
-                   ${paths}
-                </svg>
-             </div>
-          `;
+				 <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 56px;">
+					<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+					   <circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
+					   ${paths}
+					</svg>
+				 </div>
+			  `;
 		};
 
 		selectList();

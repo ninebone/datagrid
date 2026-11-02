@@ -39,17 +39,14 @@ export class NineTableSheetsFooter extends HTMLElement {
             const sheets = Array.from(this.#host.shadowRoot.querySelectorAll('nine-table-sheet'));
             const splitters = Array.from(this.#host.shadowRoot.querySelectorAll('nine-splitter'));
 
-            // 1. 모든 스플리터 일단 숨김 처리
             splitters.forEach(s => s.style.setProperty('display', 'none'));
 
-            // 2. 현재 active 상태인 시트들을 인덱스 오름차순으로 정렬
             const activeSheets = sheets
                 .map((sheet, idx) => ({ sheet, idx }))
                 .filter(({ sheet }) => sheet.classList.contains('active'));
 
             if (activeSheets.length < 2) return;
 
-            // 3. 인접한 활성화 시트 쌍 사이에 정확히 하나의 스플리터만 노출
             for (let i = 0; i < activeSheets.length - 1; i++) {
                 const currentIdx = activeSheets[i].idx;
 

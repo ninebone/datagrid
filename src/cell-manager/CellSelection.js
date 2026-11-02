@@ -7,32 +7,6 @@ export class CellSelection {
 	constructor(sheet) {
 		this.#sheet = sheet;
 		this.#initEvents();
-
-		/**
-		// 🎯 [신규 구조 대응] .ng-sheet-body 및 내부 컨테이너 스크롤 감지
-		const bodyViewport = this.#sheet.querySelector('.ng-sheet-body');
-		if (bodyViewport) {
-			bodyViewport.addEventListener('scroll', () => {
-				if (this.#range.startRow >= 0 && this.#range.startCol >= 0) {
-					this.render();
-				}
-			});
-		} */
-
-		/**
-		const containers = this.#sheet.querySelectorAll(
-			'.ng-sheet-body-content .ng-container-left, .ng-sheet-body-content .ng-container-body, .ng-sheet-body-content .ng-container-right'
-		);
-
-		containers.forEach(container => {
-			container.addEventListener('scroll', () => {
-				if (this.#range.startRow >= 0 && this.#range.startCol >= 0) {
-					this.render();
-				}
-			});
-		}); */
-
-		trace.log("🎯 [CellSelection] Initialized (New Structure Compatible)");
 	}
 
 	#getMatrixRow(tr) {
@@ -54,7 +28,6 @@ export class CellSelection {
 	}
 
 	setFocus(matrixRow, col) {
-		// 1. 기존 포커스 클래스 제거
 		this.#sheet.querySelectorAll(`tr.selected-start`).forEach($tr => {
 			$tr.classList.remove("selected-start");
 			$tr.querySelectorAll(`td.selected-start`).forEach($td => {
@@ -62,7 +35,6 @@ export class CellSelection {
 			});
 		});
 
-		// 🎯 [신규 구조 대응] data-matrix-row 탐색 경로 수정 (.ng-sheet-body-content 기준)
 		const $td = this.#sheet.querySelector(`.ng-sheet-body-content tr[data-matrix-row="${matrixRow}"] td[data-col="${col}"]`);
 		if (!$td) return;
 
@@ -76,7 +48,6 @@ export class CellSelection {
 		let c1 = Math.min(startCol, endCol);
 		let c2 = Math.max(startCol, endCol);
 
-		// 🎯 [신규 구조 대응] 컨테이너 셀렉터 경로 수정
 		const containers = this.#sheet.querySelectorAll('.ng-container-left, .ng-container-body, .ng-container-right');
 
 		let expanded = true;
@@ -85,8 +56,6 @@ export class CellSelection {
 		while (expanded && loopCount < 5) {
 			expanded = false;
 			loopCount++;
-
-
 
 			containers.forEach(container => {
 
@@ -137,21 +106,10 @@ export class CellSelection {
 	render = () => {
 		const { startRow, startCol, endRow, endCol } = this.#range;
 
-		// 🎯 [신규 구조 대응] 컨테이너 셀렉터 경로 수정
 		const containers = this.#sheet.querySelectorAll(
 			'.ng-container-left, .ng-container-body, .ng-container-right'
 		);
 
-		/**
-		const selectedStartTr = this.#sheet.querySelector('tr.selected-start');
-		const selectedStartCell = this.#sheet.querySelector('th.selected-start,td.selected-start');
-
-		const selectedStartMatrixRow = parseInt(selectedStartTr?.dataset.matrixRow, 10);
-		const selectedStartIndex = parseInt(selectedStartCell?.dataset.index, 10);
-		const selectedStartCol = parseInt(selectedStartCell?.dataset.col, 10);
-		*/
-
-		// 1. 기존 선택 클래스 초기화
 		containers.forEach(container => {
 			container.querySelectorAll('.selected, .selected-top, .selected-bottom, .selected-left, .selected-right, .selected-start').forEach(el => {
 				el.classList.remove('selected', 'selected-top', 'selected-bottom', 'selected-left', 'selected-right', 'selected-start');
@@ -164,10 +122,9 @@ export class CellSelection {
 
 		if (startRow < 0 || startCol < 0) return;
 
-		// 2. 범위 렌더링
 		containers.forEach((container) => {
 			const visibleTrs = Array.from(container.querySelectorAll('tbody tr')).filter(tr => {
-				return tr.style.display !== 'none'; // 혹은 tr.offsetHeight > 0 체크
+				return tr.style.display !== 'none';
 			});
 
 			visibleTrs.forEach(tr => {
@@ -196,24 +153,11 @@ export class CellSelection {
 				});
 			});
 		});
-
-		/**
-		trace.log(selectedStartMatrixRow, selectedStartCol);
-		// 3. 포커스 셀 복구
-		const $focusTd = this.#sheet.querySelector(`.ng-sheet-body-content tr[data-matrix-row="${selectedStartMatrixRow}"] td[data-col="${selectedStartCol}"]`);
-		if ($focusTd) {
-			$focusTd.classList.add("selected-start");
-		}
-
-		this.#sheet.querySelectorAll(`.ng-sheet-body-content tr[data-matrix-row="${selectedStartMatrixRow}"]`).forEach($tr => {
-			$tr.classList.add("selected-start");
-		}); */
 	}
 
 	#initEvents() {
 		const mainZone = this.#sheet.querySelector('.ng-sheet-body');
 		if (!mainZone) {
-			trace.log("❌ [CellSelection] .ng-sheet-body not found!");
 			return;
 		}
 

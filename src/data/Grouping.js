@@ -1,6 +1,5 @@
 import { trace } from "@nopeer";
 
-// 💡 배열 인덱스 상수 정의
 export const GROUP_IDX = {
 	ID: 0,
 	DEPTH: 1,
@@ -45,8 +44,6 @@ export class GroupingManager {
 
 	apply() {
 
-		trace.log("==================", "Grouping.Apply");
-
 		if (this.#isApplying) return;
 		this.#isApplying = true;
 
@@ -63,11 +60,9 @@ export class GroupingManager {
 
 		this.#groupColumns = groupColumns;
 
-		// 💡 데이터 캐시와 렌더링 아이템은 이제 SheetView 단일 파이프라인에서 관리하므로
-		// 그룹핑 설정이 바뀌면 SheetView.refresh()를 호출해 전체 흐름을 일괄 재계산합니다.
 		this.#isApplying = false;
 		this.#sheet.scrollToY(0);
-		this.#sheet.view.refresh(); // 🎯 SheetView에서 필터/정렬/그룹핑 일괄 처리
+		this.#sheet.view.refresh();
 	}
 
 	clear() {
@@ -78,7 +73,6 @@ export class GroupingManager {
 		this.#sheet.view.refresh();
 	}
 
-	// SheetView가 그룹핑 연산 후 groupMap을 공유할 수 있도록 설정 메서드 제공
 	setGroupMap(map) {
 		this.#groupMap = map;
 	}

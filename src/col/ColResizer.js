@@ -65,8 +65,6 @@ export class ColResizer {
             containers.forEach(container => {
                 const tables = container.querySelectorAll('table');
 
-                trace.log("====================", containers, containerType);
-
                 if (containerType === 'body') {
                     tables.forEach(tbl => {
                         tbl.style.width = `${totalWidth}px`;
@@ -109,16 +107,8 @@ export class ColResizer {
 
     setColumnWidth(globalColIndex, width, containerType = null) {
 
-        trace.log("setColumnWidth");
-
-
         let targetCols = [];
 
-        //if (containerType) {
-        //    targetCols = Array.from(this.#sheet.querySelectorAll(`.ng-container-${containerType} table colgroup col[data-col="${globalColIndex}"]`));
-        //} else {
-        //    targetCols = Array.from(this.#sheet.querySelectorAll(`table colgroup col[data-col="${globalColIndex}"]`));
-        //}
         targetCols = Array.from(this.#sheet.querySelectorAll(`table colgroup col[data-col="${globalColIndex}"]`));
 
         if (targetCols.length === 0) return;
@@ -132,8 +122,6 @@ export class ColResizer {
         targetCols.forEach(col => {
             col.setAttribute('width', width);
             col.style.width = `${width}px`;
-
-            trace.log(col, width);
         });
 
         const sourceCol = this.#sheet.sourceTable?.querySelector(`colgroup col[data-col="${globalColIndex}"]`);
@@ -142,12 +130,8 @@ export class ColResizer {
             sourceCol.style.width = `${width}px`;
         }
 
-
-
         this.refreshLayout(resolvedContainerType);
 
-        // 🎯 [핵심] autoFit을 여기서 또 호출하면 루프가 돌거나 레이아웃 계산이 꼬입니다.
-        // 바디 영역 리사이즈 시에는 body만 refreshLayout 해주면 됩니다!
         if (resolvedContainerType === 'left' || resolvedContainerType === 'right') {
             this.refreshLayout('body');
         }
@@ -215,13 +199,10 @@ export class ColResizer {
 
     #onPointerDown = (e) => {
 
-        trace.log("onPointerDown");
-
         const headerPart = e.actualTarget.closest('thead');
         if (!headerPart) return;
 
         const cell = e.actualTarget.closest('th, td');
-        trace.log(cell, e.actualTarget);
 
         if (!cell || !cell.classList.contains('resizable-edge')) return;
 
@@ -320,7 +301,6 @@ export class ColResizer {
     }
 
     #onDragMove = (e) => {
-        trace.log(e);
         this.#updatePositions(e.clientX);
     };
 
@@ -445,15 +425,11 @@ export class ColResizer {
             }
         });
 
-        trace.log(extraPadding);
-
-
         const fieldIdx = this.#host.fields.get().indexOf(tbodyCell.dataset.bind);
 
         const computedStyle = window.getComputedStyle(tbodyCell);
         const font = computedStyle.font || '12px sans-serif';
 
-        // 헤더 텍스트 길이 측정
         const headerText = cell.innerText || "";
         const headerSize = nine.measureTextSize(headerText, font);
         let maxTextWidth = (headerSize.width || 0) + 16;
@@ -468,10 +444,8 @@ export class ColResizer {
                 }
             });
 
-            // 글자 수 당 대략적인 픽셀 계산 (기본 패딩 여백 포함, 최소 32px ~ 최대 400px 제한)
             const calculatedWidth = Math.max(32, Math.min(400, Math.ceil(maxTextWidth) + extraPadding));
 
-            // 자동 계산된 너비 적용
             this.setColumnWidth(tbodyCell.dataset.col, calculatedWidth, this.#getContainerType(cell));
         })
     };
