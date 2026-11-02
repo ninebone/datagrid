@@ -49,6 +49,8 @@ class CellRadio extends EditableCellElement {
 
 	#rendererRadio = () => {
 
+		if (!this.host) return;
+
 		const dataSource = this.cell.getAttribute("data-source");
 		if (!dataSource) return;
 

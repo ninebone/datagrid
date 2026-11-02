@@ -15,9 +15,11 @@ const Overview = () => {
 
 	useEffect(() => {
 
-		tableRef.current.getCommonCode = (group) => {
-			return exampleData.generateCommonCode(group);
-		};
+		setTimeout(() => {
+			tableRef.current.getCommonCode = (group) => {
+				return exampleData.generateCommonCode(group);
+			};
+		});
 
 		tableRef.current.renderImage = (v) => {
 			return `<img src="${v}" style="vertical-align:middle; width:58px; height:58px; border-radius:50%;" />`;
