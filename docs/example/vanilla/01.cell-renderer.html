@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>nine-table ::: cell-renderer</title>
+
+    <link rel="stylesheet" href="css/example.css" />
+
+    <script type="text/javascript" src="_data/example-data.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/table@latest/dist/nine-table.umd.js"></script>
+
+    <script>
+        nine.setup({
+            debug: {
+                enable: true,
+                filter: ["nine-table"],
+            },
+            "nine-table": {
+                cssFile: "./css/nine-table/_nine-table.css",
+            },
+        });
+    </script>
+</head>
+
+<body>
+    <h1>NineTable Cell Renderer & Expression Example</h1>
+
+    <nine-table show-footer="true">
+        <table row-indicator="true">
+            <colgroup>
+                <col width="100"/>
+                <col width="50"/>
+                <col width="50"/>
+                <col width="50"/>
+                <col width="50"/>
+                <col width="150"/>
+                <col width="150"/>
+                <col width="120"/>
+                <col width="120"/>
+                <col width="120"/>
+                <col width="80"/>
+                <col width="80"/>
+                <col width="80"/>
+            </colgroup>
+            <thead>
+            <tr>
+                <th rowSpan="2">NAME</th>
+                <th rowSpan="2">AGE</th>
+                <th colSpan="3">text-align</th>
+                <th colSpan="5">data-expr</th>
+                <th colSpan="2">color</th>
+                <th rowSpan="2">visible</th>
+            </tr>
+            <tr>
+                <th>left</th>
+                <th>center</th>
+                <th>right</th>
+                <th>case #1 (combine)</th>
+                <th>case #2 (html)</th>
+                <th>case #3 (calculate)</th>
+                <th>case #4 (with host)</th>
+                <th>case #5 (html + host)</th>
+                <th>color</th>
+                <th>background</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr style="height: 32px;">
+                <td data-bind="NAME"></td>
+                <td data-bind="AGE"></td>
+                <td data-bind="REC1" text-align="left"></td>
+                <td data-bind="REC2" text-align="center"></td>
+                <td data-bind="REC3" text-align="right"></td>
+                <td data-expr="data.NAME + ' (' + data.AGE + ')'"></td>
+                <td data-expr="'[<b><font color=blue>' + data.AGE + '</font></b>] ' + data.NAME" html="true"></td>
+                <td data-expr="Math.round((data.REC1 + data.REC2 + data.REC3) / 3)"></td>
+                <td data-expr="host.formatDecimalNumber((data.REC1 + data.REC2 + data.REC3) / 3, 2)"></td>
+                <td data-expr="host.renderBadge(data.REC1)" html="true"></td>
+                <td data-bind="REC1" color="data.REC1 < 50 ? 'red' : ''"</td>
+                <td data-bind="REC1" background-color="data.REC1 < 50 ? 'rgba(255,0,0,0.5)' : ''"></td>
+                <td data-bind="REC1" visible="data.REC1 < 50 ? true : false"></td>
+            </tr>
+            </tbody>
+        </table>
+    </nine-table>
+
+</body>
+
+<script>
+
+    const DATA_CNT = 100000;
+
+    const grd = document.querySelector("nine-table");
+
+    grd.addEventListener("load", () => {
+
+        grd.renderBadge = (val) => {
+            if (val > 50) {
+                return `<span style="display: block; box-sizing: border-box; padding: 2px 6px; background: #d1e7dd; color: #0f5132; border-radius: 4px;">High</span>`;
+            } else {
+                return `<span style="display: block; box-sizing: border-box; padding: 2px 6px; background: #f8d7da; color: #842029; border-radius: 4px;">Low</span>`;
+            }
+        };
+
+        grd.formatDecimalNumber = (num, decimals = 2) => {
+            if (isNaN(num)) return 0;
+            const factor = Math.pow(10, decimals);
+            return Math.round(num * factor) / factor;
+        }
+
+
+        grd.loading = true;
+        setTimeout( () => {
+            grd.data.set(exampleData.generateRandomData(DATA_CNT));
+        });
+    });
+
+</script>
+
+</html>
+
