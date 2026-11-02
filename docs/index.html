@@ -10,7 +10,7 @@
 
     <script type="text/javascript" src="./data/example-data.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@latest/0.0.6/nine-table.umd.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/datagrid@0.0.6/dist/nine-table.umd.js"></script>
 
     <style>
         body {
@@ -181,21 +181,17 @@
 
     const grd = document.querySelector("nine-table");
 
-
-
-    grd.addEventListener("load", () => {
-
-        grd.addProvider({
-            getCommonCode: (group) => exampleData.generateCommonCode(group),
-            renderImage: (v) => `<img src="./${v}" style="vertical-align:middle; width:58px; height:58px; border-radius:50%;" />`,
-            renderBadge: (v1, v2, v3) => {
-                const v = (Number(v1) + Number(v2) + Number(v3)) / 3;
-                return v > 50
-                    ? `<span style="width: ${v}%; padding: 2px 4px; display: block; background: #d1e7dd; color: #0f5132;">High</span>`
-                    : `<span style="width: ${v}%; padding: 2px 4px; display: block; background: #f8d7da; color: #842029;">Low</span>`;
-            },
-            renderBadge2: (v, bg) => {
-                return `
+    grd.addProvider({
+        getCommonCode: (group) => exampleData.generateCommonCode(group),
+        renderImage: (v) => `<img src="./${v}" style="vertical-align:middle; width:58px; height:58px; border-radius:50%;" />`,
+        renderBadge: (v1, v2, v3) => {
+            const v = (Number(v1) + Number(v2) + Number(v3)) / 3;
+            return v > 50
+                ? `<span style="width: ${v}%; padding: 2px 4px; display: block; background: #d1e7dd; color: #0f5132;">High</span>`
+                : `<span style="width: ${v}%; padding: 2px 4px; display: block; background: #f8d7da; color: #842029;">Low</span>`;
+        },
+        renderBadge2: (v, bg) => {
+            return `
 					<div style="display: flex; align-items: center; gap: 8px; width: 100%;">
 						<span style="color: ${bg}; font-weight: 700; min-width: 16px; text-align: right;">${v}</span>
 						<div style="flex: 1; background: #e2e8f0; height: 6px; border-radius: 3px; overflow: hidden;">
@@ -203,32 +199,32 @@
 						</div>
 					</div>
 				`;
-            },
-            renderBarChart: (...values) => {
-                const color = '#3b82f6';
-                const width = 100;
-                const height = 22; // 높이를 고정하여 셀 깨짐 방지
+        },
+        renderBarChart: (...values) => {
+            const color = '#3b82f6';
+            const width = 100;
+            const height = 22; // 높이를 고정하여 셀 깨짐 방지
 
-                if (!values || values.length === 0) return '';
+            if (!values || values.length === 0) return '';
 
-                const points = values.map((v, index) => {
-                    const x = (index / (values.length - 1 || 1)) * width;
-                    const safeV = Math.min(Math.max(v, 0), 100);
-                    const y = height - (safeV / 100) * (height - 4) - 2;
-                    return { x, y };
-                });
+            const points = values.map((v, index) => {
+                const x = (index / (values.length - 1 || 1)) * width;
+                const safeV = Math.min(Math.max(v, 0), 100);
+                const y = height - (safeV / 100) * (height - 4) - 2;
+                return { x, y };
+            });
 
-                let pathData = `M ${points[0].x} ${points[0].y}`;
-                for (let i = 0; i < points.length - 1; i++) {
-                    const p0 = points[i];
-                    const p1 = points[i + 1];
-                    const cpX = (p0.x + p1.x) / 2;
-                    pathData += ` C ${cpX} ${p0.y}, ${cpX} ${p1.y}, ${p1.x} ${p1.y}`;
-                }
+            let pathData = `M ${points[0].x} ${points[0].y}`;
+            for (let i = 0; i < points.length - 1; i++) {
+                const p0 = points[i];
+                const p1 = points[i + 1];
+                const cpX = (p0.x + p1.x) / 2;
+                pathData += ` C ${cpX} ${p0.y}, ${cpX} ${p1.y}, ${p1.x} ${p1.y}`;
+            }
 
-                const areaData = `${pathData} L ${width} ${height} L 0 ${height} Z`;
+            const areaData = `${pathData} L ${width} ${height} L 0 ${height} Z`;
 
-                return `
+            return `
 					<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 24px; padding: 0 4px;">
 						<svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: 22px; overflow: visible;" preserveAspectRatio="none">
 							<path d="${areaData}" fill="${color}" opacity="0.15" />
@@ -236,59 +232,59 @@
 						</svg>
 					</div>
 			  	`;
-            },
-            renderPieChart: (...values) => {
-                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#6366f1', '#14b8a6', '#f97316', '#a855f7'];
-                const size = 56; // 셀 높이에 알맞은 컴팩트한 사이즈
-                const center = size / 2;
-                const radius = center - 1;
+        },
+        renderPieChart: (...values) => {
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#6366f1', '#14b8a6', '#f97316', '#a855f7'];
+            const size = 56; // 셀 높이에 알맞은 컴팩트한 사이즈
+            const center = size / 2;
+            const radius = center - 1;
 
-                // 유효한 숫자로 변환 및 총합 계산
-                const nums = values.map(v => Math.max(Number(v) || 0, 0));
-                const total = nums.reduce((acc, cur) => acc + cur, 0);
+            // 유효한 숫자로 변환 및 총합 계산
+            const nums = values.map(v => Math.max(Number(v) || 0, 0));
+            const total = nums.reduce((acc, cur) => acc + cur, 0);
 
-                if (total === 0) {
-                    return `
+            if (total === 0) {
+                return `
 						<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 24px;">
 						   	<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
 							  	<circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
 						   	</svg>
 						</div>
 					`;
+            }
+
+            let currentAngle = 0;
+            const paths = nums.map((val, index) => {
+                if (val === 0) return '';
+                const sliceAngle = (val / total) * 360;
+                const startAngle = currentAngle;
+                const endAngle = currentAngle + sliceAngle;
+                currentAngle = endAngle;
+
+                const color = colors[index % colors.length];
+
+                // 값이 하나뿐이거나 360도 꽉 찰 때
+                if (sliceAngle >= 360) {
+                    return `<circle cx="${center}" cy="${center}" r="${radius}" fill="${color}" />`;
                 }
 
-                let currentAngle = 0;
-                const paths = nums.map((val, index) => {
-                    if (val === 0) return '';
-                    const sliceAngle = (val / total) * 360;
-                    const startAngle = currentAngle;
-                    const endAngle = currentAngle + sliceAngle;
-                    currentAngle = endAngle;
+                const startRad = (startAngle - 90) * (Math.PI / 180);
+                const endRad = (endAngle - 90) * (Math.PI / 180);
 
-                    const color = colors[index % colors.length];
+                const x1 = center + radius * Math.cos(startRad);
+                const y1 = center + radius * Math.sin(startRad);
+                const x2 = center + radius * Math.cos(endRad);
+                const y2 = center + radius * Math.sin(endRad);
 
-                    // 값이 하나뿐이거나 360도 꽉 찰 때
-                    if (sliceAngle >= 360) {
-                        return `<circle cx="${center}" cy="${center}" r="${radius}" fill="${color}" />`;
-                    }
+                const largeArcFlag = sliceAngle > 180 ? 1 : 0;
 
-                    const startRad = (startAngle - 90) * (Math.PI / 180);
-                    const endRad = (endAngle - 90) * (Math.PI / 180);
+                // SVG Path (중앙 -> 시작점 -> 호 -> 끝점 -> 중앙 복귀)
+                const pathData = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
 
-                    const x1 = center + radius * Math.cos(startRad);
-                    const y1 = center + radius * Math.sin(startRad);
-                    const x2 = center + radius * Math.cos(endRad);
-                    const y2 = center + radius * Math.sin(endRad);
+                return `<path d="${pathData}" fill="${color}" />`;
+            }).join('');
 
-                    const largeArcFlag = sliceAngle > 180 ? 1 : 0;
-
-                    // SVG Path (중앙 -> 시작점 -> 호 -> 끝점 -> 중앙 복귀)
-                    const pathData = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
-
-                    return `<path d="${pathData}" fill="${color}" />`;
-                }).join('');
-
-                return `
+            return `
 					<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 56px;">
 						<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
 						   	<circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
@@ -296,8 +292,10 @@
 						</svg>
 					</div>
 			  	`;
-            },
-        });
+        },
+    });
+
+    grd.addEventListener("load", () => {
 
         grd.loading = true;
         setTimeout( () => {
