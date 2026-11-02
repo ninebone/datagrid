@@ -2839,8 +2839,8 @@ var N = class {
 			let n = t === 0 ? "active" : "", i = e.id || `sheet${t + 1}`;
 			return `<nine-table-sheet class="${n}" data-index="${t}" data-sheet-id="${i}" id="${i}"></nine-table-sheet>` + (t < r - 1 ? `<nine-splitter class="h" data-split-index="${t}"></nine-splitter>` : "");
 		}).join("");
-		n.log("Welcome nine-table", "0.0.1");
-		let a = ["@import \"https://cdn.jsdelivr.net/npm/@ninebone/table@0.0.1/dist/css/nine-table.css\";"];
+		n.log("Welcome nine-table", "0.0.2");
+		let a = ["@import \"https://cdn.jsdelivr.net/npm/@ninebone/table@0.0.2/dist/css/nine-table.css\";"];
 		nine["nine-table"] && nine["nine-table"].cssFile && a.push(`@import "${nine["nine-table"].cssFile}";`), this.#e.shadowRoot.innerHTML = `
             <style>
                 ${a.join("\n")}
