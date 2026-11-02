@@ -91,8 +91,7 @@ npm install @ninebone/datagrid
             
             grd.renderBadge = (v1, v2) => `<span>Score: ${Number(v1) + Number(v2)}</span>`;
 
-            // Bind Data
-            grd.loading = true;
+            // Binding Data
             grd.data.set([{
               A: "a",
               ...
