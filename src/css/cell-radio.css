@@ -1,0 +1,47 @@
+cell-radio {
+    height: 100%;
+    width: calc(100% - 8px);
+    display: flex;
+    align-items: center;
+    margin-left: 4px;
+    margin-right: 4px;
+
+    div {
+        display: flex;
+        flex-direction: row;
+    }
+
+    label {
+        display: flex;
+        align-items: center;
+        margin-right: 8px;
+        user-select: none;
+    }
+
+    label.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+
+    span {
+        margin-left: 4px;
+    }
+}
+
+.CELL-RADIO[text-align='left'] {
+    cell-radio {
+        justify-content: flex-start;
+    }
+}
+.CELL-RADIO[text-align='center'] {
+    cell-radio {
+        justify-content: center;
+    }
+}
+.CELL-RADIO[text-align='right'] {
+    cell-radio {
+        justify-content: flex-end;
+    }
+}
+
+

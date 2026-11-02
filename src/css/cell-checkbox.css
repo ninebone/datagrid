@@ -1,0 +1,49 @@
+
+cell-checkbox {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+    label {
+        display: inline-flex;
+        align-items: center;
+        user-select: none;
+    }
+    input[type="checkbox"] {
+        margin-left: 4px;
+        margin-right: 4px;
+    }
+}
+
+
+.CELL-CHECKBOX {
+    cell-checkbox {
+        justify-content: center;
+    }
+    label {
+        display: flex;
+    }
+    input {
+        background-color: #ffffff;
+    }
+}
+.CELL-CHECKBOX[text-align='left'] {
+    cell-checkbox {
+        justify-content: flex-start;
+    }
+}
+.CELL-CHECKBOX[text-align='center'] {
+    cell-checkbox {
+        justify-content: center;
+    }
+}
+.CELL-CHECKBOX[text-align='right'] {
+    cell-checkbox {
+        justify-content: flex-end;
+    }
+    label {
+        flex-direction: row-reverse;
+    }
+}
+

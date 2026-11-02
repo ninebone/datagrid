@@ -1,0 +1,42 @@
+
+cell-button {
+    --cell-button-border: 1px solid #d1d5db;
+    --cell-button-color: #1f2937;
+    --cell-button-background: #f3f4f6;
+
+    --cell-button-hover-border: 1px solid #d1d5db;
+    --cell-button-hover-color: #1f2937;
+    --cell-button-hover-background: #f3f4f6;
+    --cell-button-active-border: 1px solid #d1d5db;
+    --cell-button-active-color: #1f2937;
+    --cell-button-active-background: #f3f4f6;
+
+    display: block;
+    position: absolute;
+    inset: 0; /* top: 0, right: 0, bottom: 0, left: 0 */
+    padding: 3px 4px;
+
+    button {
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        border: var(--cell-button-border);
+        color: var(--cell-button-color);
+        background: var(--cell-button-background);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    button:hover {
+        border: var(--cell-button-hover-border);
+        color: var(--cell-button-hover-color);
+        background: var(--cell-button-hover-background);
+    }
+    button:active {
+        border: var(--cell-button-active-border);
+        color: var(--cell-button-active-color);
+        background: var(--cell-button-active-background);
+    }
+}

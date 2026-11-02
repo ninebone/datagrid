@@ -1,0 +1,41 @@
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background-color: #ffffff; /* 미체크 시 배경 */
+    border: 1px solid #9ca3af;
+    border-radius: 3px;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+input[type="checkbox"]:checked {
+    background-color: #2563eb; /* 체크 시 파란색 배경 */
+    border-color: #2563eb;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background-color: #ffffff;
+    border: 1px solid #9ca3af;
+    border-radius: 50%;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+input[type="radio"]:checked {
+    background-image: url('data:image/svg+xml;utf8,<svg height="14" width="14" xmlns="http://www.w3.org/2000/svg"><circle r="3.5" cx="50%" cy="50%" fill="%232563eb" /></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+}

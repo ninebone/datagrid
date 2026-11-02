@@ -1,0 +1,75 @@
+
+nine-table-menu-panel {
+    .menu-wrapper {
+        background: #ffffff;
+        border: 1px solid #d1d5db;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 4px;
+        padding: 4px 0;
+        min-width: 150px;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        position: relative;
+        padding: 6px 16px;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    li:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+
+    li.on::before {
+        content: '✓';
+        position: absolute;
+        left: 4px;
+        font-weight: bold;
+    }
+
+    li.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: transparent !important;
+    }
+
+    li.ng-menu-separator {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 4px 0;
+        padding: 0;
+    }
+
+    li.submenu::after {
+        content: '▶';
+        font-size: 9px;
+        margin-left: 8px;
+        color: #9ca3af;
+    }
+
+    .ng-menu-sublist {
+        display: none;
+        position: absolute;
+        top: -4px;
+        left: 100%;
+        background: #ffffff;
+        border: 1px solid #d1d5db;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 4px;
+        padding: 4px 0;
+        min-width: 140px;
+    }
+
+    li.submenu:hover > .ng-menu-sublist {
+        display: block;
+    }
+}

@@ -1,0 +1,54 @@
+cell-row-indicator {
+    --row-indicator-prefix-size: 0.40rem;
+    --row-indicator-suffix-size: 0.55rem;
+    --row-indicator-sub-size: 0.40rem;
+    --row-indicator-sub-opacity: 0.2;
+    --row-indicator-status-size: 0.55rem;
+
+    display: block;
+    position: absolute; /* 💡 셀 전체를 강제로 꽉 채움 */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    user-select: none;
+
+    .ng-row-main {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        overflow: hidden;
+        font-size: 10px;
+    }
+
+    .ng-row-prefix {
+        font-weight: normal;
+        font-size: var(--row-indicator-prefix-size);
+    }
+
+    .ng-row-suffix {
+        font-size: var(--row-indicator-suffix-size);
+    }
+
+    .ng-row-sub {
+        position: absolute;
+        right: 2px;
+        bottom: 1px;
+        font-size: var(--row-indicator-sub-size);
+        line-height: 1;
+        opacity: var(--row-indicator-sub-opacity);
+        pointer-events: none;
+    }
+
+    .ng-row-status {
+        position: absolute;
+        right: 2px;
+        top: 1px;
+        font-size: var(--row-indicator-status-size);
+        line-height: 1;
+        pointer-events: none;
+    }
+}

@@ -1,0 +1,44 @@
+* {
+    outline: none;
+    box-sizing: border-box;
+    cursor: default;
+    font-size: 12px;
+}
+
+nine-table-body { display: flex; flex-direction: row; flex: 1; overflow: hidden; position: relative; }
+nine-table-summary { display: none; width: 250px; flex-shrink: 0; border-right: 1px solid #e5e7eb; }
+nine-table-analysis { display: none; }
+nine-table-footer { display: none; }
+
+nine-table-sheets {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    background: #fff;
+
+    nine-table-sheets-body {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: row;
+    }
+}
+
+cell-input, cell-input-number, cell-button, cell-input-color, cell-input-date, cell-combo {
+    position: absolute;
+    inset: 0;
+    padding: 2px 4px;
+    display: flex;
+
+    input, button {
+        height: 100%;
+    }
+}
+
+
+.empty-value {
+    color: #999;
+}

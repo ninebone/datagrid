@@ -1,0 +1,52 @@
+{
+  "name": "@ninebone/table",
+  "version": "0.0.1",
+  "description": "Blazing-fast virtualized HTML table for massive datasets with inline editing",
+  "keywords": [
+    "datagrid",
+    "table",
+    "web-components",
+    "vanilla-js",
+    "grid",
+    "virtual-scroll"
+  ],
+  "homepage": "https://github.com/ninebone/table#readme",
+  "bugs": {
+    "url": "https://github.com/ninebone/table/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ninebone/table.git"
+  },
+  "author": "ninebone",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/nine-table.umd.js",
+  "module": "./dist/nine-table.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/nine-table.js",
+      "require": "./dist/nine-table.umd.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build:css": "node scripts/bundle-css.js",
+    "build": "vite build && npm run build:css",
+    "watch": "vite build --watch",
+    "prepublishOnly": "npm run build",
+    "release": "npm version patch && npm publish --access public"
+  },
+  "peerDependencies": {
+    "@ninebone/util": "*"
+  },
+  "devDependencies": {
+    "vite": "^8.3.5"
+  }
+}

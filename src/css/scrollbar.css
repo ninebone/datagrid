@@ -1,0 +1,184 @@
+:host {
+    --hscrollbar-height: 16px;
+    --vscrollbar-width: 16px;
+}
+
+.scroll-edge {
+    display: none; /* 평소에는 기본 숨김 */
+    grid-row: 2;
+    grid-column: 2;
+    width: var(--vscrollbar-width);
+    height: var(--hscrollbar-height);
+    background: #f3f4f6;
+    border-top: 1px solid #e5e7eb;
+    z-index: 10;
+}
+
+nine-table-hscrollbar {
+
+    --hscrollbar-background: #f9fafb;
+    --hscrollbar-border-top: 1px solid #e5e7eb;
+    --hscrollbar-button-background: #f3f4f6;
+    --hscrollbar-track-background: #f3f4f6;
+    --hscrollbar-thumb-background: #9ca3af;
+    --hscrollbar-thumb-hover-background: #6b7280;
+
+    display: none;
+    grid-row: 2;
+    grid-column: 1;
+    flex-direction: row;
+    height: var(--hscrollbar-height);
+    min-height: var(--hscrollbar-height);
+    background: var(--hscrollbar-background);
+    border-top: var(--hscrollbar-border-top);
+    z-index: 10;
+    overflow: hidden;
+    width: 100%;
+    user-select: none;
+    position: relative;
+
+    button {
+        width: var(--hscrollbar-height);
+        height: 100%;
+        background: var(--hscrollbar-button-background);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        flex-shrink: 0;
+        z-index: 2;
+    }
+    button:disabled {
+        opacity: 0.4;
+    }
+
+    .scroll-icon {
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .scroll-left .scroll-icon {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16"><path fill="none" stroke="%236b7280" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 12L6 8l4-4"/></svg>');
+    }
+
+    .scroll-right .scroll-icon {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16"><path fill="none" stroke="%236b7280" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 4l4 4-4 4"/></svg>');
+    }
+
+    .scroll-track {
+        flex: 1;
+        height: 100%;
+        position: relative;
+        background: var(--hscrollbar-track-background);
+        overflow: hidden;
+    }
+    .scroll-thumb {
+        position: absolute;
+        top: 2px;
+        bottom: 2px;
+        left: 0px;
+        background: var(--hscrollbar-thumb-background);
+        border-radius: 4px;
+        z-index: 1;
+    }
+    .scroll-thumb:hover {
+        background: var(--hscrollbar-thumb-hover-background);
+    }
+}
+
+nine-table-vscrollbar {
+
+    --vscrollbar-background: #f9fafb;
+    --vscrollbar-border-top: 2px solid #333;
+    --vscrollbar-button-background: #f3f4f6;
+    --vscrollbar-track-background: #f3f4f6;
+    --vscrollbar-thumb-background: #9ca3af;
+    --vscrollbar-thumb-hover-background: #6b7280;
+
+    display: none;
+    border-top: var(--vscrollbar-border-top);
+    grid-row: 1;
+    grid-column: 2;
+    width: var(--vscrollbar-width);
+    height: 100%;
+    z-index: 50;
+    flex-direction: column;
+    background: var(--vscrollbar-background);
+    user-select: none;
+    position: relative;
+
+    button {
+        height: var(--vscrollbar-width);
+        width: 100%;
+        background: var(--vscrollbar-button-background);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        flex-shrink: 0;
+        z-index: 2;
+    }
+    button:disabled {
+        opacity: 0.4;
+    }
+
+    .scroll-icon {
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .scroll-top .scroll-icon {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16"><path fill="none" stroke="%236b7280" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 10l4-4 4 4"/></svg>');
+    }
+
+    .scroll-bottom .scroll-icon {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16"><path fill="none" stroke="%236b7280" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6l4 4 4-4"/></svg>');
+    }
+
+    .scroll-track {
+        flex: 1;
+        width: 100%;
+        position: relative;
+        background: var(--vscrollbar-track-background);
+        overflow: hidden;
+    }
+    .scroll-thumb {
+        position: absolute;
+        left: 2px;
+        right: 2px;
+        top: 0px;
+        height: 30px;
+        background: var(--vscrollbar-thumb-background);
+        border-radius: 4px;
+        z-index: 1;
+    }
+    .scroll-thumb:hover {
+        background: var(--vscrollbar-thumb-hover-background);
+    }
+}
+
+
+/* --- 세로 스크롤바가 활성화되었을 때만 CSS로 2열 너비 확장 및 요소 표시 --- */
+nine-table-sheet.vscroll-visible {
+    grid-template-columns: 1fr var(--vscrollbar-width);
+
+    nine-table-vscrollbar {
+        display: flex;
+    }
+}
+
+/* --- 가로 스크롤바가 활성화되었을 때만 CSS로 행 높이 확장 및 요소 표시 --- */
+nine-table-sheet.hscroll-visible {
+    grid-template-rows: 1fr var(--hscrollbar-height);
+
+    nine-table-hscrollbar, .scroll-edge {
+        display: flex;
+    }
+}
+

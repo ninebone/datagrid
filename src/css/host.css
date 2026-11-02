@@ -1,0 +1,152 @@
+:host {
+    width: 100%;
+    height: 100%;
+}
+
+
+:host {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+
+    background: #fff;
+}
+
+:host([theme="simple"]) {
+    /* 1. 불필요한 패널 및 컴포넌트 숨기기 */
+    .ng-part-header, .ng-part-footer,
+    nine-table-toolbar,
+    nine-table-sheets-footer,
+    nine-table-vscrollbar,
+    nine-table-hscrollbar,
+    nine-table-sheet .ng-scroll-edge {
+        display: none;
+    }
+
+    .col-indicator-rowgroup {
+        display: none;
+    }
+
+    tr {
+        height: 32px;
+    }
+
+    /* 2. 💡 [핵심] 스크롤바용 우측 16px 빈 공간을 제거하고 1열(1fr)로 꽉 채우기 */
+    nine-table-sheet {
+        border: none;
+        overflow: hidden;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+    }
+
+    nine-table-sheet tr th,
+    nine-table-sheet tr td {
+        border: none;
+        padding: 0 8px;
+    }
+
+    /**
+    nine-table-sheet tr td {
+        text-align: left;
+    } */
+
+    /* 4. 브라우저 기본 네이티브 스크롤바를 콘텐츠 위에 자연스럽게 오버레이(Overlay) */
+    nine-table-sheet .ng-sheet-body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    }
+
+    nine-table-sheet .ng-sheet-body::-webkit-scrollbar {
+        display: block;
+        width: 6px;
+        height: 6px;
+    }
+
+    nine-table-sheet .ng-sheet-body::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    nine-table-sheet .ng-sheet-body::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: 3px;
+    }
+
+    nine-table-sheet .ng-sheet-body::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* 🎯 Toolbar 숨김 제어 */
+:host([theme="simple"]) nine-table-toolbar,
+:host([show-header="false"]) nine-table-toolbar {
+    display: none;
+}
+
+/* 🎯 Footer(StatusBar) 숨김 제어 (show-statusbar="false") */
+:host([theme="simple"]) nine-table-sheets-footer,
+:host([show-statusbar="false"]) nine-table-sheets-footer {
+    display: none;
+}
+
+:host([theme="simple"]) {
+    col[data-col="0"], th[data-col="0"], td[data-col="0"] {
+        display: none;
+    }
+    .ng-container-right {
+        display: none;
+    }
+    tr {
+        height: 26px;
+    }
+}
+
+:host(.loading) {
+    .ng-loading-bar {
+        display: block;
+    }
+}
+
+
+.ng-loading-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.08); /* 은은한 화이트 트랙 배경 */
+    z-index: 10000;
+    display: none;
+    overflow: hidden;
+}
+
+/* 🎯 아주 좁고 쨍한 빛 조각 형태로 압축 */
+.ng-loading-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 12%; /* 바의 전체 길이를 12%로 대폭 축소 */
+    background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.4) 20%,
+            #ffffff 50%,
+            rgba(255, 255, 255, 0.4) 80%,
+            transparent 100%
+    );
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
+    animation: ng-loading-slide 0.9s ease-in-out infinite;
+}
+
+@keyframes ng-loading-slide {
+    0% {
+        transform: translateX(-150%);
+    }
+    100% {
+        transform: translateX(850%); /* 폭이 좁아진 만큼 이동 거리 확장 */
+    }
+}

@@ -1,0 +1,138 @@
+:host {
+    --cell-selection-bg: rgba(37, 99, 235, 0.08);
+    --cell-selection-border-color: green;
+    --hscrollbar-height: 16px;
+    --vscrollbar-width: 16px;
+    --cell-input-border-color: #eee;
+    --cell-input-bg: #fff;
+    --cell-input-color: #333;
+    --cell-input-readonly-bg: #fdfdfd;
+    --cell-input-btn-bg: #f9f9f9;
+}
+
+nine-table-sheet {
+    --sheet-bg: #ffffff;
+    --sheet-nodata-color: #9ca3af;
+    --sheet-fixed-brightness: 99%;
+}
+
+table {
+    --table-th-bg: #f9fafb;
+    --table-th-color: #111827;
+    --table-td-bg: #fff;
+    --table-td-color: #111827;
+    --table-disabled-bg: #f0f0f0;
+    --th-border-left: none;
+    --th-border-top: none;
+    --th-border-right: 1px solid #e5e7eb;
+    --th-border-bottom: 1px solid #e5e7eb;
+    --td-border-left: none;
+    --tD-border-top: none;
+    --td-border-right: 1px solid #e5e7eb;
+    --td-border-bottom: 1px solid #e5e7eb;
+}
+
+.asc::after,.desc::after {
+    --sort-icon-size: 10px;
+}
+.asc::after {
+    --sort-icon-color: #2563eb;
+}
+.desc::after {
+    --sort-icon-color: #dc2626;
+}
+
+cell-combo {
+    --cell-combo-button-border-color: #eee;
+    --cell-combo-button-bg-color: #f9f9f9;
+}
+
+nine-table-col-resizer-panel {
+    --col-resizer-color: #2563eb;
+    --col-resizer-bg: rgba(37, 99, 235, 0.12);
+    --col-resizer-badge-bg: #1e40af;
+    --col-resizer-badge-color: #ffffff;
+}
+
+nine-table-hscrollbar {
+    --hscrollbar-background: #f9fafb;
+    --hscrollbar-border-top: 1px solid #e5e7eb;
+    --hscrollbar-button-background: #f3f4f6;
+    --hscrollbar-track-background: #f3f4f6;
+    --hscrollbar-thumb-background: #9ca3af;
+    --hscrollbar-thumb-hover-background: #6b7280;
+}
+nine-table-vscrollbar {
+    --vscrollbar-background: #f9fafb;
+    --vscrollbar-border-top: 2px solid #333;
+    --vscrollbar-button-background: #f3f4f6;
+    --vscrollbar-track-background: #f3f4f6;
+    --vscrollbar-thumb-background: #9ca3af;
+    --vscrollbar-thumb-hover-background: #6b7280;
+}
+
+cell-row-indicator {
+    --row-indicator-prefix-size: 0.40rem;
+    --row-indicator-suffix-size: 0.55rem;
+    --row-indicator-sub-size: 0.40rem;
+    --row-indicator-sub-opacity: 0.2;
+    --row-indicator-status-size: 0.55rem;
+}
+cell-button {
+    --cell-button-border: 1px solid #d1d5db;
+    --cell-button-color: #1f2937;
+    --cell-button-background: #f3f4f6;
+
+    --cell-button-hover-border: 1px solid #9ca3af;
+    --cell-button-hover-color: #111827;
+    --cell-button-hover-background: #e5e7eb;
+
+    --cell-button-active-border: 1px solid #6b7280;
+    --cell-button-active-color: #111827;
+    --cell-button-active-background: #d1d5db;
+}
+
+
+cell-input-date {
+
+    input {
+        position: relative;
+        margin: 0;
+        width: 100%;
+        padding: 0 4px;
+        border: 1px solid var(--cell-input-border-color);
+        background: var(--cell-input-bg);
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 4px center;
+        background-size: 14px 16px;
+        color: var(--cell-input-color);
+    }
+
+    input:hover {
+        filter: brightness(95%);
+    }
+
+    input::before {
+        content: attr(data-placeholder);
+        position: absolute;
+        display: flex;
+        align-items: center;
+        width: calc(100% - 22px);
+        height: 100%;
+        left: 1px;
+        top: 1px;
+        pointer-events: none;
+    }
+
+    input.has-value::before, input:focus::before {
+        display: none;
+    }
+
+    input:focus {
+
+    }
+}

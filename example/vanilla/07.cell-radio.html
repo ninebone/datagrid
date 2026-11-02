@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>nine-table ::: cell-radio</title>
+
+    <link rel="stylesheet" href="./css/example.css" />
+
+    <script type="text/javascript" src="./_data/example-data.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/table@latest/dist/nine-table.umd.js"></script>
+
+    <script>
+        nine.setup({
+            debug: {
+                enable: true,
+                filter: ["nine-table"],
+            },
+            "nine-table": {
+                cssFile: "./css/nine-table/_nine-table.css",
+            },
+        });
+    </script>
+</head>
+
+<body>
+    <h1>NineTable High-Performance Editable Grid & Cell Validation Showcase</h1>
+
+    <nine-table show-footer="true">
+        <table row-indicator="true">
+            <colgroup>
+                <col width="80"/>
+                <col width="50"/>
+                <col width="130"/>
+                <col width="50"/>
+                <col width="170"/>
+                <col width="50"/>
+                <col width="260"/>
+                <col width="50"/>
+                <col width="190"/>
+                <col width="130"/>
+                <col width="130"/>
+            </colgroup>
+            <thead>
+            <tr>
+                <th rowSpan="2">NAME</th>
+                <th colspan="2">SEX</th>
+                <th colspan="2">STATUS</th>
+                <th colspan="2">DEPART (data-source)</th>
+                <th colspan="2">DEPART1 (datalist)</th>
+                <th rowSpan="2">enable</th>
+                <th rowSpan="2">visible</th>
+            </tr>
+            <tr>
+                <th style="filter:brightness(0.95);">code</th>
+                <th>radio</th>
+                <th style="filter:brightness(0.95);">code</th>
+                <th>radio</th>
+                <th style="filter:brightness(0.95);">code</th>
+                <th>radio</th>
+                <th style="filter:brightness(0.95);">code</th>
+                <th>radio</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td data-bind="NAME"></td>
+
+                <td data-bind="SEX" text-align="center" style="background: white; filter:brightness(0.98);"></td>
+                <td cell-type="radio" data-bind="SEX" text-align="center" data-source="host.getCommonCode('SEX')" key-name="code" value-name="codename"></td>
+
+                <td data-bind="STATUS" text-align="center" style="background: white; filter:brightness(0.98);"></td>
+                <td cell-type="radio" data-bind="STATUS" text-align="center" data-source="host.getCommonCode('STATUS')" key-name="code" value-name="codename"></td>
+
+                <td data-bind="DEPART" text-align="center" style="background: white; filter:brightness(0.98);"></td>
+                <td cell-type="radio" data-bind="DEPART" text-align="center" data-source="host.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+
+
+                <td data-bind="DEPART1" text-align="center" style="background: white; filter:brightness(0.98);"></td>
+                <td cell-type="radio" data-bind="DEPART1" text-align="center">
+                    <datalist>
+                        <option k="A" v="#AAA"/>
+                        <option k="B" v="#BBB"/>
+                        <option k="C" v="#CCC"/>
+                    </datalist>
+                </td>
+
+                <td cell-type="radio" data-bind="SEX" data-source="host.getCommonCode('SEX')"
+                    key-name="code" value-name="codename"
+                    enable="data.STATUS === 'C' ? true : false"></td>
+
+                <td cell-type="radio" data-bind="SEX" data-source="host.getCommonCode('SEX')"
+                    key-name="code" value-name="codename"
+                    visible="data.STATUS === 'C' ? true : false"></td>
+            </tr>
+            </tbody>
+        </table>
+    </nine-table>
+
+</body>
+
+<script>
+
+    const DATA_CNT = 100000;
+
+    const grd = document.querySelector("nine-table");
+
+    grd.addEventListener("load", () => {
+        grd.getCommonCode = (group) => {
+            return exampleData.generateCommonCode(group);
+        };
+
+        grd.loading = true;
+        setTimeout( () => {
+            grd.data.set(exampleData.generateRandomData(DATA_CNT));
+        });
+    });
+
+</script>
+
+</html>
+

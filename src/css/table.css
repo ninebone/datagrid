@@ -1,0 +1,137 @@
+table {
+    --table-th-bg: #f9fafb;
+    --table-th-color: #111827;
+    --table-td-bg: #fff;
+    --table-td-color: #111827;
+    --table-disabled-bg: #f0f0f0;
+    --th-border-left: none;
+    --th-border-top: none;
+    --th-border-right: 1px solid #e5e7eb;
+    --th-border-bottom: 1px solid #e5e7eb;
+    --td-border-left: none;
+    --tD-border-top: none;
+    --td-border-right: 1px solid #e5e7eb;
+    --td-border-bottom: 1px solid #e5e7eb;
+
+
+    border-collapse: separate;
+    border-spacing: 0;
+    width: auto;
+    min-width: 100%;
+    table-layout: fixed;
+}
+
+nine-table-sheet[auto-fit-col="true"] table {
+    width: 100%;
+    min-width: 100%;
+}
+
+col {
+    width: attr(width px);
+}
+
+thead {
+    display: table-header-group;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+tfoot {
+    display: table-footer-group;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+}
+
+tbody {
+    position: relative;
+}
+
+tbody.foot {
+    height: 100vh;
+}
+
+thead tr {
+    height: 48px;
+}
+tbody tr {
+    height: 32px;
+}
+tfoot tr {
+    height: 32px;
+}
+
+tr.hover th, tr.hover td {
+    background-color: rgba(37, 99, 235, 0.06);
+}
+
+th, td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0px 4px;
+    border-top: 1px solid transparent;
+    border-left: 1px solid transparent;
+    color: var(--table-td-color);
+    position: relative;
+}
+
+th {
+    border-left: var(--th-border-left);
+    border-top: var(--th-border-top);
+    border-right: var(--th-border-right);
+    border-bottom: var(--th-border-bottom);
+    background: var(--table-th-bg);
+    color: var(--table-th-color);
+    font-weight: 600;
+    user-select: none;
+}
+
+td {
+    border-left: var(--td-border-left);
+    border-top: var(--td-border-top);
+    border-right: var(--td-border-right);
+    border-bottom: var(--td-border-bottom);
+    background: var(--table-td-bg);
+    color: var(--table-td-color);
+}
+
+td.invalid::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 2px solid red;
+    border-right: 2px solid red;
+    border-bottom: 2px solid transparent;
+    border-left: 2px solid transparent;
+    z-index: 1;
+    pointer-events: none;
+}
+
+td[disabled="true"] {
+    input, button {
+        background: var(--table-disabled-bg);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+}
+
+td[text-align="left"] {
+    input {
+        text-align: left;
+    }
+}
+td[text-align="right"] {
+    input {
+        text-align: right;
+    }
+}
+td[text-align="center"] {
+    input {
+        text-align: center;
+    }
+}

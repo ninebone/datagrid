@@ -1,0 +1,28 @@
+
+tr.col-indicator-rowgroup {
+    th,td {
+        padding: 0;
+    }
+}
+
+.col-indicator-rowgroup.expand {
+    height: 20px;
+}
+.col-indicator-rowgroup.collapse {
+    height: 2px;
+}
+.col-indicator-rowgroup.expand th {
+    background-color: #eee;
+    border-right-color: #ccc;
+    border-top: 2px solid #666;
+}
+.col-indicator-rowgroup.collapse th {
+    background-color: #666;
+    border: none;
+}
+.col-indicator-rowgroup.collapse div {
+    display: unset;
+}
+.col-indicator-rowgroup.collapse div {
+    display: none;
+}

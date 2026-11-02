@@ -1,0 +1,53 @@
+
+nine-table-toolbar {
+    --display: flex;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    padding: 0 12px;
+    --border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+    user-select: none;
+    flex-shrink: 0;
+
+
+    .ng-toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .ng-toolbar-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #111827;
+    }
+    .ng-toolbar-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        padding: 4px;
+        border-radius: 4px;
+    }
+    .ng-toolbar-menu-btn:hover {
+        background-color: #f3f4f6;
+    }
+    .ng-toolbar-custom {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+}
+
+:host([theme="simple"]) nine-table-toolbar,
+:host([show-header="false"]) nine-table-toolbar {
+    display: none;
+
+    .ng-toolbar-menu-btn {
+        display: none;
+    }
+}
+
+

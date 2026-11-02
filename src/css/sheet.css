@@ -1,0 +1,78 @@
+nine-table-sheet {
+    --sheet-bg: #ffffff;
+    --sheet-nodata-color: #9ca3af;
+    --sheet-fixed-brightness: 99%;
+
+    display: none;
+    grid-template-columns: 1fr 0;
+    grid-template-rows: 1fr 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: var(--sheet-bg);
+    overflow: hidden;
+
+    .ng-sheet-body {
+        display: block;
+        flex: 1 1 auto;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: relative;
+        scrollbar-width: none;
+        &::-webkit-scrollbar { display: none; height: 0px; width: 0px; }
+    }
+
+    .ng-sheet-body-content {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        position: sticky;
+    }
+
+    .ng-container-left, .ng-container-body, .ng-container-right {
+        flex-direction: column;
+        position: relative;
+        background: var(--sheet-bg);
+    }
+    .ng-container-body {
+        display: flex;
+    }
+    .ng-container-left, .ng-container-right {
+        border: none;
+        flex-shrink: 0;
+        overflow: hidden;
+        filter: brightness(var(--sheet-fixed-brightness));
+    }
+    .ng-container-body {
+        flex: 1;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        &::-webkit-scrollbar { display: none; height: 0px; width: 0px; }
+    }
+
+    .nodata-overlay {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--sheet-bg);
+        z-index: 20;
+        align-items: center;
+        justify-content: center;
+        color: var(--sheet-nodata-color);
+    }
+}
+
+nine-table-sheet.active {
+    display: grid;
+}
+
+

@@ -1,0 +1,142 @@
+
+:host {
+    --cell-input-border-color: #eee;
+    --cell-input-bg: #fff;
+    --cell-input-color: #333;
+    --cell-input-readonly-bg: #fdfdfd;
+    --cell-input-btn-bg: #f9f9f9;
+}
+
+cell-input {
+    input {
+        position: relative;
+        user-select: auto;
+        width: 100%;
+        border: 1px solid var(--cell-input-border-color);
+        padding-left: 4px;
+        background: var(--cell-input-bg);
+        color: var(--cell-input-color);
+    }
+
+    input:read-only {
+        border-color: var(--cell-input-readonly-bg);
+        filter: brightness(97%);
+    }
+}
+
+cell-input-color {
+
+    input[type=color] {
+        width: 100%;
+        padding: 0px;
+        margin-left: unset;
+        border: 1px solid var(--cell-input-border-color);
+        border-right: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: transparent;
+    }
+
+    input[type=color]::-webkit-color-swatch {
+        border: 0;
+    }
+
+    input[type=color]::-webkit-color-swatch-wrapper {
+        padding: 1px;
+    }
+
+    button {
+        display: inline-flex;
+        width: 24px;
+        margin-right: unset;
+        border: 1px solid var(--cell-input-border-color);
+        background-color: var(--cell-input-btn-bg);
+        justify-content: center;
+        align-items: center;
+    }
+
+    button:after {
+        content: "";
+        border-top: 0.3em solid var(--cell-input-color);
+        border-right: 0.3em solid transparent;
+        border-bottom: 0;
+        border-left: 0.3em solid transparent;
+    }
+
+    input[type=color]:hover, button:hover {
+        filter: brightness(95%);
+    }
+}
+
+cell-input-date {
+
+    input {
+        position: relative;
+        margin: 0;
+        width: 100%;
+        padding: 0 4px;
+        border: 1px solid var(--cell-input-border-color);
+        background: var(--cell-input-bg);
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 4px center;
+        background-size: 14px 16px;
+        color: var(--cell-input-color);
+    }
+
+    input:hover {
+        filter: brightness(95%);
+    }
+
+    input::before {
+        content: attr(data-placeholder);
+        position: absolute;
+        display: flex;
+        align-items: center;
+        width: calc(100% - 22px);
+        height: 100%;
+        left: 1px;
+        top: 1px;
+        pointer-events: none;
+    }
+
+    input.has-value::before, input:focus::before {
+        display: none;
+    }
+
+    input:focus {
+
+    }
+}
+
+cell-input-number {
+    input.border-left-none {
+        border-left: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    input.border-right-none {
+        border-right: 0;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    input {
+        position: relative;
+        user-select: auto;
+        width: 100%;
+        border: 1px solid var(--cell-input-border-color);
+        background: var(--cell-input-bg);
+        color: var(--cell-input-color);
+        text-align: right;
+    }
+
+    input:read-only {
+        border-color: var(--cell-input-readonly-bg);
+        filter: brightness(97%);
+    }
+}

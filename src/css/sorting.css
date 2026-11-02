@@ -1,0 +1,25 @@
+.asc::after,
+.desc::after {
+    --sort-icon-size: 10px;
+
+    content: "";
+    display: inline-block;
+    width: var(--sort-icon-size);
+    height: var(--sort-icon-size);
+    flex-shrink: 0;
+    margin-left: 4px;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.asc::after {
+    --sort-icon-color: #2563eb;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16"><path fill="%232563eb" d="M8 3L3 11h10L8 3z"/></svg>');
+}
+
+.desc::after {
+    --sort-icon-color: #dc2626;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16"><path fill="%23dc2626" d="M8 13L3 5h10l-5 8z"/></svg>');
+}

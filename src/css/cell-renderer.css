@@ -1,0 +1,22 @@
+
+
+cell-renderer {          /* Custom element host layout */
+    display: block;
+    span.wrapper {
+        display: block;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;   /* 줄바꿈 방지 */
+    }
+}
+
+.CELL-RENDERER {      /* Parent cell hook */
+    text-align: left;
+}
+.CELL-RENDERER[text-align="center"] {
+    text-align: center;
+}
+.CELL-RENDERER[text-align="right"] {
+    text-align: right;
+}
