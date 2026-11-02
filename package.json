@@ -10,13 +10,13 @@
     "grid",
     "virtual-scroll"
   ],
-  "homepage": "https://github.com/ninebone/table#readme",
+  "homepage": "https://ninebone.github.io/datagrid",
   "bugs": {
-    "url": "https://github.com/ninebone/table/issues"
+    "url": "https://github.com/ninebone/datagrid/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ninebone/table.git"
+    "url": "https://github.com/ninebone/datagrid.git"
   },
   "author": "ninebone",
   "license": "MIT",
