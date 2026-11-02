@@ -2,14 +2,12 @@ import { trace } from "@nopeer";
 import { BasicCellElement } from './BasicCellElement.js';
 
 const exprCache = new Map();
-const hostFuncCache = new Map();
 
 export class CellElement extends BasicCellElement {
 	#host;
 	#sheet;
 	#tr;
 	#cell;
-
 	#attr;
 
 	constructor() {
@@ -107,9 +105,6 @@ export class CellElement extends BasicCellElement {
 		}
 	}
 
-	/**
-	 * 🎯 [Proxy 최적화] 속성 읽기 시에도 fields.indexOf() 사용
-	 */
 	get data() {
 		const rawRecord = this.#tr?.data;
 		if (!rawRecord) return null;
@@ -122,16 +117,12 @@ export class CellElement extends BasicCellElement {
 				if (prop === '__ng') return target.__ng;
 				if (prop === 'v') return target.v;
 
-				// 💡 host.fields.indexOf(prop) 사용
 				const idx = host?.fields?.indexOf?.(prop) ?? -1;
 				return idx >= 0 ? target.v[idx] : target[prop];
 			}
 		});
 	}
 
-	/**
-	 * 🎯 [핵심] 변환 없이 원시 v 배열에서 direct 인덱스 검색 (GC zero)
-	 */
 	get value() {
 		if (!this.#cell || !this.#tr?.data) return "";
 
@@ -140,14 +131,12 @@ export class CellElement extends BasicCellElement {
 
 		const rawRecord = this.#tr.data;
 
-		// 1. 원시 데이터 배열({ v: [...] }) 구조인 경우
 		if (rawRecord.v && Array.isArray(rawRecord.v)) {
 			// 💡 fields.indexOf(bindKey)로 바로 찾기!
 			const colIdx = this.#host.fields.get().indexOf(bindKey) ?? -1;
 			return colIdx >= 0 ? (rawRecord.v[colIdx] ?? "") : "";
 		}
 
-		// 2. 일반 JSON 객체인 경우 (하위 호환)
 		return rawRecord[bindKey] ?? "";
 	}
 
@@ -192,18 +181,7 @@ export class CellElement extends BasicCellElement {
 		if (expr) {
 			try {
 				if (this.#tr.getAttribute("grouping") === "true") {
-					// 💡 상수가 정의되어 있다면 GROUP_IDX.ID 로 고유 ID 추출 (아니면 배열 인덱스 직접 참조)
-					// 배열 구조체인 경우: rawRecord[0]이 groupId임
-					//const groupId = Array.isArray(rawRecord) ? rawRecord[0] : (rawRecord.__ng?.id || rawRecord.m?.id);
 
-					// 💡 매니저를 통해 해당 그룹의 자식 레코드 목록을 O(1)로 획득
-					//const childRecords = this.#sheet.grouping.getChildrenRecords("g_0");
-					//trace.log("--========", childRecords);
-					// 그룹 전용 표현식 계산 메서드 호출
-					//return "";//this.getGroupExprValue(expr, childRecords, row, this.#cell);
-
-					//trace.log(this, this.#cell.dataset.bind);
-					//return "x";//this.data.length;
 					return this.getGroupExprValue(expr, this.#tr.data, row, this.#cell);
 				} else {
 					return this.#host.exprEngine.evaluate(expr, this.#tr.data, row);
@@ -211,14 +189,14 @@ export class CellElement extends BasicCellElement {
 					//return this.getExprValue(expr, this.#tr.data, row, this.#cell);
 				}
 			} catch (e) {
-				console.trace(e);
+				//console.trace(e);
 				//console.error("Expr evaluation error:", expr, e);
 				return defaultValue;
 			}
 		}
 
 		if (bindKey) {
-			const val = this.value; // 직통 읽기
+			const val = this.value;
 			return val !== null && val !== undefined ? val : defaultValue;
 		}
 
@@ -231,7 +209,7 @@ export class CellElement extends BasicCellElement {
 
 		if (!this.#cell || !this.#tr) return;
 
-		const val = this.value; // 원시 배열 직통 조회
+		const val = this.value;
 
 		this.#cell.classList.remove("invalid");
 
@@ -272,9 +250,6 @@ export class CellElement extends BasicCellElement {
 		return this.#host.exprEngine.evaluate(expr, data, row);
 	}
 
-	/**
-	 * 🎯 [신규] 그룹 행의 자식 데이터 목록(childRecords)을 기반으로 합계/평균/개수 등을 처리하는 메서드
-	 */
 	getGroupExprValue = (expr, groupRecord, row, cell) => {
 		if (!expr) return "";
 
@@ -282,15 +257,12 @@ export class CellElement extends BasicCellElement {
 			row = parseInt(row, 10);
 			const cleanExpr = expr.replace("()", "").trim();
 
-			// 1. 호스트(컴포넌트)에 정의된 그룹 전용 커스텀 메서드가 있는 경우 우선 위임
 			if (this.#host && typeof this.#host[cleanExpr] === 'function') {
 				return this.#host[cleanExpr].call(this, groupRecord, row, cell);
 			}
 
-			// 2. 기본 내장 집계 함수 파싱 처리 (예: sum(price), count(), avg(score) 등)
 			const match = cleanExpr.match(/^(\w+)\s*\(\s*([\w\-]*)\s*\)/);
 			if (match) {
-				// 💡 groupRecord에서 자식 레코드 목록 안전하게 추출 (indices 배열 -> 실제 레코드 매핑)
 				const indices = groupRecord[GROUP_IDX.CHILDREN];
 				const allRecords = this.#host?.data?.getArray ? this.#host.data.getArray() : [];
 				const childRecords = indices ? indices.map(idx => allRecords[idx]).filter(Boolean) : [];
@@ -327,9 +299,6 @@ export class CellElement extends BasicCellElement {
 				return this.#host.exprFunction(expr).call(this, groupRecord, row, this.#host.data);
 			}
 
-			// 4. 💡 캐싱을 적용한 그룹 동적 표현식 평가 (예: "childRecords.reduce(...)")
-			// groupRecord 자체나 내부 자식들을 활용하는 표현식 문자열 처리
-			// 4. 💡 캐싱을 적용한 그룹 동적 표현식 평가 (안전성 강화 버전)
 			if (expr.includes("data.") || expr.includes("childRecords") || expr.includes("groupRecord")) {
 				let evalFn = exprCache.get("grp_" + expr);
 				if (!evalFn) {
@@ -389,41 +358,6 @@ export class EditableCellElement extends CellElement {
 
 	connectedCallback() {
 		super.connectedCallback();
-
-
-
-		/**
-		this.querySelectorAll("input, textarea").forEach($el => {
-			$el.addEventListener("change", (event) => {
-				if (!this.closest("tbody")) return;
-
-				const target = event.target;
-				const inputType = target.getAttribute('type');
-
-				if (inputType === "checkbox") {
-					const trueVal = super.attr["true-value"] || "Y";
-					const falseVal = super.attr["false-value"] || "N";
-					this.value = target.checked ? trueVal : falseVal;
-				} else {
-					let v = target.value;
-					const maxbyte = super.attr["maxbyte"];
-
-					trace.log(maxbyte);
-
-					if (maxbyte) {
-						const byteLen = nine.getByteLength(v);
-						if (byteLen >= parseInt(maxbyte, 10)) {
-							v = nine.cut(v, parseInt(maxbyte, 10));
-							target.value = v;
-						}
-					}
-
-					this.value = this.getAttribute("type") === "number" ? (isNaN(v) ? "" : Number(v)) : v;
-				}
-
-				super.sheet.invalidate();
-			});
-		}); */
 	}
 
 	refresh() {

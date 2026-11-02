@@ -19,7 +19,6 @@ export class CellComboPanel extends HTMLElement {
 		const grd = this.querySelector("nine-table-simple");
 		if (!grd || !dataSource || dataSource.length === 0) return;
 
-		// 1. 부모(parent)의 items 속성 확인 (예: "CODE,NAME,DESC" 형태)
 		const itemsAttr = this.#parent.getAttribute("items");
 		let fieldKeys = [];
 
@@ -31,20 +30,16 @@ export class CellComboPanel extends HTMLElement {
 
 		const activeColumnCount = fieldKeys.length;
 
-		// 2. 🎯 [수정] multi 모드 여부에 따라 0번 컬럼(체크박스) 가시성 제어
-		//trace.log(grd.shadowRoot, grd.shadowRoot.querySelectorAll('nine-table-body table'));
 		grd.shadowRoot.querySelector(".ng-container-left").style.display = multi ? '' : 'none';
 
 		grd.shadowRoot.querySelectorAll('table colgroup col, tbody td').forEach(($el, idx) => {
-			trace.log($el);
 
 			const col = parseInt($el.dataset.col, 10);
-			if (col >= 2) {	// row-indicator, checkbox 제외
+			if (col >= 2) {
 				$el.style.display = (col - 2 >= activeColumnCount) ? 'none' : '';
 			}
 		});
 
-		// 3. 동적 데이터 매핑 (dataSource 원본 객체에서 fieldKeys 순서대로 tmp1 ~ tmpN에 매핑)
 		const formattedData = dataSource.map(item => {
 			const row = {
 				CHK: "N",
@@ -59,7 +54,6 @@ export class CellComboPanel extends HTMLElement {
 
 		grd.data.set(formattedData);
 
-		// 4. 멀티 모드일 때 기존 선택값 반영
 		if (multi && this.#parent.value) {
 			const selectedKeys = String(this.#parent.value).split(separator || ",");
 			grd.data.getValidData().forEach(m => {
@@ -77,21 +71,14 @@ export class CellComboPanel extends HTMLElement {
 		this.#valueName = valueName;
 		this.#isOpen = true;
 
-		trace.log(new Date());
-
 		this.classList.add("active");
 
 		const grd = this.querySelector("nine-table-simple");
 		if (!grd || !dataSource) return;
 
-		// 🎯 패널을 열자마자 active를 주어 레이아웃(offsetHeight) 확보 및 초기화 수행
-
-
-		// 검색어 초기화 및 체크박스 기본값 설정
 		this.querySelector(".search-input").value = "";
 		this.querySelector("#chkAll").checked = true;
 
-		// 데이터 개수 및 모드에 따른 클래스 제어
 		if (dataSource.length > 10) {
 			this.classList.add("expand");
 		} else {
@@ -104,9 +91,6 @@ export class CellComboPanel extends HTMLElement {
 			this.classList.remove("multi");
 		}
 
-		// 데이터 및 멀티컬럼 구조 초기화 실행
-
-		// 🎯 [필터 패널 방식 위치 정렬 적용] 시트(sheet) 기준 상대 좌표계산
 		const sheet = parent.closest("nine-table-sheet");
 		const btnEl = parent.querySelector(".btn1");
 		if (!btnEl || !sheet) return;
@@ -117,7 +101,6 @@ export class CellComboPanel extends HTMLElement {
 		let left = btnRect.left - sheetRect.left;
 		let top = btnRect.bottom - sheetRect.top + 2;
 
-		// 화면 오른쪽 밖으로 넘칠 경우 보정
 		const panelWidth = this.offsetWidth || 250;
 		const panelHeight = this.offsetHeight || 250;
 		if (left + panelWidth > sheetRect.width) {
@@ -131,34 +114,27 @@ export class CellComboPanel extends HTMLElement {
 		if (top + panelHeight > sheetRect.height) {
 			const upwardTop = (btnRect.top - sheetRect.top) - panelHeight - 2;
 			if (upwardTop >= 0) {
-				top = upwardTop; // 위쪽 공간이 있으면 위로 팝업
+				top = upwardTop;
 			} else {
-				top = Math.max(0, sheetRect.height - panelHeight - 5); // 위아래 다 부족하면 시트 하단에 밀착
+				top = Math.max(0, sheetRect.height - panelHeight - 5);
 			}
 		}
 
 		this.style.left = `${left}px`;
 		this.style.top = `${top}px`;
 
-		// 내부 그리드 행 클릭 이벤트 바인딩 (싱글 모드용)
-		trace.log(new Date());
-
 		setTimeout(() => {
-			trace.log(new Date());
+
 			this.#initData(dataSource, keyName, valueName, multi, separator);
-			trace.log(new Date());
+
 			const viewContainer = grd.shadowRoot.querySelector(".ng-container-body table tbody.body");
 
-			// 중복 바인딩 방지를 위한 플래그 체크 또는 기존 리스너 관리
 			if (!viewContainer.__hasClickEvent) {
 
 				viewContainer.addEventListener("mousedown", (e) => {
-					trace.log("==========================================", e.target);
 
 					const tr = e.target.closest("tr");
 					if (!tr) return;
-
-					trace.log("==========================================", multi);
 
 					if (!multi) {
 						this.#onClickRow(e);
@@ -166,8 +142,6 @@ export class CellComboPanel extends HTMLElement {
 				});
 				viewContainer.__hasClickEvent = true;
 			}
-
-			trace.log(new Date());
 		}, 100);
 	}
 
@@ -189,7 +163,6 @@ export class CellComboPanel extends HTMLElement {
 
 		this.#parent.value = record.k;
 
-		//this.#parent.sheet.invalidate();
 		this.#parent.sheet.rowManager.refresh(true);
 
 		this.close();
@@ -207,7 +180,6 @@ export class CellComboPanel extends HTMLElement {
 		});
 
 		this.#parent.value = selectedKeys.join(this.#parent.getAttribute("multi-separator") || ",");
-		//this.#parent.sheet.invalidate();
 		this.#parent.sheet.rowManager.refresh(true);
 
 		this.close();
@@ -224,7 +196,6 @@ export class CellComboPanel extends HTMLElement {
 		const keyword = e.target.value.toLowerCase();
 		const grd = this.querySelector("nine-table-simple");
 
-		// 동적 컬럼(모든 밸류) 대상 검색 대응
 		grd.data.getValidDataNF().forEach(m => {
 			const match = Object.values(m.v).some(val =>
 				val !== null && val !== undefined && String(val).toLowerCase().includes(keyword)
@@ -249,30 +220,9 @@ export class CellComboPanel extends HTMLElement {
 		this.querySelector("#btnOk").addEventListener("click", this.#onOk);
 		this.querySelector("#chkAll").addEventListener("change", this.#onSelectAll);
 
-
-
-		// 🎯 [개선] open() 할 때마다 붙일 필요 없이, 내부 그리드 영역에 이벤트 위임 처리
-
-		/**
-		// shadowRoot 내부 또는 컴포넌트 전체 영역을 감싸는 리스너 등록
-		this.querySelector("nine-table-simple").addEventListener("click", (e) => {
-			trace.log(e);
-
-			const tr = e.target.closest("tr");
-			if (!tr) return;
-
-			// 멀티 모드가 아닐 때만 행 클릭 동작 수행
-			const isMulti = this.classList.contains("multi");
-			if (!isMulti) {
-				this.#onClickRow(e, false, grd);
-			}
-		}); */
-
-		// 패널 외부 클릭 시 닫기
 		document.addEventListener("mousedown", (e) => {
 			const path = e.composedPath ? e.composedPath() : [];
 
-			// 패널 자신이나 현재 열려 있는 필터 버튼이 경로에 포함되어 있다면 닫지 않음
 			if (path.includes(this)) {
 				return;
 			}

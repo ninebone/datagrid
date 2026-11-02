@@ -252,7 +252,6 @@
             const center = size / 2;
             const radius = center - 1;
 
-            // 유효한 숫자로 변환 및 총합 계산
             const nums = values.map(v => Math.max(Number(v) || 0, 0));
             const total = nums.reduce((acc, cur) => acc + cur, 0);
 
@@ -276,7 +275,6 @@
 
                 const color = colors[index % colors.length];
 
-                // 값이 하나뿐이거나 360도 꽉 찰 때
                 if (sliceAngle >= 360) {
                     return `<circle cx="${center}" cy="${center}" r="${radius}" fill="${color}" />`;
                 }
@@ -291,7 +289,6 @@
 
                 const largeArcFlag = sliceAngle > 180 ? 1 : 0;
 
-                // SVG Path (중앙 -> 시작점 -> 호 -> 끝점 -> 중앙 복귀)
                 const pathData = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
 
                 return `<path d="${pathData}" fill="${color}" />`;

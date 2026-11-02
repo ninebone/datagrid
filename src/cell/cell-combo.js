@@ -13,11 +13,9 @@ export class CellCombo extends EditableCellElement {
 
 	constructor() {
 		super();
-		this.applyBaseStyle();
 	}
 
 	connectedCallback() {
-
 
 		this.#renderer();
 		super.connectedCallback();
@@ -32,7 +30,6 @@ export class CellCombo extends EditableCellElement {
 	}
 
 	rerenderer = () => {
-		trace.log("rerenderer");
 		this.#initData();
 		this.refresh();
 	};
@@ -43,24 +40,10 @@ export class CellCombo extends EditableCellElement {
 		const dataSource = super.cell?.getAttribute("data-source");
 		if (!dataSource) return;
 
-		// 🎯 공통 표현식 평가기를 통해 데이터 소스(배열 또는 함수 결과) 획득
-		//this.#host.exprEngine.evaluate(dataSource, data, row);
-
 		this.#dataSource = super.getExprValue(dataSource, super.tr.data, super.tr.dataset.row);
-		//trace.log("*******************************", this.#dataSource);
 	}
 
 	#initEvent = () => {
-		// 엔터 키 입력 시 드롭다운 토글
-		/**
-		this.addEventListener("keydown", e => {
-			if (e.code === "Enter") {
-				e.preventDefault();
-				this.#togglePanel();
-			}
-		}); */
-
-		// Light DOM 기준이므로 this 안에서 버튼 탐색
 		this.querySelectorAll("button").forEach(btn => {
 			btn.addEventListener("click", (e) => {
 				e.stopPropagation();
@@ -70,9 +53,8 @@ export class CellCombo extends EditableCellElement {
 	}
 
 	#togglePanel = () => {
-		trace.log(new Date());
+
 		if (!this.#panel) {
-			// 🎯 필터링 패널 방식과 동일하게 현재 셀이 속한 sheet(또는 그리드) 탐색
 			this.#panel = super.sheet.querySelector("cell-combo-panel");
 			if (!this.#panel) {
 				this.#panel = document.createElement("cell-combo-panel");
@@ -80,15 +62,11 @@ export class CellCombo extends EditableCellElement {
 			}
 		}
 
-		trace.log(new Date());
-
 		if (this.#panel.isOpen && this.#panel.targetCell === this) {
 			this.#panel.close();
 		} else {
 			this.#panel.open(this, this.#dataSource, this.#keyName, this.#valueName, this.#multi, this.#multiSeparator);
 		}
-
-		trace.log(new Date());
 	}
 
 	#renderer = () => {
@@ -97,7 +75,6 @@ export class CellCombo extends EditableCellElement {
             <button class="btn2" type="button" tabindex="-1"></button>
         `;
 
-		// Light DOM 구조이므로 this에서 직접 쿼리
 		this.#targetBtn = this.querySelector(".btn1");
 	};
 
@@ -105,7 +82,6 @@ export class CellCombo extends EditableCellElement {
 		const v = super.refresh();
 		if (!this.#targetBtn) return v;
 
-		// 현재 값에 매칭되는 텍스트(표시명) 계산
 		this.#targetBtn.textContent = this.#getDisplayText() || "Select";
 		this.#validateInput();
 

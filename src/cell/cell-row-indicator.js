@@ -8,22 +8,21 @@ class CellRowIndicator extends CellElement {
 
 	constructor() {
 		super();
-		this.applyBaseStyle();
 	}
 
 	connectedCallback() {
 		this.#renderer();
-		super.connectedCallback?.();
+		super.connectedCallback();
 
 		if (this.cell) {
 			this.cell.removeAttribute("tabindex");
 			this.cell.dataset.bind = "rowState";
 
 			if (!this.cell.dataset.expr) {
-				this.cell.dataset.expr = "data.__ng._[ninegrid.ROW.ORDER]";
+				//this.cell.dataset.expr = "data.__ng._[ninegrid.ROW.ORDER]";
 			}
 
-			this.cell.setAttribute("text-align", "center");
+			this.cell.setAttribute("text-align", "right");
 		}
 
 		this.#mainTarget = this.querySelector(".ng-row-main");

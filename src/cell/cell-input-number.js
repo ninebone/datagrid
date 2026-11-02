@@ -101,7 +101,6 @@ class CellInputNumber extends EditableCellElement
 		if (this.#scale && Number(this.#scale) > 0) validKey.push(".");
 		if (this.#min || Number(this.#min) > 0) validKey.push("-");
 
-		// 숫자 키패드 및 상단 숫자 키 허용 + 소수점/마이너스 허용
 		const isNumKey = (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
 
 		if (!isNumKey && !validKey.includes(e.key)) {
@@ -109,7 +108,6 @@ class CellInputNumber extends EditableCellElement
 			return;
 		}
 
-		// 소수점 자리수(scale) 제한 체크
 		if (this.#scale && isNumKey && e.target.selectionStart == e.target.selectionEnd) {
 			const s = e.target.value;
 			const idx = s.indexOf(".");

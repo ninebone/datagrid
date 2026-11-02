@@ -17,7 +17,6 @@ class CellInputDate extends EditableCellElement
 
 		this.#target = this.querySelector("input");
 
-		// 값 변경 시 즉시 반영 및 검증
 		this.#target.addEventListener("input", (event) => {
 			const val = event.target.value;
 			this.value = val;
@@ -89,8 +88,6 @@ class CellInputDate extends EditableCellElement
 			}
 		}
 
-		//trace.log(this.#type, formattedVal);
-
 		this.#target.value = formattedVal || "";
 		this.#target.classList.toggle("has-value", !!formattedVal); // 💡 값이 있으면 클래스 추가
 
@@ -104,7 +101,6 @@ class CellInputDate extends EditableCellElement
 		if (val !== "" && val !== null && val !== undefined) {
 			let isValid = this.#isValidDate(val);
 
-			// 💡 형식 검증을 통과했더라도 min/max 범위를 벗어났다면 invalid 처리
 			if (isValid) {
 				if (this.#min && val < this.#min) isValid = false;
 				if (this.#max && val > this.#max) isValid = false;

@@ -20,8 +20,6 @@ class CellCheckbox extends EditableCellElement {
         this.#initEvent();
     }
 
-
-
     get dataSource() {
         return [
             { value: this.trueValue, text: this.#trueText },
@@ -39,7 +37,6 @@ class CellCheckbox extends EditableCellElement {
         this.#target.addEventListener("change", (event) => {
             if (!this.closest("tbody")) return;
 
-            //const newVal = this.value === this.trueValue ? this.falseValue : this.trueValue;
             if (this.#isRadio) {
                 this.selectAll(false);
                 this.value = this.trueValue;
@@ -60,14 +57,13 @@ class CellCheckbox extends EditableCellElement {
         const originalContent = this.cell.getAttribute("content") || "";
         const childHtml = this.#isRadio ? `<input type="radio" value="${trueValue}" />` : `<label><input type="checkbox" /><span>${originalContent}</span></label>`;
 
-        // 🎯 div.ng-wrap 없이 cell-checkbox(Host) 자체를 플렉스 컨테이너로 활용하여 중앙정렬 보장
         this.innerHTML = `
             ${childHtml}
         `;
     }
 
     refresh = () => {
-        const val = super.refresh(); // CellElement의 원시값 직통 조회 활용
+        const val = super.refresh();
 
         this.#target.checked = (val === this.trueValue);
 
