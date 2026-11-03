@@ -82,7 +82,7 @@ const exampleData = {
             data.push({
                 ORDER:     i + 1,
                 NAME:      [4,13,100].includes(i) ? 'nandoo' : getRandomName(),
-                PIC:       `/images/pic/pic_${getRandomInt(20)}.jpg`,
+                PIC:       `./images/pic/pic_${getRandomInt(20)}.jpg`,
                 SEX:       getRandom(["M", "F"]),
                 AGE:       20 + getRandomInt(80),
                 TEL:       getRandomTel(),

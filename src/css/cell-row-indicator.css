@@ -52,3 +52,25 @@ cell-row-indicator {
         pointer-events: none;
     }
 }
+
+cell-row-indicator .row-status {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    top: 1px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+}
+
+cell-row-indicator.is-insert .row-status {
+    background-color: #333;
+}
+
+cell-row-indicator.is-update .row-status {
+    background-color: darkgoldenrod;
+}
+
+cell-row-indicator.is-delete .row-status {
+    background-color: red;
+}

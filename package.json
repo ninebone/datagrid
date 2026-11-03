@@ -4,10 +4,13 @@
   "description": "Blazing-fast virtualized HTML table for massive datasets with inline editing",
   "keywords": [
     "datagrid",
+    "data-grid",
+    "datatable",
+    "data-table",
     "table",
-    "web-components",
-    "vanilla-js",
     "grid",
+    "web-components",
+    "react",
     "virtual-scroll"
   ],
   "homepage": "https://ninebone.github.io/datagrid",

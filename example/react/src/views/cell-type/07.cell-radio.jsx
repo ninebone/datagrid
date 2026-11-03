@@ -73,17 +73,17 @@ const Radio = () => {
 						<td data-bind="SEX" text-align="center"
 							style={{ background: 'white', filter:'brightness(0.98)' }}></td>
 						<td cell-type="radio" data-bind="SEX" text-align="center"
-							data-source="host.getCommonCode('SEX')" key-name="code" value-name="codename"></td>
+							data-source="provider.getCommonCode('SEX')" key-name="code" value-name="codename"></td>
 
 						<td data-bind="STATUS" text-align="center"
 							style={{ background: 'white', filter:'brightness(0.98)' }}></td>
 						<td cell-type="radio" data-bind="STATUS" text-align="center"
-							data-source="host.getCommonCode('STATUS')" key-name="code" value-name="codename"></td>
+							data-source="provider.getCommonCode('STATUS')" key-name="code" value-name="codename"></td>
 
 						<td data-bind="DEPART" text-align="center"
 							style={{ background: 'white', filter:'brightness(0.98)' }}></td>
 						<td cell-type="radio" data-bind="DEPART" text-align="center"
-							data-source="host.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+							data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
 
 
 						<td data-bind="DEPART1" text-align="center"
@@ -96,11 +96,11 @@ const Radio = () => {
 							</datalist>
 						</td>
 
-						<td cell-type="radio" data-bind="SEX" data-source="host.getCommonCode('SEX')"
+						<td cell-type="radio" data-bind="SEX" data-source="provider.getCommonCode('SEX')"
 							key-name="code" value-name="codename"
 							enable="data.STATUS === 'C' ? true : false"></td>
 
-						<td cell-type="radio" data-bind="SEX" data-source="host.getCommonCode('SEX')"
+						<td cell-type="radio" data-bind="SEX" data-source="provider.getCommonCode('SEX')"
 							key-name="code" value-name="codename"
 							visible="data.STATUS === 'C' ? true : false"></td>
 					</tr>

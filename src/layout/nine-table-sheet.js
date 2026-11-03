@@ -82,6 +82,10 @@ export class NineTableSheet extends HTMLElement {
         return this.#host.hasAttribute('simple') || this.#host.getAttribute('theme') === 'simple';
     }
 
+    scrollTo = (dataRow, callback) => {
+        this.rowManager.scrollToDataRow(dataRow, 'top', callback);
+    }
+
     recompileAndRefresh() {
         if (!this.#source.table) return;
 

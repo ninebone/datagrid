@@ -49,7 +49,7 @@ export class ngData {
 
 	#getValidRecords = () => {
 		const rawRecords = this.#parent.rawRecords || [];
-		return rawRecords.filter(o => !o.__ng?.deleted);
+		return rawRecords.filter(item => item.m._[NINE_TABLE.META.INDEX.ROW_STATE] !== NINE_TABLE.ROW_STATE.DELETE);
 	};
 
 	get count() {
@@ -199,7 +199,7 @@ export class ngData {
 			o: {},
 			c: {},
 			__: [0, 0, 0, 0, ngData.ROW_STATE.EMPTY, false, false, true, false, true, true, false, this.#defaultHeight.slice(), -1, {}, {}],
-			_: [rowid, [], ],
+			_: [rowid, NINE_TABLE.ROW_STATE.EMPTY, [], []],
 		};
 	};
 
@@ -244,11 +244,22 @@ export class ngData {
 			o.m = this.#getDefaultMeta(rowid);
 			o.__ng = o.m;
 			o.__ng.rowid = rowid;
-			o.__ng.rowState = ngData.ROW_STATE.INSERT;
-			o.__ng._[0] = rowid;
+			//o.__ng.rowState = ngData.ROW_STATE.INSERT;
+
+			o.m._[NINE_TABLE.META.INDEX.ROWID] = rowid;
+			o.m._[NINE_TABLE.META.INDEX.ROW_STATE] = NINE_TABLE.ROW_STATE.EMPTY;
 		});
 		return arr;
 	};
+
+	#getIndexFromRow = (rowid) => {
+		const index = this.#parent.rawRecords.findIndex(record => {
+			if (!record || !record.m || !record.m._) return false;
+			return record.m._[NINE_TABLE.META.INDEX.ROWID] === rowid;
+		});
+
+		return index;
+	}
 
 	add = (dataSource, updateState = true) => {
 		if (dataSource === undefined) dataSource = {};
@@ -257,43 +268,89 @@ export class ngData {
 		this.#parent.rawRecords = this.#parent.rawRecords.concat(this.#defaultInsert(arr));
 
 		const row = this.count() - 1;
-		if (!updateState) {
+		if (updateState) {
 			arr.forEach((_, idx) => {
 				const target = this.#parent.rawRecords[this.#parent.rawRecords.length - 1 - idx];
-				if (target) target.__ng.rowState = ngData.ROW_STATE.EMPTY;
+				if (target) target.m._[NINE_TABLE.META.INDEX.ROW_STATE] = NINE_TABLE.ROW_STATE.INSERT;
 			});
 		}
 
 		this.#invalidate();
+
 		return row;
 	};
 
-	delete = (at) => {
-		let arr = [];
-		if (Array.isArray(at)) {
-			arr = at;
-		} else if (typeof at === "undefined") {
-			arr = [this.#parent.host.row.at];
-		} else {
-			arr = [parseInt(at, 10)];
+
+	insert = (rowid, dataSource, updateState = true) => {
+		//trace.log("찾을 rowid:", rowid);
+
+		if (dataSource === undefined) dataSource = {};
+		const arr = this.#json2Array(dataSource);
+		if (arr.length === 0) return -1;
+
+		let targetIndex = this.#getIndexFromRow(rowid);
+		/**
+		if (rowid !== undefined && rowid !== null) {
+			targetIndex = this.#parent.rawRecords.findIndex(record => {
+				if (!record || !record.m || !record.m._) return false;
+				return record.m._[NINE_TABLE.META.INDEX.ROWID] === rowid;
+			});
+		} */
+
+		const processedArr = this.#defaultInsert(arr);
+
+		//if (targetIndex === -1) {
+		//	targetIndex = this.#parent.rawRecords.length;
+		//}
+
+		this.#parent.rawRecords.splice(targetIndex, 0, ...processedArr);
+
+		if (updateState) {
+			processedArr.forEach((_, idx) => {
+				const target = this.#parent.rawRecords[targetIndex + idx];
+
+				if (target && target.m && target.m._) {
+					target.m._[NINE_TABLE.META.INDEX.ROW_STATE] = NINE_TABLE.ROW_STATE.INSERT;
+				}
+			});
 		}
 
-		const validRecords = this.#getValidRecords();
+		this.#invalidate();
 
-		arr.sort((a, b) => b - a).forEach(rowidx => {
-			if (validRecords[rowidx]) {
-				const targetId = validRecords[rowidx].__ng.rowid;
-				if (validRecords[rowidx].__ng.rowState === ngData.ROW_STATE.INSERT) {
-					this.#parent.rawRecords = this.#parent.rawRecords.filter(item => item.__ng.rowid !== targetId);
+		return processedArr[0].m._[NINE_TABLE.META.INDEX.ROWID]; // 삽입된 실제 배열 인덱스 반환
+	};
+
+	remove = (v) => {
+		let arr = [];
+		if (Array.isArray(v)) {
+			arr = at;
+		//} else if (typeof at === "undefined") {
+		//	arr = [this.#parent.host.row.at];
+		} else {
+			arr = [parseInt(v, 10)];
+		}
+
+		let arrIndex = [];
+		arr.forEach(rowid => {
+			arrIndex.push(this.#getIndexFromRow(rowid));
+		});
+
+		const records = this.#parent.rawRecords;//this.#getValidRecords();
+
+		arrIndex.sort((a, b) => b - a).forEach(index => {
+			//if (validRecords[index]) {
+				const targetId = records[index].m._[NINE_TABLE.META.INDEX.ROWID];
+
+				if (records[index].m._[NINE_TABLE.META.INDEX.ROW_STATE] === NINE_TABLE.ROW_STATE.INSERT) {
+					this.#parent.rawRecords = this.#parent.rawRecords.filter(item => item.m._[NINE_TABLE.META.INDEX.ROWID] !== targetId);
 				} else {
 					this.#parent.rawRecords.forEach(item => {
-						if (item.__ng.rowid === targetId) {
-							item.__ng.deleted = true;
-							item.__ng.rowState = ngData.ROW_STATE.DELETE;
+						if (item.m._[NINE_TABLE.META.INDEX.ROWID] === targetId) {
+							item.m._[NINE_TABLE.META.INDEX.ROW_STATE] = NINE_TABLE.ROW_STATE.DELETE;
 						}
 					});
 				}
-			}
+			//}
 		});
 
 		this.#invalidate();
@@ -310,13 +367,15 @@ export class ngData {
 		const rowData = validRecords[rowIndex];
 		if (!rowData) return;
 
-
-
 		const oldValue = rowData.v[COL_IDX];
+		if (oldValue !== value && rowData.m._[NINE_TABLE.META.INDEX.ROW_STATE] !== NINE_TABLE.ROW_STATE.INSERT) {
+			rowData.m._[NINE_TABLE.META.INDEX.ROW_STATE] = NINE_TABLE.ROW_STATE.UPDATE;
+		}
+		/**
 		if (oldValue !== value && rowData.__ng.rowState !== ngData.ROW_STATE.INSERT) {
 			if (!rowData.__ng.o.hasOwnProperty(colnm)) rowData.__ng.o[colnm] = oldValue;
 			rowData.__ng.rowState = ngData.ROW_STATE.UPDATE;
-		}
+		} */
 
 		rowData.v[COL_IDX] = value;
 	};
