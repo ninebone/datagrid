@@ -132,7 +132,6 @@ export class CellElement extends BasicCellElement {
 		const rawRecord = this.#tr.data;
 
 		if (rawRecord.v && Array.isArray(rawRecord.v)) {
-			// 💡 fields.indexOf(bindKey)로 바로 찾기!
 			const colIdx = this.#host.fields.get().indexOf(bindKey) ?? -1;
 			return colIdx >= 0 ? (rawRecord.v[colIdx] ?? "") : "";
 		}

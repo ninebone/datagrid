@@ -356,26 +356,23 @@ export class ngData {
 		this.#invalidate();
 	};
 
-	setValue = (rowIndex, colnm, value) => {
+	setValue = (rowid, colnm, value) => {
 
-		rowIndex = parseInt(rowIndex, 10);
+		rowid = parseInt(rowid, 10);
 		const fields = this.getHostFields();
 		const COL_IDX = fields.indexOf(colnm);
 		if (COL_IDX < 0) return;
 
-		const validRecords = this.#getValidRecords();
-		const rowData = validRecords[rowIndex];
+		const index = this.#getIndexFromRow(rowid);
+
+		const records = this.#parent.rawRecords;
+		const rowData = records[index];
 		if (!rowData) return;
 
 		const oldValue = rowData.v[COL_IDX];
 		if (oldValue !== value && rowData.m._[NINE_TABLE.META.INDEX.ROW_STATE] !== NINE_TABLE.ROW_STATE.INSERT) {
 			rowData.m._[NINE_TABLE.META.INDEX.ROW_STATE] = NINE_TABLE.ROW_STATE.UPDATE;
 		}
-		/**
-		if (oldValue !== value && rowData.__ng.rowState !== ngData.ROW_STATE.INSERT) {
-			if (!rowData.__ng.o.hasOwnProperty(colnm)) rowData.__ng.o[colnm] = oldValue;
-			rowData.__ng.rowState = ngData.ROW_STATE.UPDATE;
-		} */
 
 		rowData.v[COL_IDX] = value;
 	};
