@@ -24,17 +24,8 @@ jobs:
 
       - run: npm ci
 
-      # 1. 빌드하기 '전에' 버전을 자동으로 먼저 올립니다 (0.0.8 -> 0.0.9)
-      - name: Auto increment version
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          npm version patch --no-git-tag-version
-
-      # 2. 올라간 최신 버전으로 빌드를 수행합니다
       - run: npm run build
 
-      # 3. provenance 서명과 함께 안전하게 퍼블리싱합니다
       - run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
