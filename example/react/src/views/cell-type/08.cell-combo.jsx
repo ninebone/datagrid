@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { exampleData } from '../_data/example-data.js';
+import { exampleData } from '@/_data/example-data.js';
 import "@ninebone/datagrid";
 
-const Button = () => {
+const Combo = () => {
 	const DATA_CNT = 100000;
 	const tableRef = useRef(null);
 
@@ -15,9 +15,7 @@ const Button = () => {
 
 	useEffect(() => {
 		tableRef.current.addProvider({
-			checkNum: (n1,n2,n3) => {
-				return Number(n1) + Number(n2) + Number(n3) > 100 ? true : false;
-			},
+			getCommonCode: (group) => exampleData.generateCommonCode(group),
 		});
 
 		selectList();
@@ -70,13 +68,21 @@ const Button = () => {
 						<td data-bind="REC1" cell-type="input-number"></td>
 						<td data-bind="REC2" cell-type="input-number"></td>
 						<td data-bind="REC3" cell-type="input-number"></td>
-						<td cell-type="button" data-bind="DEPART" data-expr="data.REC1 + ':' + data.NAME"></td>
-						<td data-bind="REC2" cell-type="input-number" text-align="center" max="90"></td>
+						<td cell-type="combo" data-bind="DEPART" data-source="host.getCommonCode('DEPART')"
+							key-name="code" value-name="codename"></td>
+						<td cell-type="combo" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;"
+							enable="data.REC1 > 70 ? true : false;">
+							<datalist>
+								<option k="A" v="aaa a"/>
+								<option k="B" v="bb b"/>
+								<option k="C" v="c c"/>
+							</datalist>
+						</td>
 						<td data-bind="REC3" cell-type="input-number" text-align="right" scale="2"></td>
 						<td data-bind="REC1" cell-type="input-number" validator="data.REC1 < 50 ? true : false"></td>
 						<td data-bind="REC2" cell-type="input-number" validator="data.REC2 < 50 ? true : false"></td>
 						<td data-bind="REC3" cell-type="input-number"
-							validator="provider.checkNum(data.REC1,data.REC2,data.REC3)"></td>
+							validator="host.checkNum(data.REC1,data.REC2,data.REC3)"></td>
 						<td data-bind="REC1" cell-type="input-number" enable="data.REC1 < 50 ? true : false"></td>
 						<td data-bind="REC2" cell-type="input-number" visible="data.REC2 < 50"></td>
 					</tr>
@@ -87,4 +93,4 @@ const Button = () => {
 	);
 };
 
-export default Button;
+export default Combo;

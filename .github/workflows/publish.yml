@@ -1,0 +1,32 @@
+name: Publish to npm
+
+on:
+  push:
+    branches:
+      - dev  # dev 브랜치에 푸시될 때 자동 실행 (원하시면 main으로 변경 가능)
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    # 💡 Provenance(공급망 보안 증명) 발급을 위해 반드시 필요한 권한 설정
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      # 패키지 설치 및 빌드 (JS + CSS 빌드가 알아서 순서대로 실행됨)
+      - run: npm ci
+      - run: npm run build
+
+      # 💡 GitHub Actions 환경에서 안전하게 배포 + 공급망 보안 점수를 올려주는 --provenance 적용!
+      - run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
