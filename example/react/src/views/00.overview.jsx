@@ -37,13 +37,14 @@ const Overview = () => {
 			renderBarChart: (...values) => {
 				const color = '#3b82f6';
 				const width = 100;
-				const height = 22; // 높이를 고정하여 셀 깨짐 방지
+				const height = 22; // 높이 고정
 
 				if (!values || values.length === 0) return '';
 
 				const points = values.map((v, index) => {
-					const x = (index / (values.length - 1 || 1)) * width;
+					const x = (index / (values.length > 1 ? values.length - 1 : 1)) * width;
 					const safeV = Math.min(Math.max(v, 0), 100);
+					// 🛑 깨졌던 수식(- 연산자 복구)
 					const y = height - (safeV / 100) * (height - 4) - 2;
 					return { x, y };
 				});
@@ -59,13 +60,71 @@ const Overview = () => {
 				const areaData = `${pathData} L ${width} ${height} L 0 ${height} Z`;
 
 				return `
-					<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 24px; padding: 0 4px;">
-						<svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: 22px; overflow: visible;" preserveAspectRatio="none">
-							<path d="${areaData}" fill="${color}" opacity="0.15" />
-							<path d="${pathData}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" />
-						</svg>
+                	<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 24px; padding: 0 4px; box-sizing: border-box;">
+					   <svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: 22px; display: block; overflow: visible;" preserveAspectRatio="none">
+						  <path d="${areaData}" fill="${color}" opacity="0.15" />
+						  <path d="${pathData}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" />
+					   </svg>
 					</div>
-			  	`;
+				`;
+			},
+			renderPieChart: (...values) => {
+				const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#6366f1', '#14b8a6', '#f97316', '#a855f7'];
+				const size = 36; // 셀 높이에 맞게 살짝 컴팩트하게 조정
+				const center = size / 2;
+				// 🛑 깨졌던 수식(- 연산자 복구)
+				const radius = center - 2;
+
+				const nums = values.map(v => Math.max(Number(v) || 0, 0));
+				const total = nums.reduce((acc, cur) => acc + cur, 0);
+
+				if (total === 0) {
+					return `
+                   <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                         <circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
+                      </svg>
+                   </div>
+                `;
+				}
+
+				let currentAngle = 0;
+				const paths = nums.map((val, index) => {
+					if (val === 0) return '';
+					const sliceAngle = (val / total) * 360;
+					const startAngle = currentAngle;
+					const endAngle = currentAngle + sliceAngle;
+					currentAngle = endAngle;
+
+					const color = colors[index % colors.length];
+
+					if (sliceAngle >= 360) {
+						return `<circle cx="${center}" cy="${center}" r="${radius}" fill="${color}" />`;
+					}
+
+					// 🛑 각도 계산식 내 마이너스(-) 복구
+					const startRad = (startAngle - 90) * (Math.PI / 180);
+					const endRad = (endAngle - 90) * (Math.PI / 180);
+
+					const x1 = center + radius * Math.cos(startRad);
+					const y1 = center + radius * Math.sin(startRad);
+					const x2 = center + radius * Math.cos(endRad);
+					const y2 = center + radius * Math.sin(endRad);
+
+					const largeArcFlag = sliceAngle > 180 ? 1 : 0;
+					const pathData = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+
+					return `<path d="${pathData}" fill="${color}" />`;
+				}).join('');
+
+				return `
+					<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; box-sizing: border-box;">
+					   <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display: block;">
+						  <circle cx="${center}" cy="${center}" r="${radius}" fill="#e2e8f0" />
+						  ${paths}
+					   </svg>
+					</div>
+				`;
 			},
 			renderPieChart: (...values) => {
 				const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#6366f1', '#14b8a6', '#f97316', '#a855f7'];

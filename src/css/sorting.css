@@ -1,25 +1,48 @@
+
 .asc::after,
 .desc::after {
-    --sort-icon-size: 10px;
-
+    z-index: 1;
     content: "";
     display: inline-block;
-    width: var(--sort-icon-size);
-    height: var(--sort-icon-size);
-    flex-shrink: 0;
-    margin-left: 4px;
-    vertical-align: middle;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    left: 50%;
+    top: -2px;
+    transform: translateX(-50%);
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
 }
 
 .asc::after {
-    --sort-icon-color: #2563eb;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16"><path fill="%232563eb" d="M8 3L3 11h10L8 3z"/></svg>');
 }
 
 .desc::after {
-    --sort-icon-color: #dc2626;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16"><path fill="%23dc2626" d="M8 13L3 5h10l-5 8z"/></svg>');
+}
+
+
+tbody.body td *:first-child, tbody.body th *:first-child {
+    transform: translate(0, 0);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1.35), opacity 0.4s ease-out;
+}
+
+tbody.body .sorting-anim-asc *:first-child {
+    transform: translate(0px, 20px);
+    opacity: 0.2;
+    transition: none;
+}
+
+tbody.body .sorting-anim-desc *:first-child {
+    transform: translate(0px, -30px);
+    opacity: 0.2;
+    transition: none;
+}
+
+tbody.body .sorting-anim-none *:first-child {
+    transform: translate(0px, 0px);
+    opacity: 0.2;
+    transition: none;
 }
