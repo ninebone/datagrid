@@ -1,5 +1,6 @@
 import { trace } from "@nopeer";
 import { CellElement } from "./core/CellElement.js";
+import {NINE_TABLE} from "@";
 
 class CellRowIndicator extends CellElement {
 	#mainTarget;
@@ -21,27 +22,41 @@ class CellRowIndicator extends CellElement {
 
 		this.#mainTarget = this.querySelector(".ng-row-main");
 		this.#subTarget = this.querySelector(".ng-row-sub");
-		this.#statusTarget = this.querySelector(".ng-row-status");
+		this.#statusTarget = this.querySelector(".row-status");
 	}
 
 	#renderer = () => {
 		this.innerHTML = `
 			<span class="ng-row-main"></span>
             <span class="ng-row-sub"></span>
-            <span class="ng-row-status"></span>
+            <span class="row-status"></span>
         `;
 	}
 
 	refresh = () => {
 		if (!this.cell || !this.tr) return;
 
+		this.classList.remove("is-insert", "is-update", "is-delete");
+
 		const row = this.row;
 		if (isNaN(row)) return;
 
 		const rawRecord = this.tr.data;
 
-		if (rawRecord && rawRecord.__ng) {
-
+		if (rawRecord) {
+			switch (rawRecord.m._[NINE_TABLE.META.INDEX.ROW_STATE]) {
+				case NINE_TABLE.ROW_STATE.INSERT:
+					this.classList.add("is-insert");
+					break;
+				case NINE_TABLE.ROW_STATE.UPDATE:
+					this.classList.add("is-update");
+					break;
+				case NINE_TABLE.ROW_STATE.DELETE:
+					this.classList.add("is-delete");
+					break;
+				default:
+					break;
+			}
 		}
 
 		const displayNum = this.index + 1;
@@ -56,6 +71,7 @@ class CellRowIndicator extends CellElement {
 			this.#mainTarget.innerHTML = `
             	<span class="ng-row-prefix">${prefixPart}</span>
             	<span class="ng-row-suffix">${suffixPart}</span>
+            	<div class="row-status"></div>
         	`;
 		} else {
 			this.#mainTarget.innerHTML = `${formattedNum}`;

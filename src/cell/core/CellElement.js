@@ -143,12 +143,11 @@ export class CellElement extends BasicCellElement {
 	set value(v) {
 		if (!this.#cell || !this.#host?.data) return;
 
-		const row = parseInt(this.#cell.dataset.row, 10);
+		const row = parseInt(this.#tr.dataset.row, 10);
 		const bindKey = this.#cell.dataset.bind;
 		if (isNaN(row) || !bindKey) return;
 
-		const updateRowState = this.getAttribute('update-row-state') !== "false";
-		this.#host.data.setValue(row, bindKey, v, updateRowState);
+		this.#host.data.setValue(row, bindKey, v);
 	}
 
 	get row() {

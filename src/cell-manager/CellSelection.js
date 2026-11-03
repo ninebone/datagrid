@@ -96,8 +96,25 @@ export class CellSelection {
 		}
 
 		this.#range = { startRow: r1, startCol: c1, endRow: r2, endCol: c2 };
+
+		//this.#sheet.view.clearSelectedRange();
+		//this.#sheet.view.setSelectedRange(r1, r2, c1, c2);
+
 		this.render();
 	}
+
+	get minRow() {
+		return this.#range.startRow;
+	};
+	get maxRow() {
+		return this.#range.endRow;
+	};
+	get minCol() {
+		return this.#range.startCol;
+	};
+	get maxCol() {
+		return this.#range.endCol;
+	};
 
 	refresh = () => {
 		this.render();
@@ -130,6 +147,14 @@ export class CellSelection {
 			visibleTrs.forEach(tr => {
 				const { matrixRow } = this.#getMatrixRow(tr);
 				if (matrixRow < 0) return;
+
+
+				if (matrixRow >= startRow && matrixRow <= endRow) {
+					tr.classList.add('selected');
+				}
+
+				//trace.log(this.#sheet.view);
+
 
 				tr.querySelectorAll('td, th').forEach(cell => {
 					const col = parseInt(cell.dataset.col, 10);

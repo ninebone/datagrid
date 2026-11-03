@@ -68,7 +68,7 @@ const Combo = () => {
 						<td data-bind="REC1" cell-type="input-number"></td>
 						<td data-bind="REC2" cell-type="input-number"></td>
 						<td data-bind="REC3" cell-type="input-number"></td>
-						<td cell-type="combo" data-bind="DEPART" data-source="host.getCommonCode('DEPART')"
+						<td cell-type="combo" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')"
 							key-name="code" value-name="codename"></td>
 						<td cell-type="combo" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;"
 							enable="data.REC1 > 70 ? true : false;">
@@ -82,7 +82,7 @@ const Combo = () => {
 						<td data-bind="REC1" cell-type="input-number" validator="data.REC1 < 50 ? true : false"></td>
 						<td data-bind="REC2" cell-type="input-number" validator="data.REC2 < 50 ? true : false"></td>
 						<td data-bind="REC3" cell-type="input-number"
-							validator="host.checkNum(data.REC1,data.REC2,data.REC3)"></td>
+							validator="provider.checkNum(data.REC1,data.REC2,data.REC3)"></td>
 						<td data-bind="REC1" cell-type="input-number" enable="data.REC1 < 50 ? true : false"></td>
 						<td data-bind="REC2" cell-type="input-number" visible="data.REC2 < 50"></td>
 					</tr>

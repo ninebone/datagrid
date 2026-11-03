@@ -9,7 +9,8 @@ export default class NineTable extends HTMLElement {
     #shadowRoot;
     #dataManager;
     #layoutManager;
-    #templateCnt = 0;      // 🎯 로딩 상태 플래그
+    #templateCnt = 0;
+    #customStyle = '';
 
     constructor() {
         super();
@@ -75,20 +76,107 @@ export default class NineTable extends HTMLElement {
     get dataManager() { return this.#dataManager; }
     get data() { return this.#dataManager.data; }
     get row() { return this.#dataManager.row; }
+    get customStyle() {
+        return this.#customStyle;
+    }
 
-
-    addProvider(methods) {
-        if (!methods || typeof methods !== 'object') return;
-
-        setTimeout(() => {
-            Object.entries(methods).forEach(([name, fn]) => {
-                if (typeof fn === 'function') {
-                    this[name] = fn;
-                }
-            });
-
-            this.rerenderer();
+    scrollTo = (dataRow, callback) => {
+        this.#shadowRoot.querySelectorAll('nine-table-sheet.active').forEach($sheet => {
+            $sheet.scrollTo(dataRow, callback);
         });
+    }
+
+    currentRow = () => {
+        let rows = this.currentRows();
+        return (rows.length === 0) ? -1 : rows[0];
+    }
+    currentRows = () => {
+
+        let rows = [];
+        this.#shadowRoot.querySelectorAll('nine-table-sheet.active').forEach($sheet => {
+
+            const arr = $sheet.view.getArray($sheet.selection.minRow);
+            const rowid = arr.m._[NINE_TABLE.META.INDEX.ROWID];
+
+            //trace.log(this.data.getArray($sheet.selection.minRow));
+
+            rows.push(rowid);
+        });
+
+        return rows;
+    }
+
+    addRow = (dataSource, updateState = true) => {
+        return this.data.add(dataSource, updateState);
+    }
+    insertRow = (index, dataSource, updateState = true) => {
+
+        const activeSheet = this.#shadowRoot.querySelector('nine-table-sheet.active');
+        if (!activeSheet) return;
+
+        const currentJson = activeSheet.view.get(index);
+        const rowid = currentJson.m._[NINE_TABLE.META.INDEX.ROWID];
+
+        const toRowid = this.data.insert(rowid, dataSource, updateState);
+        const records = activeSheet.view.getArray();
+
+        const targetIndex = records.findIndex(record => {
+            if (!record || !record.m || !record.m._) return false;
+            return record.m._[NINE_TABLE.META.INDEX.ROWID] === toRowid; // 타입 차이 방지를 위해 == 사용
+        });
+
+        return targetIndex;
+    };
+    removeRow = (index) => {
+
+        const activeSheet = this.#shadowRoot.querySelector('nine-table-sheet.active');
+        if (!activeSheet) return;
+
+        const currentJson = activeSheet.view.get(index);
+        const rowid = currentJson.m._[NINE_TABLE.META.INDEX.ROWID];
+
+        this.data.remove(rowid);
+    };
+
+    currentIndex = () => {
+        let rows = this.currentIndexs();
+        return (rows.length === 0) ? -1 : rows[0];
+    }
+    currentIndexs = () => {
+
+        let rows = [];
+        this.#shadowRoot.querySelectorAll('nine-table-sheet.active').forEach($sheet => {
+            rows.push($sheet.selection.minRow);
+        });
+
+        return rows;
+    }
+
+    addProvider(provider) {
+        if (!provider || typeof provider !== 'object') return;
+
+        const { style, ...methods } = provider;
+
+        if (style && typeof style === 'string') {
+            this.#customStyle = style;
+
+            const styleEl = this.#shadowRoot.getElementById('nine-table-scoped-custom-style');
+            if (styleEl) {
+                styleEl.textContent = style;
+            }
+        }
+
+        if (Object.keys(methods).length > 0) {
+            setTimeout(() => {
+                Object.entries(methods).forEach(([name, fn]) => {
+                    if (typeof fn === 'function') {
+                        this[name] = fn;
+                    }
+                });
+
+                this.rerenderer();
+            });
+        }
     }
 
     setData(records) {

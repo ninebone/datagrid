@@ -79,6 +79,7 @@ export class LayoutManager {
         this.#host.shadowRoot.innerHTML = `
             <style>
                 ${cssImports.join('\n')}
+                ${this.#host.customStyle}
             </style>
             
             <nine-table-toolbar></nine-table-toolbar>
