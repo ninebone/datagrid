@@ -1,6 +1,6 @@
 {
   "name": "@ninebone/datagrid",
-  "version": "0.0.7",
+  "version": "0.0.10",
   "description": "Blazing-fast virtualized HTML table for massive datasets with inline editing",
   "keywords": [
     "datagrid",
@@ -18,7 +18,10 @@
     "type": "git",
     "url": "https://github.com/ninebone/datagrid.git"
   },
-  "author": "ninebone",
+  "author": {
+    "name": "ninebone",
+    "email": "nandoo@hanmail.net"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/nine-table.umd.js",

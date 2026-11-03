@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { exampleData } from '../_data/example-data.js';
+import { exampleData } from '@/_data/example-data.js';
 import "@ninebone/datagrid";
 
 const Radio = () => {
