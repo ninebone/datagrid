@@ -107,17 +107,103 @@ export class Sorting {
 			);
 		}
 
-		this.#applySorting();
+		this.#applySorting(cell);
 	}
 
-	#applySorting() {
-		if (!this.#sheet.view) {
-			return;
-		}
+
+	#applySorting1(cell) {
+		this.#sheet.view.setSorting(this.#columns);
+		this.#syncHeaderUI();
+		this.#sheet.invalidate();
+
+		requestAnimationFrame(() => {
+			const bodyContents = this.#sheet.querySelectorAll('tbody.body td *:first-child');
+
+			bodyContents.forEach($el => {
+				// 위에서 아래로 뚝 떨어질 준비 (시작 위치를 조금 더 위나 아래로 설정)
+				$el.style.transform = 'translate(0px, -30px)'; // 위에서 떨어지게 하려면 음수(-)
+				$el.style.opacity = '0.3';
+				$el.style.transition = 'none';
+			});
+
+			requestAnimationFrame(() => {
+				bodyContents.forEach($el => {
+					// 💡 1을 초과하는 값이 들어가서 툭 튀었다가 안착하는 스프링 바운스 이징
+					// 마지막 값(1.35)이 높을수록 튕기는 폭이 커집니다.
+					$el.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1.35), opacity 0.4s ease-out';
+					$el.style.transform = 'translate(0, 0)';
+					$el.style.filter = 'blur(0px)';
+					$el.style.opacity = '1';
+				});
+			});
+		});
+	}
+
+	#applySorting111(cell) {
 
 		this.#sheet.view.setSorting(this.#columns);
 		this.#syncHeaderUI();
 		this.#sheet.invalidate();
+
+		requestAnimationFrame(() => {
+			const bodyContents = this.#sheet.querySelectorAll('tbody.body td *:first-child');
+
+			bodyContents.forEach($el => {
+				let startY = 0;
+				let startBlur = '0px';
+
+				if (cell.classList.contains('asc')) {
+					startY = 20;
+				} else if (cell.classList.contains('desc')) {
+					startY = -30;
+				} else {
+					startY = 0;
+					startBlur = '4px';
+				}
+
+				$el.style.transform = `translate(0px, ${startY}px)`;
+				$el.style.filter = `blur(${startBlur})`;
+				$el.style.opacity = '0.2';
+				$el.style.transition = 'none';
+			});
+
+			requestAnimationFrame(() => {
+				bodyContents.forEach($el => {
+					$el.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1.35), opacity 0.4s ease-out, filter 0.4s ease-out';
+					$el.style.transform = 'translate(0, 0)';
+					$el.style.filter = 'blur(0px)';
+					$el.style.opacity = '1';
+				});
+			});
+		});
+	}
+
+	#applySorting(cell) {
+
+		this.#sheet.view.setSorting(this.#columns);
+		this.#syncHeaderUI();
+		this.#sheet.invalidate();
+		requestAnimationFrame(() => {
+		const cells = this.#sheet.querySelectorAll('tbody.body th, tbody.body td');
+
+		cells.forEach($td => {
+			$td.classList.remove('sorting-anim-asc', 'sorting-anim-desc', 'sorting-anim-none');
+
+			if (cell.classList.contains('asc')) {
+				$td.classList.add('sorting-anim-asc');
+			} else if (cell.classList.contains('desc')) {
+				$td.classList.add('sorting-anim-desc');
+			} else {
+				$td.classList.add('sorting-anim-none');
+			}
+		});
+
+		requestAnimationFrame(() => {
+			cells.forEach($td => {
+				$td.classList.remove('sorting-anim-asc', 'sorting-anim-desc', 'sorting-anim-none');
+			});
+		});
+		});
 	}
 
 	#syncHeaderUI() {

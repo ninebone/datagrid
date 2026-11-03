@@ -43,25 +43,17 @@ cell-row-indicator {
         pointer-events: none;
     }
 
-    .ng-row-status {
+    .row-status {
+        display: inline-block;
         position: absolute;
-        right: 2px;
+        right: 0;
         top: 1px;
-        font-size: var(--row-indicator-status-size);
-        line-height: 1;
-        pointer-events: none;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
     }
 }
 
-cell-row-indicator .row-status {
-    display: inline-block;
-    position: absolute;
-    right: 0;
-    top: 1px;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-}
 
 cell-row-indicator.is-insert .row-status {
     background-color: #333;
