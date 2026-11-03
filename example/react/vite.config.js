@@ -1,14 +1,21 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import path, { resolve } from 'path';
+import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: './',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),          // 🎯 @를 src 경로로 절대 경로 설정
-    }
+      '@': path.resolve(__dirname, './src'),
+      'react': path.resolve(__dirname, './node_modules/react'),
+      'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
+    },
+    dedupe: ['react', 'react-dom'],
+  },
+  build: {
+
   },
   server: {
     port: 9901
