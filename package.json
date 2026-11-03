@@ -18,7 +18,10 @@
     "type": "git",
     "url": "https://github.com/ninebone/datagrid.git"
   },
-  "author": "ninebone",
+  "author": {
+    "name": "ninebone",
+    "email": "nandoo@hanmail.net"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/nine-table.umd.js",
