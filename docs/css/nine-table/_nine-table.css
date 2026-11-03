@@ -93,46 +93,53 @@ cell-button {
 }
 
 
-cell-input-date {
+cell-row-indicator .row-status {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    top: 1px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+}
 
-    input {
-        position: relative;
-        margin: 0;
-        width: 100%;
-        padding: 0 4px;
-        border: 1px solid var(--cell-input-border-color);
-        background: var(--cell-input-bg);
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 4px center;
-        background-size: 14px 16px;
-        color: var(--cell-input-color);
+cell-row-indicator.is-insert .row-status {
+    background-color: #333;
+}
+
+cell-row-indicator.is-update .row-status {
+    background-color: darkgoldenrod;
+}
+
+cell-row-indicator.is-delete .row-status {
+    background-color: red;
+}
+
+tbody {
+
+    tr.selected {
+        cell-row-indicator {
+            border-left: 2px solid darkgoldenrod;
+        }
+
+        cell-row-indicator {
+            border-left: 2px solid darkgoldenrod;
+        }
     }
 
-    input:hover {
-        filter: brightness(95%);
+    th.selected, td.selected {
+        .selected {
+            background-color: var(--cell-selection-bg);
+        }
+
+        .selected-start {
+            background-color: transparent;
+        }
+
+        .selected-top    { border-top: 2px solid var(--cell-selection-border-color); }
+        .selected-bottom { border-bottom: 2px solid var(--cell-selection-border-color); }
+        .selected-left   { border-left: 2px solid var(--cell-selection-border-color); }
+        .selected-right  { border-right: 2px solid var(--cell-selection-border-color); }
     }
 
-    input::before {
-        content: attr(data-placeholder);
-        position: absolute;
-        display: flex;
-        align-items: center;
-        width: calc(100% - 22px);
-        height: 100%;
-        left: 1px;
-        top: 1px;
-        pointer-events: none;
-    }
-
-    input.has-value::before, input:focus::before {
-        display: none;
-    }
-
-    input:focus {
-
-    }
 }
