@@ -182,3 +182,36 @@ nine-table-sheet.hscroll-visible {
     }
 }
 
+@media (hover: none) and (pointer: coarse) {
+
+    nine-table-sheet.vscroll-visible {
+        grid-template-columns: 1fr;
+        nine-table-vscrollbar {
+            display: none;
+        }
+    }
+    nine-table-sheet.hscroll-visible {
+        grid-template-rows: 1fr;
+
+        nine-table-hscrollbar, .scroll-edge {
+            display: none;
+        }
+    }
+
+    /* Hide custom scrollbar elements on touch-based mobile devices */
+    nine-table-vscrollbar,
+    nine-table-hscrollbar,
+    .scroll-edge {
+        display: none;
+    }
+
+    /* Optional: Hide native scrollbars visually while maintaining smooth touch/momentum scrolling */
+    .ng-sheet-body {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+    .ng-sheet-body::-webkit-scrollbar {
+        display: none; /* Chrome/Safari/Opera */
+    }
+}
+

@@ -166,7 +166,8 @@ export class NineTableHScrollBar extends HTMLElement {
             clearInterval(this.#interval2);
         };
 
-        ['mouseup', 'mouseleave', 'touchend'].forEach(evt => {
+        //['mouseup', 'mouseleave', 'touchend'].forEach(evt => {
+        ['mouseup', 'mouseleave'].forEach(evt => {
             this.#elements.left.addEventListener(evt, clearTimer);
             this.#elements.right.addEventListener(evt, clearTimer);
             this.#elements.track.addEventListener(evt, clearTimer);
@@ -174,8 +175,8 @@ export class NineTableHScrollBar extends HTMLElement {
 
         this.#elements.left.addEventListener("mousedown", e => { if (e.button !== 0) return; delayScroll(-20); });
         this.#elements.right.addEventListener("mousedown", e => { if (e.button !== 0) return; delayScroll(20); });
-        this.#elements.left.addEventListener("touchstart", () => delayScroll(-20));
-        this.#elements.right.addEventListener("touchstart", () => delayScroll(20));
+        //this.#elements.left.addEventListener("touchstart", () => delayScroll(-20));
+        //this.#elements.right.addEventListener("touchstart", () => delayScroll(20));
 
         this.#elements.track.addEventListener("mousedown", e => {
             if (e.button !== 0) return;

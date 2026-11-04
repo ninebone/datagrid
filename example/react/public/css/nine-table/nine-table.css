@@ -117,3 +117,6 @@ tbody {
     .selected-left   { border-left: 2px solid var(--cell-selection-border-color); }
     .selected-right  { border-right: 2px solid var(--cell-selection-border-color); }
 }
+
+
+
