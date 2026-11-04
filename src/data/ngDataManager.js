@@ -37,16 +37,6 @@ export class ngDataManager {
 		this.getRowPosition = () => this.row.at;
 		this.setRowPosition = (nRow) => { this.row.at = nRow; };
 
-		this.scrollTo_V1 = (nRow) => {
-			if (nRow < 0) nRow = 0;
-			if (nRow >= this.rawRecords.length) nRow = this.rawRecords.length - 1;
-
-			this.viewRecords.rawIndex = nRow;
-			if (this.viewRecords.reset) this.viewRecords.reset();
-
-			return (nRow <= 0 || nRow >= this.rawRecords.length - 1) ? false : true;
-		};
-
 		this.getColumn = (rowidx, colnm) => this.data.get(rowidx, colnm);
 
 		this.setColumn = (rowidx, colnm, v) => {

@@ -4,11 +4,15 @@ import { fields } from "@/data/Fields.js";
 import { LayoutManager } from '@/layout/core/LayoutManager.js';
 import { ExprEngine } from "@/core/ExprEngine.js";
 import { NINE_TABLE } from "@/core/constants.js";
+import { DataAPI } from '../api/DataAPI.js';
+import { NineTableAPI } from '../api/NineTableAPI.js';
 
 export default class NineTable extends HTMLElement {
     #shadowRoot;
     #dataManager;
     #layoutManager;
+    #dataApi;
+    #sheetApi;
     #templateCnt = 0;
     #customStyle = '';
 
@@ -21,7 +25,12 @@ export default class NineTable extends HTMLElement {
 
         this.#shadowRoot = this.attachShadow({ mode: 'open' });
         this.#dataManager = new ngDataManager(this);
-    }
+
+        this.#dataApi = new DataAPI(this);
+        this.#sheetApi = new NineTableAPI(this);
+
+        this.#bindApiMethods();
+   }
 
     connectedCallback() {
         setTimeout(() => {
@@ -75,81 +84,11 @@ export default class NineTable extends HTMLElement {
     get shadow() { return this.#shadowRoot; }
     get dataManager() { return this.#dataManager; }
     get data() { return this.#dataManager.data; }
-    get row() { return this.#dataManager.row; }
+    //get row() { return this.#dataManager.row; }
     get customStyle() {
         return this.#customStyle;
     }
 
-    scrollTo = (dataRow, callback) => {
-        this.#shadowRoot.querySelectorAll('nine-table-sheet.active').forEach($sheet => {
-            $sheet.scrollTo(dataRow, callback);
-        });
-    }
-
-    currentRow = () => {
-        let rows = this.currentRows();
-        return (rows.length === 0) ? -1 : rows[0];
-    }
-    currentRows = () => {
-
-        let rows = [];
-        this.#shadowRoot.querySelectorAll('nine-table-sheet.active').forEach($sheet => {
-
-            const arr = $sheet.view.getArray($sheet.selection.minRow);
-            const rowid = arr.m._[NINE_TABLE.META.INDEX.ROWID];
-
-            //trace.log(this.data.getArray($sheet.selection.minRow));
-
-            rows.push(rowid);
-        });
-
-        return rows;
-    }
-
-    addRow = (dataSource, updateState = true) => {
-        return this.data.add(dataSource, updateState);
-    }
-    insertRow = (index, dataSource, updateState = true) => {
-
-        const activeSheet = this.#shadowRoot.querySelector('nine-table-sheet.active');
-        if (!activeSheet) return;
-
-        const currentJson = activeSheet.view.get(index);
-        const rowid = currentJson.m._[NINE_TABLE.META.INDEX.ROWID];
-
-        const toRowid = this.data.insert(rowid, dataSource, updateState);
-        const records = activeSheet.view.getArray();
-
-        const targetIndex = records.findIndex(record => {
-            if (!record || !record.m || !record.m._) return false;
-            return record.m._[NINE_TABLE.META.INDEX.ROWID] === toRowid; // 타입 차이 방지를 위해 == 사용
-        });
-
-        return targetIndex;
-    };
-    removeRow = (index) => {
-
-        const activeSheet = this.#shadowRoot.querySelector('nine-table-sheet.active');
-        if (!activeSheet) return;
-
-        const currentJson = activeSheet.view.get(index);
-        const rowid = currentJson.m._[NINE_TABLE.META.INDEX.ROWID];
-
-        this.data.remove(rowid);
-    };
-
-    currentIndex = () => {
-        let rows = this.currentIndexs();
-        return (rows.length === 0) ? -1 : rows[0];
-    }
-    currentIndexs = () => {
-        let rows = [];
-        this.#shadowRoot.querySelectorAll('nine-table-sheet.active').forEach($sheet => {
-            rows.push(Math.floor($sheet.selection.minRow / $sheet.template.length));
-        });
-
-        return rows;
-    }
 
     addProvider(provider) {
         if (!provider || typeof provider !== 'object') return;
@@ -262,6 +201,39 @@ export default class NineTable extends HTMLElement {
                     fn.call(this);
                 } finally {
                     this.loading = false;
+                }
+            });
+        });
+    }
+
+    #bindApiMethods() {
+        //const apis = [this.#sheetAPI, this.#dataApi];
+        const apis = [this.#sheetApi];
+
+        apis.forEach(api => {
+            // api 인스턴스(this)에 직접 선언된 속성들과 프로토타입 속성을 모두 가져옴
+            // Reflect.ownKeys를 사용하면 심볼이나 숨겨진 프로퍼티까지 안전하게 탐색 가능합니다.
+            const keys = new Set([
+                ...Reflect.ownKeys(api),
+                ...Reflect.ownKeys(Object.getPrototypeOf(api))
+            ]);
+
+            keys.forEach(key => {
+                // constructor나 내부 프라이빗 멤버(#)는 제외
+                if (key === 'constructor' || String(key).startsWith('#')) return;
+
+                const target = api[key];
+
+                if (typeof target === 'function') {
+                    if (!this[key]) {
+                        //trace.log(`[Binding Function] ${key}`);
+                        this[key] = (...args) => target.apply(api, args);
+                    }
+                } else if (target !== null && typeof target === 'object') {
+                    if (!this[key]) {
+                        //trace.log(`[Binding Object Namespace] ${key}`, target);
+                        this[key] = target; // 객체 네임스페이스(예: row) 통째로 연결
+                    }
                 }
             });
         });

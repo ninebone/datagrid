@@ -150,7 +150,9 @@ export class CellSelection {
 
 
 				if (matrixRow >= startRow && matrixRow <= endRow) {
-					tr.classList.add('selected');
+					container.querySelectorAll(`tbody tr[data-index="${tr.dataset.index}"]`).forEach(tr => {
+						tr.classList.add('selected');
+					});
 				}
 
 				//trace.log(this.#sheet.view);

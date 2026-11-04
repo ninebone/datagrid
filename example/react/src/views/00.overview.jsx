@@ -17,7 +17,45 @@ const Overview = () => {
 
 		tableRef.current?.addProvider?.({
 			getCommonCode: (group) => exampleData.generateCommonCode(group),
-			renderImage: (v) => `<img src="${v}" style="vertical-align:middle; width:58px; height:58px; border-radius:50%;" />`,
+			renderImage: (imageUrl, ...values) => {
+				// 1. 가변 인자 값들의 평균 계산 (값이 없으면 0)
+				const nums = values.map(v => Number(v) || 0);
+				const total = nums.reduce((acc, cur) => acc + cur, 0);
+				const avg = nums.length > 0 ? Math.round(total / nums.length) : 0;
+
+				// 2. 미니 도넛 차트 설정 (지름 36px)
+				const size = 36;
+				const center = size / 2;
+				const radius = center - 4;
+				const circumference = 2 * Math.PI * radius;
+
+				// 평균값(0~100 기준 가정, 넘치면 100으로 제한)을 백분율로 환산
+				const safeAvg = Math.min(Math.max(avg, 0), 100);
+				const strokeDashoffset = circumference - (safeAvg / 100) * circumference;
+				const chartColor = safeAvg > 50 ? '#10b981' : '#3b82f6'; // 점수에 따른 색상 분기
+
+				return `
+					<div style="display: flex; justify-content:center; align-items: center; gap: 8px; width: 100%;">
+					   <!-- 프로필 이미지 -->
+					   <img src="${imageUrl}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" />
+					   
+					   <!-- 미니 도넛 차트 및 평균값 텍스트 -->
+					   <div style="position: relative; display: flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; flex-shrink: 0;">
+						  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform: rotate(-90deg);">
+							 <!-- 백그라운드 트랙 원 -->
+							 <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#e2e8f0" stroke-width="3" />
+							 <!-- 진행률 도넛 원 -->
+							 <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="${chartColor}" stroke-width="3" 
+								stroke-dasharray="${circumference}" stroke-dashoffset="${strokeDashoffset}" stroke-linecap="round" />
+						  </svg>
+						  <!-- 중앙에 표시되는 평균 숫자 -->
+						  <div style="position: absolute; font-size: 10px; font-weight: 700; color: #1e293b;">
+							 ${avg}
+						  </div>
+					   </div>
+					</div>
+				 `;
+			},
 			renderBadge: (v1, v2, v3) => {
 				const v = (Number(v1) + Number(v2) + Number(v3)) / 3;
 				return v > 50
@@ -198,11 +236,11 @@ const Overview = () => {
 			<nine-table ref={tableRef} show-footer="true" style={{width: '90%', height: '80%'}}>
 				<table row-indicator="true">
 					<colgroup>
-						<col width="50" fixed="left"/>
-						<col width="50" fixed="left"/>
-						<col width="80"/>
-						<col width="80"/>
-						<col width="130"/>
+						<col width="50" fixed="left" background="red" />
+						<col width="50" fixed="left" background="red"/>
+						<col width="100" background="darkorange" />
+						<col width="80" background="blue" />
+						<col width="130" background="blue" />
 						<col width="100"/>
 						<col width="100"/>
 						<col width="100"/>
@@ -239,8 +277,7 @@ const Overview = () => {
 					<tr>
 						<td data-bind="sel" rowSpan="2" cell-type="checkbox"></td>
 						<td data-bind="sel2" rowSpan="2" cell-type="checkbox" is-radio="true"></td>
-						<td data-bind="NAME" rowSpan="2" text-align="center" data-expr="provider.renderImage(data.PIC)"
-							html="true"></td>
+						<td data-bind="NAME" rowSpan="2" data-expr="provider.renderImage(data.PIC, data.REC1, data.REC2, data.REC3)" html="true"></td>
 						<td data-bind="NAME" rowSpan="2"></td>
 						<td data-expr="'<font color=\'#999\'>' + data.REC1 + '+' + data.REC2 + '+' + data.REC3 + ' (Avg.<font color=\'green\'><b>' + Math.round((data.REC1 + data.REC2 + data.REC3) / 3) + '</b></font>)</font>'"
 							html="true"></td>
@@ -277,7 +314,7 @@ const Overview = () => {
 				</table>
 				<table row-indicator="true">
 					<colgroup>
-						<col width="100"/>
+						<col width="100" background="red" />
 						<col width="50"/>
 						<col width="50"/>
 						<col width="50"/>

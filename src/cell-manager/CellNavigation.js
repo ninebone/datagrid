@@ -353,7 +353,12 @@ export class CellNavigation {
 			const cell = e.target.closest('td, th');
 			if (!cell) return;
 			if (cell.dataset.index === undefined || cell.dataset.col === undefined) return;
-			this.currentCell = cell;
+
+			if (cell.querySelector("cell-row-indicator")) {
+				this.#sheet.row.focus(cell.dataset.index);
+			} else {
+				this.currentCell = cell;
+			}
 		});
 
 		this.#sheet.addEventListener('keydown', (e) => {
