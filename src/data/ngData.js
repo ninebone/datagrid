@@ -377,6 +377,22 @@ export class ngData {
 		rowData.v[COL_IDX] = value;
 	};
 
+	getChangedData = (rowState) => {
+
+		const records = this.#parent.rawRecords;
+
+		if (rowState) {
+			return this.#conv( records.filter(item => { return item.m._[NINE_TABLE.META.INDEX.ROW_STATE] === rowState; } ) );
+		}
+		else {
+			return {
+				C: this.#conv( records.filter(item => { return item.m._[NINE_TABLE.META.INDEX.ROW_STATE] === NINE_TABLE.ROW_STATE.INSERT; } ) ),
+				U: this.#conv( records.filter(item => { return item.m._[NINE_TABLE.META.INDEX.ROW_STATE] === NINE_TABLE.ROW_STATE.UPDATE; } ) ),
+				D: this.#conv( records.filter(item => { return item.m._[NINE_TABLE.META.INDEX.ROW_STATE] === NINE_TABLE.ROW_STATE.DELETE; } ) ),
+			};
+		}
+	};
+
 	#conv = (arr) => {
 		if (!arr) return arr;
 

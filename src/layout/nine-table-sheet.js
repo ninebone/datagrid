@@ -16,6 +16,7 @@ import { Sorting } from "@/data/Sorting.js";
 import { SheetView } from "@/data/SheetView.js";
 
 import { PreCompiler } from "@/layout/core/PreCompiler.js";
+import { SheetAPI } from "@/api/SheetAPI.js";
 
 export class NineTableSheet extends HTMLElement {
     #index;
@@ -29,6 +30,7 @@ export class NineTableSheet extends HTMLElement {
     #sorting;
     #filtering;
     #grouping;
+    #api;
 
     #view;
 
@@ -45,6 +47,10 @@ export class NineTableSheet extends HTMLElement {
 
         this.#host = this.getRootNode().host;
         this.#rowManager = new RowManager(this);
+
+        this.#api = new SheetAPI(this);
+
+        this.#bindApiMethods();
     }
 
     connectedCallback() {
@@ -540,6 +546,40 @@ export class NineTableSheet extends HTMLElement {
                 $tr.classList.remove('hover');
             });
             activeRowIndex = null;
+        });
+    }
+
+    #bindApiMethods = () => {
+        //const apis = [this.#sheetAPI, this.#dataAPI];
+        const apis = [this.#api];
+
+        apis.forEach(api => {
+            // api 인스턴스(this)에 직접 선언된 속성들과 프로토타입 속성을 모두 가져옴
+            // Reflect.ownKeys를 사용하면 심볼이나 숨겨진 프로퍼티까지 안전하게 탐색 가능합니다.
+            const keys = new Set([
+                ...Reflect.ownKeys(api),
+                ...Reflect.ownKeys(Object.getPrototypeOf(api))
+            ]);
+
+            keys.forEach(key => {
+                // constructor나 내부 프라이빗 멤버(#)는 제외
+                if (key === 'constructor' || String(key).startsWith('#')) return;
+
+                const target = api[key];
+
+                if (typeof target === 'function') {
+                    if (!this[key]) {
+                        //trace.log(`[Binding Function] ${key}`);
+                        this[key] = (...args) => target.apply(api, args);
+                    }
+                } else if (target !== null && typeof target === 'object') {
+
+                    if (!this[key]) {
+                        //trace.log(`[Binding Object Namespace] ${key}`);
+                        this[key] = target; // 객체 네임스페이스(예: row) 통째로 연결
+                    }
+                }
+            });
         });
     }
 
