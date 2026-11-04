@@ -3,7 +3,7 @@ import { exampleData } from '@/_data/example-data.js';
 import "@ninebone/datagrid";
 
 const Overview = () => {
-	const DATA_CNT = 100000;
+	const DATA_CNT = 10000;
 	const tableRef = useRef(null);
 
 	const selectList = (params = {}) => {

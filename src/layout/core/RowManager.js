@@ -81,7 +81,6 @@ export class RowManager {
         const viewHeight = this.#sheet.querySelector('.ng-sheet-body').offsetHeight || 0;
         const rawTotalVirtualHeight = Math.max(totalCount * rowHeight - (viewHeight - fixedHeight - rowHeight), 0);
 
-
         const MAX_BROWSER_HEIGHT = 15000000;
         const useScaling = rawTotalVirtualHeight > MAX_BROWSER_HEIGHT;
 
@@ -93,19 +92,27 @@ export class RowManager {
             totalVirtualHeight = MAX_BROWSER_HEIGHT;
         }
 
+
         this.#sheet.elements.scrollHolder.style.height = `${totalVirtualHeight}px`;
 
         const actualScrollTop = useScaling ? (scrollTop / scaleFactor) : scrollTop;
 
+
+
         const maxStartIndex = Math.max(0, totalCount - 1);
         const clampedScrollTop = Math.min(actualScrollTop, rawTotalVirtualHeight);
-
         const startIndex = Math.max(0, Math.min(Math.floor(clampedScrollTop / rowHeight), maxStartIndex));
 
-        const renderOffsetTop = clampedScrollTop % rowHeight;
-        this.#sheet.elements.left.tbody.body.style.top =
-            this.#sheet.elements.body.tbody.body.style.top =
-                this.#sheet.elements.right.tbody.body.style.top = `-${renderOffsetTop}px`;
+        /*
+         * FIX: Use GPU-accelerated transform3d instead of 'top' positioning.
+         * On mobile devices (iOS Safari), direct 'top' updates trigger expensive
+         * layout reflows and cause severe scrolling lag during inertia touch scrolls.
+         * translate3d forces hardware compositing for buttery-smooth performance.
+         */
+        this.#sheet.elements.left.tbody.body.style.transform =
+            this.#sheet.elements.body.tbody.body.style.transform =
+                this.#sheet.elements.right.tbody.body.style.transform = `translate3d(0px, -${clampedScrollTop % rowHeight}px, 0px)`;
+
 
         const firstTr = this.#element.firstTr;
         const currentStartIndex = firstTr && firstTr.dataset.row !== undefined ? parseInt(firstTr.dataset.row, 10) : -1;
