@@ -121,7 +121,7 @@ const Radio = () => {
 					</thead>
 					<tbody>
 					<tr>
-						<td data-bind="NAME"></td>
+						<td data-bind="NAME" rowSpan="2"></td>
 
 						<td data-bind="AGE" text-align="center" className="gray"></td>
 						<td data-bind="AGE" cell-type="input" text-align="center"></td>
@@ -143,6 +143,17 @@ const Radio = () => {
 						<td cell-type="radio" data-bind="SEX" data-source="provider.getCommonCode('SEX')"
 							key-name="code" value-name="codename"
 							visible="data.STATUS === 'C' ? true : false"></td>
+					</tr>
+					<tr>
+						<td colSpan="2" text-align="center"></td>
+
+						<td colSpan="2" text-align="center"></td>
+
+						<td colSpan="2" text-align="center"></td>
+
+						<td colSpan="2" text-align="center"></td>
+
+						<td colSpan="2" text-align="center"></td>
 					</tr>
 					</tbody>
 				</table>

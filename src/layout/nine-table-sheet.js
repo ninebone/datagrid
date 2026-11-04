@@ -64,6 +64,13 @@ export class NineTableSheet extends HTMLElement {
 
     get elements() { return this.#elements; }
 
+    get template() {
+        return {
+            length: this.#source?.tbody?.tr?.length || 0,
+            trs: this.#source?.tbody?.tr || []
+        };
+    }
+
     get isAutoFitCol() {
         const attrTrue = this.getAttribute('auto-fit-col') === 'true' || this.#host?.getAttribute('auto-fit-col') === 'true';
         const sourceTableTrue = this.#source.table?.getAttribute('auto-fit-col') === 'true';

@@ -143,10 +143,9 @@ export default class NineTable extends HTMLElement {
         return (rows.length === 0) ? -1 : rows[0];
     }
     currentIndexs = () => {
-
         let rows = [];
         this.#shadowRoot.querySelectorAll('nine-table-sheet.active').forEach($sheet => {
-            rows.push($sheet.selection.minRow);
+            rows.push(Math.floor($sheet.selection.minRow / $sheet.template.length));
         });
 
         return rows;
