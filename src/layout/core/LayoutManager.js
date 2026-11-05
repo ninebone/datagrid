@@ -127,8 +127,6 @@ export class LayoutManager {
     #applyAutoHeight = () => {
         this.#host.shadowRoot.querySelectorAll('nine-table-sheet').forEach(($sheet) => {
             if ($sheet.index === 0) {
-                trace.log($sheet, $sheet.template.height, $sheet.view.count());
-
                 const fixedHeight = ($sheet.querySelector("thead")?.offsetHeight || 0) +
                     ($sheet.querySelector("tfoot")?.offsetHeight || 0) +
                     ($sheet.querySelector("tbody.head")?.offsetHeight || 0);
