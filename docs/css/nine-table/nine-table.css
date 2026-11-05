@@ -92,31 +92,4 @@ cell-button {
     --cell-button-active-background: #d1d5db;
 }
 
-tbody {
-
-    tr.selected {
-        cell-row-indicator {
-            border-left: 2px solid darkgoldenrod;
-        }
-
-        cell-row-indicator {
-            border-left: 2px solid darkgoldenrod;
-        }
-    }
-
-    .selected {
-        background-color: var(--cell-selection-bg);
-    }
-
-    .selected-start {
-        background-color: transparent;
-    }
-
-    .selected-top    { border-top: 2px solid var(--cell-selection-border-color); }
-    .selected-bottom { border-bottom: 2px solid var(--cell-selection-border-color); }
-    .selected-left   { border-left: 2px solid var(--cell-selection-border-color); }
-    .selected-right  { border-right: 2px solid var(--cell-selection-border-color); }
-}
-
-
 
