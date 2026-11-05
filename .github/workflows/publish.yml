@@ -26,9 +26,7 @@ jobs:
 
       # 1.
       - name: Install dependencies
-        run: |
-          npm ci
-          npm install --prefix example/react
+        run: npm ci
 
       # 2.
       - name: Build Core and Example
