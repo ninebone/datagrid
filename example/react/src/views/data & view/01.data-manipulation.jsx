@@ -15,7 +15,7 @@ const Radio = () => {
 
 	const selectCode = async () => {
 		setTimeout( () => {
-			tableRef.current.addProvider({
+			tableRef.current.provider.add({
 				getCommonCode: (group) => {
 					return exampleData.generateCommonCode(group);
 				},
@@ -61,7 +61,7 @@ const Radio = () => {
 
 	useEffect(() => {
 
-		tableRef.current.addProvider({
+		tableRef.current.provider.add({
 			style: `
 				tr.first {
 					height: 36px;

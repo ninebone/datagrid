@@ -40,6 +40,7 @@ npm install @ninebone/datagrid
 
 <!-- HTML example -->
 
+````html
 <html>
 <head>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
@@ -86,15 +87,14 @@ npm install @ninebone/datagrid
     <script>
         const grd = document.querySelector("nine-table");
 
-        grd.addEventListener("load", () => {
-            // Define custom provider helper functions used in data-expr
-  
-            grd.addProvider.({
-                getCommonCode: (group) => exampleData.generateCommonCode(group),
-                renderImage: (v) => `<img src="${v}" style="vertical-align:middle; width:58px; height:58px; border-radius:50%;" />`,
-                renderBadge: (v1, v2) => `<span>Score: ${Number(v1) + Number(v2)}</span>`,
-			});
+        // Define custom provider helper functions used in data-expr
+        grd.provider.add({
+            getCommonCode: (group) => exampleData.generateCommonCode(group),
+            renderImage: (v) => `<img src="${v}" style="vertical-align:middle; width:58px; height:58px; border-radius:50%;" />`,
+            renderBadge: (v1, v2) => `<span>Score: ${Number(v1) + Number(v2)}</span>`,
+        });
 			
+        grd.addEventListener("load", () => {
             // Binding Data
             grd.data.set([
               {

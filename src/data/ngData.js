@@ -172,6 +172,8 @@ export class ngData {
 				loadData();
 			}, { once: true });
 		}
+
+
 	};
 
 	get nextId() {
@@ -265,7 +267,9 @@ export class ngData {
 		if (dataSource === undefined) dataSource = {};
 		const arr = this.#json2Array(dataSource);
 
-		this.#parent.rawRecords = this.#parent.rawRecords.concat(this.#defaultInsert(arr));
+		const processedArr = this.#defaultInsert(arr);
+
+		this.#parent.rawRecords = this.#parent.rawRecords.concat(processedArr);
 
 		const row = this.count() - 1;
 		if (updateState) {
@@ -276,6 +280,11 @@ export class ngData {
 		}
 
 		this.#invalidate();
+
+		this.#host.dispatchEvent(new CustomEvent(NINE_TABLE.EVENT.ROW_ADDED, {
+			bubbles: true,
+			detail: { target: this.#host, rowid: processedArr.length > 0 ? processedArr[0].m._[NINE_TABLE.META.INDEX.ROWID] : null }
+		}));
 
 		return row;
 	};
@@ -317,6 +326,11 @@ export class ngData {
 
 		this.#invalidate();
 
+		this.#host.dispatchEvent(new CustomEvent(NINE_TABLE.EVENT.ROW_ADDED, {
+			bubbles: true,
+			detail: { target: this.#host, rowid: processedArr.length > 0 ? processedArr[0].m._[NINE_TABLE.META.INDEX.ROWID] : null }
+		}));
+
 		return processedArr[0].m._[NINE_TABLE.META.INDEX.ROWID]; // 삽입된 실제 배열 인덱스 반환
 	};
 
@@ -354,6 +368,11 @@ export class ngData {
 		});
 
 		this.#invalidate();
+
+		this.#host.dispatchEvent(new CustomEvent(NINE_TABLE.EVENT.ROW_REMOVED, {
+			bubbles: true,
+			detail: { target: this.#host, rowid: arr.length > 0 ? arr[0] : null }
+		}));
 	};
 
 	setValue = (rowid, colnm, value) => {

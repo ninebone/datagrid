@@ -169,7 +169,7 @@
 
     const grd = document.querySelector("nine-table");
 
-    grd.addProvider({
+    grd.provider.add({
         getCommonCode: (group) => exampleData.generateCommonCode(group),
         renderImage: (v) => `<img src="./${v}" style="vertical-align:middle; width:58px; height:58px; border-radius:50%;" />`,
         renderBadge: (v1, v2, v3) => {

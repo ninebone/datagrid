@@ -18,6 +18,8 @@ export const NINE_TABLE = {
     },
     EVENT: {
         LOAD: "load",
+        ROW_ADDED: "row-added",
+        ROW_REMOVED: "row-removed",
         CELL_BUTTON_CLICK:  "cell-button-click",
     },
 };

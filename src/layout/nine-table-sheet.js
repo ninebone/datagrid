@@ -39,6 +39,12 @@ export class NineTableSheet extends HTMLElement {
     };
 
     #elements;
+    #trTemplateHeight;
+    #template = {
+        length: 0,
+        height: 0,
+        heights: [],
+    };
 
     static SCROLLBAR_SIZE = 16;
 
@@ -57,6 +63,7 @@ export class NineTableSheet extends HTMLElement {
         this.#init();
     }
 
+    get template() { return this.#template; }
     get index() { return this.#index; }
     get colResizer() { return this.#colResizer; }
     get filtering() { return this.#filtering; }
@@ -70,12 +77,13 @@ export class NineTableSheet extends HTMLElement {
 
     get elements() { return this.#elements; }
 
+    /**
     get template() {
         return {
             length: this.#source?.tbody?.tr?.length || 0,
             trs: this.#source?.tbody?.tr || []
         };
-    }
+    } */
 
     get isAutoFitCol() {
         const attrTrue = this.getAttribute('auto-fit-col') === 'true' || this.#host?.getAttribute('auto-fit-col') === 'true';
@@ -155,7 +163,7 @@ export class NineTableSheet extends HTMLElement {
     #adjustOverlay = () => {
         const $thead = this.querySelector('.ng-container-body thead');
         const $overlay = this.querySelector('.nodata-overlay');
-        $overlay.style.top = `${$thead.offsetHeight}px`;
+        $overlay.style.top = `${$thead?.offsetHeight}px`;
     }
 
     get view() {
@@ -264,15 +272,9 @@ export class NineTableSheet extends HTMLElement {
         this.querySelector('nine-table-hscrollbar')?.refresh();
     }
 
-    generate = ($table, index) => {
-
-        $table.style.display = 'none';
+    generateTemplate = ($table, index) => {
 
         this.#index = index;
-
-        PreCompiler.initializeTable(this.#host, $table);
-
-        $table.style.display = '';
 
         this.#source = {
             table: TableCompiler.compile($table),
@@ -280,6 +282,48 @@ export class NineTableSheet extends HTMLElement {
                 tr: $table.querySelectorAll("tbody tr"),
             }
         };
+
+        this.querySelector(`.ng-container-body`).appendChild(this.#source.table);
+
+        this.#template.height = this.#template.length = 0;
+        this.#template.heights = [];
+        this.querySelectorAll(`.ng-container-body tbody.body tr`).forEach(($tr) => {
+            this.#template.height += $tr.offsetHeight || 0;
+            this.#template.heights.push($tr.offsetHeight || 0);
+        });
+        this.#template.length = this.#template.heights.length;
+
+        if (this.#index === 0) {
+            const minRows = parseInt(this.#host.getAttribute('display-min-rows'), 10);
+            const maxRows = parseInt(this.#host.getAttribute('display-max-rows'), 10);
+
+            const h = (this.querySelector("nine-table-toolbar")?.offsetHeight || 0) +
+                (this.querySelector("nine-table-footer")?.offsetHeight || 0) +
+                (this.querySelector("thead")?.offsetHeight || 0) +
+                (this.querySelector("tfoot")?.offsetHeight || 0) +
+                (this.querySelector("tbody.head")?.offsetHeight || 0);
+
+            if (this.#host.getAttribute('auto-height') === "true" || !isNaN(minRows) || !isNaN(maxRows)) {
+                this.#host.setAttribute('scroll-bar', "none");
+            }
+
+            if (!isNaN(minRows)) {
+                this.#host.style.minHeight = h + (this.#template.height * minRows) + "px";
+            }
+
+            if (!isNaN(maxRows)) {
+                this.#host.style.maxHeight = h + (this.#template.height * maxRows) + "px";
+            }
+        }
+
+        this.querySelectorAll(("tbody.body tr")).forEach(($tr) => {
+            $tr.style.display = "none";
+        })
+
+        this.querySelector(`.ng-container-body table`).remove();
+    };
+
+    generate = () => {
 
         this.#renderSplitContainers();
 
@@ -447,7 +491,9 @@ export class NineTableSheet extends HTMLElement {
             <div class="ng-sheet-body">
                 <div class="ng-sheet-body-content">
                     <div class="ng-container-left"></div>
-                    <div class="ng-container-body"></div>
+                    <div class="ng-container-body">
+                    
+                    </div>
                     <div class="ng-container-right"></div>
                 </div>
                 <div class="ng-virtual-height-holder"></div>

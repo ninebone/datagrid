@@ -91,7 +91,7 @@
 
     const grd = document.querySelector("nine-table");
 
-    grd.addProvider({
+    grd.provider.add({
         checkName: (v) => {
             return nine.getByteLength(v) > 15 ? false : true;
         },

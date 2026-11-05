@@ -15,9 +15,10 @@ const Overview = () => {
 
 	useEffect(() => {
 
-		tableRef.current?.addProvider?.({
+		tableRef.current?.provider.add({
 			getCommonCode: (group) => exampleData.generateCommonCode(group),
 			renderImage: (imageUrl, ...values) => {
+
 				// 1. 가변 인자 값들의 평균 계산 (값이 없으면 0)
 				const nums = values.map(v => Number(v) || 0);
 				const total = nums.reduce((acc, cur) => acc + cur, 0);
@@ -236,11 +237,11 @@ const Overview = () => {
 			<nine-table ref={tableRef} show-footer="true" style={{width: '90%', height: '80%'}}>
 				<table row-indicator="true">
 					<colgroup>
-						<col width="50" fixed="left" background="red" />
-						<col width="50" fixed="left" background="red"/>
-						<col width="100" background="darkorange" />
-						<col width="80" background="blue" />
-						<col width="130" background="blue" />
+						<col width="50" background="red" />
+						<col width="50" background="red"/>
+						<col width="100" background="red" />
+						<col width="80" />
+						<col width="130" />
 						<col width="100"/>
 						<col width="100"/>
 						<col width="100"/>
@@ -274,7 +275,7 @@ const Overview = () => {
 					</tr>
 					</thead>
 					<tbody>
-					<tr>
+					<tr style={{ height:'42px' }}>
 						<td data-bind="sel" rowSpan="2" cell-type="checkbox"></td>
 						<td data-bind="sel2" rowSpan="2" cell-type="checkbox" is-radio="true"></td>
 						<td data-bind="NAME" rowSpan="2" data-expr="provider.renderImage(data.PIC, data.REC1, data.REC2, data.REC3)" html="true"></td>
