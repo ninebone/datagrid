@@ -17,5 +17,12 @@ bin-release/
 # should NOT be excluded as they contain compiler settings and other important
 # information for Eclipse / Flash Builder.
 .idea/
-/dist/
-/node_modules/
+# Dependencies
+node_modules/
+example/node_modules/
+example/react/node_modules/
+
+# Build Outputs
+dist/
+example/dist/
+example/react/dist/
