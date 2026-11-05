@@ -14,7 +14,7 @@ const Renderer = () => {
 	};
 
 	useEffect(() => {
-		tableRef.current.addProvider?.({
+		tableRef.current.provider.add?.({
 			renderBadge: (val) => {
 				if (val > 50) {
 					return `<span style="display: block; box-sizing: border-box; padding: 0 6px; background: #d1e7dd; color: #0f5132; border-radius: 4px;">High</span>`;

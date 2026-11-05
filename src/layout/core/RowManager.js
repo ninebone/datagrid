@@ -11,9 +11,6 @@ export class RowManager {
 
     #containerTemplates = new Map();
 
-    #templateRowHeights = [];
-    #cachedTemplateHeight = null;
-
     #resizeObserver = null;
     #sheetHeight = 0;
     #cachedRowCount;
@@ -29,7 +26,7 @@ export class RowManager {
     }
 
     getRowHeight() {
-        return this.#templateRowHeights.reduce((sum, h) => sum + h, 0);//this.#cachedTemplateHeight;
+        return this.#sheet.template.height;
     }
 
     refresh = (force = false) => {
@@ -39,11 +36,11 @@ export class RowManager {
         const bodyViewport = this.#sheet.querySelector('.ng-sheet-body');
         if (!bodyViewport) return;
 
-        const wasInvalidHeight = !this.#cachedTemplateHeight || this.#cachedTemplateHeight <= 0;
+        const wasInvalidHeight = !this.#sheet.template.height || this.#sheet.template.height <= 0;
 
         if (wasInvalidHeight) {
             this.#measureAndCacheHeight();
-            if (this.#cachedTemplateHeight && this.#cachedTemplateHeight > 0) {
+            if (this.#sheet.template.height && this.#sheet.template.height > 0) {
                 this.#renderAllContainers();
             }
         }
@@ -61,7 +58,7 @@ export class RowManager {
             return;
         }
 
-        const rowHeight = this.#cachedTemplateHeight;
+        const rowHeight = this.#sheet.template.height;
         if (!rowHeight || rowHeight <= 0) return;
 
         const viewRecords = this.#sheet.view.getArray();
@@ -72,14 +69,12 @@ export class RowManager {
             return;
         }
 
-        const templateLength = this.#sheet.templateLength;
-
         const fixedHeight = (this.#sheet.elements.body.thead?.offsetHeight || 0) +
             (this.#sheet.elements.body.tfoot?.offsetHeight || 0) +
             this.#sheet.elements.body.tbody.head.offsetHeight;
 
         const viewHeight = this.#sheet.querySelector('.ng-sheet-body').offsetHeight || 0;
-        const rawTotalVirtualHeight = Math.max(totalCount * rowHeight - (viewHeight - fixedHeight - rowHeight), 0);
+        const rawTotalVirtualHeight = Math.max(totalCount * rowHeight - (viewHeight - fixedHeight - rowHeight) - rowHeight, 0);
 
         const MAX_BROWSER_HEIGHT = 15000000;
         const useScaling = rawTotalVirtualHeight > MAX_BROWSER_HEIGHT;
@@ -97,11 +92,11 @@ export class RowManager {
 
         const actualScrollTop = useScaling ? (scrollTop / scaleFactor) : scrollTop;
 
-
-
         const maxStartIndex = Math.max(0, totalCount - 1);
         const clampedScrollTop = Math.min(actualScrollTop, rawTotalVirtualHeight);
         const startIndex = Math.max(0, Math.min(Math.floor(clampedScrollTop / rowHeight), maxStartIndex));
+
+        //trace.log(clampedScrollTop % rowHeight, rowHeight);
 
         /*
          * FIX: Use GPU-accelerated transform3d instead of 'top' positioning.
@@ -131,7 +126,7 @@ export class RowManager {
             const rows = $tbody.querySelectorAll('tbody.body tr');
 
             rows.forEach(($tr, index) => {
-                const dataIndex = startIndex + Math.floor(index / templateLength);
+                const dataIndex = startIndex + Math.floor(index / this.#sheet.template.length);
 
                 if (dataIndex >= totalCount) {
                     $tr.style.display = 'none';
@@ -177,7 +172,7 @@ export class RowManager {
         const getItemHeight = (item) => {
             if (item.type === 'group') {
                 const depth = item.record[GROUP_IDX.DEPTH] || 0;
-                const groupHeight = this.#templateRowHeights[depth] || this.#cachedTemplateHeight / templateLength;
+                const groupHeight = this.#sheet.template.height[depth] || this.#sheet.template.height / templateLength;
                 return groupHeight;
             } else {
                 let dataRowsHeight = 0;
@@ -185,11 +180,11 @@ export class RowManager {
 
                 let groupHeightsTotal = 0;
                 for(let i = 0; i < templateLength - 1; i++) {
-                    groupHeightsTotal += this.#templateRowHeights[i] || 0;
+                    groupHeightsTotal += this.#sheet.template.heights[i] || 0;
                 }
-                dataRowsHeight = this.#cachedTemplateHeight - groupHeightsTotal;
+                dataRowsHeight = this.#sheet.template.height - groupHeightsTotal;
 
-                return dataRowsHeight > 0 ? dataRowsHeight : this.#cachedTemplateHeight;
+                return dataRowsHeight > 0 ? dataRowsHeight : this.#sheet.template.height;
             }
         };
 
@@ -235,7 +230,7 @@ export class RowManager {
             return;
         }
 
-        const visibleRowsCount = Math.ceil(viewportClientHeight / (this.#cachedTemplateHeight / templateLength));
+        const visibleRowsCount = Math.ceil(viewportClientHeight / (this.#sheet.template.height / templateLength));
         const dynamicBuffer = (this.#sheet.grouping.columns?.length || 1) * 15;
         const targetStart = startIndex;
         const targetEnd = Math.min(totalVirtualCount, startIndex + visibleRowsCount + dynamicBuffer);
@@ -367,7 +362,7 @@ export class RowManager {
 
         this.#isGrouped = this.#sheet.sourceTable.querySelector("tbody tr[grouping='true']") ? true : false;
 
-        this.#cachedTemplateHeight = null;
+        //this.#cachedTemplateHeight = null;
         this.#containerTemplates.clear();
 
         this.#element = {
@@ -394,6 +389,7 @@ export class RowManager {
 
         if (bodyViewport) {
             this.#sheetHeight = bodyViewport.clientHeight;
+            //trace.log("this.#sheetHeight", this.#sheetHeight, this.#sheet);
 
             this.#measureAndCacheHeight();
             this.#renderAllContainers();
@@ -403,7 +399,7 @@ export class RowManager {
 
                 if (this.#isProgrammaticScroll) return;
 
-                const rowHeight = this.#cachedTemplateHeight || 0;
+                const rowHeight = this.#sheet.template.height || 0;
                 const totalCount = this.#sheet.view.getArray()?.length || 0;
                 const rawTotalVirtualHeight = totalCount * rowHeight;
 
@@ -436,7 +432,7 @@ export class RowManager {
             targetScrollTop = ratio * maxScrollTop;
         } else {
 
-            const rowHeight = this.#cachedTemplateHeight;
+            const rowHeight = this.#sheet.template.height;
             const rawTargetScrollTop = targetRow * rowHeight;
 
             const fixedHeight = (this.#sheet.elements.body.thead?.offsetHeight || 0) +
@@ -479,38 +475,35 @@ export class RowManager {
     };
 
     #measureAndCacheHeight = () => {
+        return;
         if (!this.#sheet.classList.contains('active')) return;
 
         if (!this.#sheet.sourceTable) return;
 
         const trTemplates = this.#sheet.sourceTable?.querySelectorAll('tbody.body tr');
 
-        const $tbody = this.#sheet.querySelector('.ng-sheet-body .ng-container-body tbody.body');
+        const $tbody = this.#sheet.querySelector('.ng-container-body tbody.body');
+        if (!$tbody) return;
 
-        $tbody.querySelectorAll('tr').forEach(tr => tr.remove());
+        $tbody?.querySelectorAll('tr')?.forEach(tr => tr.remove());
 
         const fragment = document.createDocumentFragment();
         trTemplates.forEach($tr => fragment.appendChild($tr.cloneNode(true)));
-        $tbody.appendChild(fragment);
+        $tbody?.appendChild(fragment);
 
         const renderedTrs = $tbody.querySelectorAll('tr');
 
-        this.#templateRowHeights = [];
-        renderedTrs.forEach($tr => {
-            this.#templateRowHeights.push(Math.max($tr.offsetHeight, 24));
-        });
 
         renderedTrs.forEach(tr => tr.remove());
 
-        this.#cachedTemplateHeight = this.#templateRowHeights.reduce((sum, h) => sum + h, 0);
 
         this.#updateRowCount();
     };
 
     #updateRowCount = () => {
 
-        if (this.#sheetHeight > 0 && this.#cachedTemplateHeight > 0) {
-            const visibleRows = Math.ceil(this.#sheetHeight / this.#cachedTemplateHeight);
+        if (this.#sheetHeight > 0 && this.#sheet.template.height > 0) {
+            const visibleRows = Math.ceil(this.#sheetHeight / this.#sheet.template.height);
 
             let dynamicBuffer = this.#BUFFER_ROW_COUNT;
             if (this.#isGrouped && this.#sheet.grouping) {
@@ -629,9 +622,10 @@ export class RowManager {
 
                 if (height > 0 && this.#sheetHeight !== height) {
                     this.#sheetHeight = height;
+                    //trace.log("this.#sheetHeight", this.#sheetHeight);
                     this.#updateRowCount();
 
-                    if (this.#cachedTemplateHeight !== null) {
+                    if (this.#sheet.template.height !== null) {
                         this.#renderAllContainers();
                         this.refresh();
                     }

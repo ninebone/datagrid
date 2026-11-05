@@ -15,7 +15,7 @@ const InputNumber = () => {
 
 	useEffect(() => {
 
-		tableRef.current.addProvider({
+		tableRef.current.provider.add({
 			checkNum: (n1,n2,n3) => {
 				return Number(n1) + Number(n2) + Number(n3) > 100 ? true : false;
 			},

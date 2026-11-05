@@ -15,7 +15,7 @@ const InputColor = () => {
 
 	const selectCode = async () => {
 		//setTimeout( () => {
-			tableRef.current.addProvider({
+			tableRef.current.provider.add({
 				getColorList: (v) => {
 					const rawList = exampleData.generateCommonCode((v > 50) ? "COLOR" : "COLOR2");
 					return rawList.map(item => ({

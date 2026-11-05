@@ -92,31 +92,50 @@ cell-button {
     --cell-button-active-background: #d1d5db;
 }
 
-tbody {
 
-    tr.selected {
-        cell-row-indicator {
-            border-left: 2px solid darkgoldenrod;
-        }
-
-        cell-row-indicator {
-            border-left: 2px solid darkgoldenrod;
-        }
-    }
-
-    .selected {
-        background-color: var(--cell-selection-bg);
-    }
-
-    .selected-start {
-        background-color: transparent;
-    }
-
-    .selected-top    { border-top: 2px solid var(--cell-selection-border-color); }
-    .selected-bottom { border-bottom: 2px solid var(--cell-selection-border-color); }
-    .selected-left   { border-left: 2px solid var(--cell-selection-border-color); }
-    .selected-right  { border-right: 2px solid var(--cell-selection-border-color); }
+:host([theme="simple"]) nine-table-sheets-footer,
+:host([show-footer="false"]) nine-table-sheets-footer,
+:host([show-statusbar="false"]) nine-table-sheets-footer {
+    display: none;
 }
 
+:host([theme="simple"]),
+:host([auto-height="true"]),
+:host([scroll-bar="none"]) {
 
+    nine-table-vscrollbar
+    nine-table-hscrollbar,
+    nine-table-sheet .ng-scroll-edge {
+        display: none;
+    }
+    nine-table-sheet {
+        --hscrollbar-height: 0px;
+        --vscrollbar-width: 0px;
 
+        .ng-sheet-body {
+            overflow-y: auto;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+
+        .ng-sheet-body::-webkit-scrollbar {
+            display: block;
+            width: 6px;
+            height: 6px;
+        }
+
+        .ng-sheet-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .ng-sheet-body::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 3px;
+        }
+
+        .ng-sheet-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+}

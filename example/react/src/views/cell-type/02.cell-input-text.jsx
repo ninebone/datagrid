@@ -15,7 +15,7 @@ const InputText = () => {
 
 	useEffect(() => {
 
-		tableRef.current.addProvider({
+		tableRef.current.provider.add({
 			checkName: (v) => {
 				return nine.getByteLength(v) > 15 ? false : true;
 			},

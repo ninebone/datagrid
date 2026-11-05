@@ -14,7 +14,7 @@ const Combo = () => {
 	};
 
 	useEffect(() => {
-		tableRef.current.addProvider({
+		tableRef.current.provider.add({
 			getCommonCode: (group) => exampleData.generateCommonCode(group),
 		});
 

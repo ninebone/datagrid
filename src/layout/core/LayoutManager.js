@@ -3,6 +3,8 @@ import '@/layout/nine-table-sheets.js';
 import '@/layout/nine-table-sheets-footer.js';
 import '@/layout/nine-table-toolbar.js';
 import { NineTableSheet } from "@/layout/nine-table-sheet.js";
+import {PreCompiler} from "@/layout/core/PreCompiler.js";
+import {NINE_TABLE} from "@";
 
 export class LayoutManager {
     #host;
@@ -14,15 +16,7 @@ export class LayoutManager {
 
     #init = () => {
         this.#render();
-
-        new ResizeObserver((entries) => {
-            for (let entry of entries) {
-                const isAutoHeight = this.#host.getAttribute('auto-height') === 'true';
-                if (isAutoHeight) {
-                    this.#applyAutoHeight();
-                }
-            }
-        }).observe(this.#host);
+        this.#initEvent();
     }
 
     set loading(val) {
@@ -33,30 +27,12 @@ export class LayoutManager {
         }
     }
 
-    #applyAutoHeight = () => {
-        const activeSheets = Array.from(this.#host.shadowRoot.querySelectorAll('nine-table-sheet.active'));
-        if (activeSheets.length === 0) return;
 
-        const maxDisplayRows = parseInt(this.#host.getAttribute('max-display-row'), 10) || 10;
-        const maxRowHeight = Math.max(...activeSheets.map(sheet => sheet.getRowHeight()));
-
-        const toolbarEl = this.#host.shadowRoot.querySelector('nine-table-toolbar');
-        const footerEl = this.#host.shadowRoot.querySelector('nine-table-sheets-footer');
-
-        const toolbarHeight = toolbarEl ? toolbarEl.getBoundingClientRect().height : 0;
-        const footerHeight = footerEl ? footerEl.getBoundingClientRect().height : 0;
-        const extraPadding = NineTableSheet.SCROLLBAR_SIZE;
-
-        const calculatedHeight = (maxDisplayRows * maxRowHeight) + toolbarHeight + footerHeight + extraPadding;
-
-        this.#host.style.height = `${calculatedHeight}px`;
-    };
 
     #render = () => {
 
         const rawElements = Array.from(this.#host.children);
         const rawTables = rawElements.filter(el => (el.tagName.toUpperCase() === 'TABLE') );
-        const isAutoHeight = this.#host.getAttribute('auto-height') === 'true';
         const sheetCount = rawTables.length;
 
         const sheetsHtml = rawTables.map((tbl, idx) => {
@@ -79,7 +55,7 @@ export class LayoutManager {
         this.#host.shadowRoot.innerHTML = `
             <style>
                 ${cssImports.join('\n')}
-                ${this.#host.customStyle}
+                ${this.#host.provider.style.value}
             </style>
             
             <nine-table-toolbar></nine-table-toolbar>
@@ -98,16 +74,74 @@ export class LayoutManager {
             <nine-table-footer></nine-table-footer>
         `;
 
-        this.#host.shadowRoot.querySelectorAll('nine-table-sheet').forEach(($el, idx) => {
+        rawTables.forEach($el => {
+            PreCompiler.initializeTable(this.#host, $el);
+        })
 
-            if (rawTables[idx]) {
-                setTimeout(() => {
-                    $el.generate(rawTables[idx], idx);
-                    if (isAutoHeight) {
-                        this.#applyAutoHeight();
+        this.#host.shadowRoot.querySelectorAll('nine-table-sheet').forEach(($sheet, idx) => {
+            $sheet.classList.add('active');
+            $sheet.generateTemplate(rawTables[idx], idx);
+        });
+
+        this.#host.shadowRoot.querySelectorAll('nine-table-sheet').forEach(($sheet) => {
+
+            setTimeout(() => {
+                $sheet.generate();
+                if (this.#isAutoHeight) this.#applyAutoHeight();
+            });
+        });
+
+        setTimeout(() => {
+            this.#host.data.clear();
+        });
+    };
+
+    #initEvent = () => {
+
+        this.#host.addEventListener(NINE_TABLE.EVENT.ROW_ADDED, () => {
+            if (this.#isAutoHeight) this.#applyAutoHeight();
+        });
+
+        this.#host.addEventListener(NINE_TABLE.EVENT.ROW_REMOVED, () => {
+            if (this.#isAutoHeight) this.#applyAutoHeight();
+        });
+
+        let lastHeight = 0; // 직전 높이를 기억할 변수
+
+        new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                if (entry.target.tagName === "NINE-TABLE") {
+                    const currentHeight = entry.contentRect.height;
+
+                    if (currentHeight !== lastHeight) {
+                        lastHeight = currentHeight;
+                        if (this.#isAutoHeight) {
+                            this.#applyAutoHeight();
+                        }
                     }
-                });
+                }
+            }
+        }).observe(this.#host);
+    };
+
+    #applyAutoHeight = () => {
+        this.#host.shadowRoot.querySelectorAll('nine-table-sheet').forEach(($sheet) => {
+            if ($sheet.index === 0) {
+                trace.log($sheet, $sheet.template.height, $sheet.view.count());
+
+                const fixedHeight = ($sheet.querySelector("thead")?.offsetHeight || 0) +
+                    ($sheet.querySelector("tfoot")?.offsetHeight || 0) +
+                    ($sheet.querySelector("tbody.head")?.offsetHeight || 0);
+                const basicHeight = this.#host.offsetHeight - $sheet.offsetHeight + fixedHeight;
+
+                const h = Math.min($sheet.template.height * $sheet.view.count(), window.innerHeight * 0.8);
+
+                this.#host.style.height = basicHeight + (h) + "px";
             }
         });
     };
+
+    get #isAutoHeight() {
+        return this.#host.getAttribute('auto-height') === 'true';
+    }
 }

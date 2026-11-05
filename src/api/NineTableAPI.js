@@ -10,7 +10,7 @@ export class NineTableAPI {
         namespaces.forEach(ns => {
             this[ns] = new Proxy({}, {
                 get: (target, prop) => {
-                    const $sheet = this.getActiveSheet();
+                    const $sheet = this.#getActiveSheet();
                     if (!$sheet || !$sheet[ns]) return undefined;
 
                     const targetMethod = $sheet[ns][prop];
@@ -28,7 +28,7 @@ export class NineTableAPI {
         return this.#host.shadow.querySelectorAll('nine-table-sheet.active');
     }
 
-    getActiveSheet() {
+    #getActiveSheet() {
         const arr = this.getActiveSheets();
         return arr.length > 0 ? arr[0] : null;
     }

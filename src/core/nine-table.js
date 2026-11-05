@@ -14,7 +14,6 @@ export default class NineTable extends HTMLElement {
     #dataApi;
     #sheetApi;
     #templateCnt = 0;
-    #customStyle = '';
 
     constructor() {
         super();
@@ -85,37 +84,10 @@ export default class NineTable extends HTMLElement {
     get dataManager() { return this.#dataManager; }
     get data() { return this.#dataManager.data; }
     //get row() { return this.#dataManager.row; }
-    get customStyle() {
-        return this.#customStyle;
-    }
 
 
-    addProvider(provider) {
-        if (!provider || typeof provider !== 'object') return;
 
-        const { style, ...methods } = provider;
 
-        if (style && typeof style === 'string') {
-            this.#customStyle = style;
-
-            const styleEl = this.#shadowRoot.getElementById('nine-table-scoped-custom-style');
-            if (styleEl) {
-                styleEl.textContent = style;
-            }
-        }
-
-        if (Object.keys(methods).length > 0) {
-            setTimeout(() => {
-                Object.entries(methods).forEach(([name, fn]) => {
-                    if (typeof fn === 'function') {
-                        this[name] = fn;
-                    }
-                });
-
-                this.rerenderer();
-            });
-        }
-    }
 
     setData(records) {
         this.#dataManager.data.set(records);
@@ -207,8 +179,8 @@ export default class NineTable extends HTMLElement {
     }
 
     #bindApiMethods() {
-        //const apis = [this.#sheetAPI, this.#dataApi];
-        const apis = [this.#sheetApi];
+
+        const apis = [this.#dataApi, this.#sheetApi];
 
         apis.forEach(api => {
             // api 인스턴스(this)에 직접 선언된 속성들과 프로토타입 속성을 모두 가져옴

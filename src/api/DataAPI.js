@@ -8,41 +8,33 @@ export class DataAPI {
     constructor(host) {
         this.#host = host;
     }
-/**
-    add(dataSource, updateState = true) {
-        return this.#host.data.add(dataSource, updateState);
-    }
-*/
 
-    /**
-    insert(index, dataSource, updateState = true) {
-        const activeSheet = this.#host.shadow.querySelector('nine-table-sheet.active');
-        if (!activeSheet) return -1;
+    provider = {
+        // 스타일 데이터를 provider 객체 내부에서 직접 관리 (일반 메서드 축약형 사용)
+        style: {
+            value: '',
+        },
+        add: (providerObj) => {
+            if (!providerObj || typeof providerObj !== 'object') return;
 
-        const currentJson = activeSheet.view.get(index);
-        const rowid = currentJson.m._[NINE_TABLE.META.INDEX.ROWID];
+            const { style, ...methods } = providerObj;
 
-        const toRowid = this.#host.data.insert(rowid, dataSource, updateState);
-        const records = activeSheet.view.getArray();
+            if (style && typeof style === 'string') {
+                this.provider.style.value = style;
+            }
 
-        return records.findIndex(record => {
-            if (!record?.m?._) return false;
-            return record.m._[NINE_TABLE.META.INDEX.ROWID] === toRowid;
-        });
-    }
+            if (Object.keys(methods).length > 0) {
+                setTimeout(() => {
+                    Object.entries(methods).forEach(([name, fn]) => {
+                        if (typeof fn === 'function') {
+                            this.#host[name] = fn;
+                        }
+                    });
 
-    remove(index) {
-        const activeSheet = this.#host.shadow.querySelector('nine-table-sheet.active');
-        if (!activeSheet) return;
-
-        const currentJson = activeSheet.view.get(index);
-        const rowid = currentJson.m._[NINE_TABLE.META.INDEX.ROWID];
-
-        this.#host.data.remove(rowid);
+                    this.#host.rerenderer();
+                });
+            }
+        },
     }
 
-    set(records) {
-        this.#host.dataManager.data.set(records);
-        this.#host.refresh();
-    } */
 }

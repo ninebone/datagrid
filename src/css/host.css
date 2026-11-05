@@ -13,6 +13,7 @@
     background: #fff;
 }
 
+
 :host([theme="simple"]) {
     /* 1. 불필요한 패널 및 컴포넌트 숨기기 */
     .ng-part-header, .ng-part-footer,
@@ -32,7 +33,6 @@
         height: 32px;
     }
 
-    /* 2. 💡 [핵심] 스크롤바용 우측 16px 빈 공간을 제거하고 1열(1fr)로 꽉 채우기 */
     nine-table-sheet {
         border: none;
         overflow: hidden;
@@ -45,38 +45,6 @@
         border: none;
         padding: 0 8px;
     }
-
-    /**
-    nine-table-sheet tr td {
-        text-align: left;
-    } */
-
-    /* 4. 브라우저 기본 네이티브 스크롤바를 콘텐츠 위에 자연스럽게 오버레이(Overlay) */
-    nine-table-sheet .ng-sheet-body {
-        overflow-y: auto;
-        overflow-x: hidden;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-    }
-
-    nine-table-sheet .ng-sheet-body::-webkit-scrollbar {
-        display: block;
-        width: 6px;
-        height: 6px;
-    }
-
-    nine-table-sheet .ng-sheet-body::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    nine-table-sheet .ng-sheet-body::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.15);
-        border-radius: 3px;
-    }
-
-    nine-table-sheet .ng-sheet-body::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.3);
-    }
 }
 
 /* 🎯 Toolbar 숨김 제어 */
@@ -87,6 +55,7 @@
 
 /* 🎯 Footer(StatusBar) 숨김 제어 (show-statusbar="false") */
 :host([theme="simple"]) nine-table-sheets-footer,
+:host([show-footer="false"]) nine-table-sheets-footer,
 :host([show-statusbar="false"]) nine-table-sheets-footer {
     display: none;
 }
@@ -102,6 +71,49 @@
         height: 26px;
     }
 }
+
+
+:host([theme="simple"]),
+:host([auto-height="true"]),
+:host([scroll-bar="none"]) {
+
+    nine-table-vscrollbar
+    nine-table-hscrollbar,
+    nine-table-sheet .ng-scroll-edge {
+        display: none;
+    }
+    nine-table-sheet {
+        --hscrollbar-height: 0px;
+        --vscrollbar-width: 0px;
+
+        .ng-sheet-body {
+            overflow-y: auto;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+
+        .ng-sheet-body::-webkit-scrollbar {
+            display: block;
+            width: 6px;
+            height: 6px;
+        }
+
+        .ng-sheet-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .ng-sheet-body::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 3px;
+        }
+
+        .ng-sheet-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+}
+
 
 :host(.loading) {
     .ng-loading-bar {

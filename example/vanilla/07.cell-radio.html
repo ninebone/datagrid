@@ -109,7 +109,7 @@
 
     const grd = document.querySelector("nine-table");
 
-    grd.addProvider({
+    grd.provider.add({
         getCommonCode: (group) => {
             return exampleData.generateCommonCode(group);
         },

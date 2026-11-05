@@ -97,7 +97,7 @@
 
     const grd = document.querySelector("nine-table");
 
-    grd.addProvider({
+    grd.provider.add({
         getColorList: (v) => {
             const rawList = exampleData.generateCommonCode((v > 50) ? "COLOR" : "COLOR2");
             return rawList.map(item => ({
