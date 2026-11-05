@@ -36,6 +36,7 @@ jobs:
       - name: Sync build to docs
         run: |
           rm -rf docs/*
+          mkdir -p docs
           cp -r example/react/dist/* docs/
 
       # 4.
