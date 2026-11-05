@@ -1,6 +1,6 @@
 {
   "name": "@ninebone/datagrid",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "Blazing-fast virtualized HTML table for massive datasets with inline editing",
   "keywords": [
     "datagrid",
@@ -51,7 +51,7 @@
     "build:example:local": "npm --prefix example/react run build",
     "build:local": "npm run build:core && npm run build:example:local",
     "build:example:ci": "cd example/react && npm run build",
-    "build:ci": "npm run build:core && npm run build:example:ci",
+    "build:ci": "npm install --package-lock-only && npm run build:core && cd example/react && npm run build",
     "build": "npm run build:local",
     "watch": "vite build --watch",
     "version": "npm run build",
