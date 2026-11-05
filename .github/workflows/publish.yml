@@ -32,7 +32,7 @@ jobs:
 
       # 2.
       - name: Build Core and Example
-        run: npm run build
+        run: npm run build:ci
 
       # 3.
       - name: Sync build to docs
