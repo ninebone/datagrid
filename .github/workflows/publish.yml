@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Publish to npm & Update Docs
 
 on:
   push:
@@ -14,18 +14,39 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
 
-      - run: npm ci
+      # 1.
+      - name: Install dependencies
+        run: npm ci
 
-      - run: npm run build
+      # 2.
+      - name: Build Core and Example
+        run: npm run build
 
-      - run: npm publish --access public --provenance
+      # 3.
+      - name: Sync build to docs
+        run: |
+          rm -rf docs/*
+          cp -r example/react/dist/* docs/
+
+      # 4.
+      - name: Commit and push docs updates
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ci: auto-build core & example, update docs [skip ci]"
+          branch: main
+
+      # 5.
+      - name: Publish to npm
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
