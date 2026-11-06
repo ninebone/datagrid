@@ -69,6 +69,91 @@
     }
     tr {
         height: 28px;
+        min-height: 28px;
+        max-height: 28px;
+    }
+}
+
+:host(.combo-list) {
+    :focus {
+        --border-right: 2px solid #ccc;
+    }
+
+    tr.selected {
+        transform: unset !important;
+
+        .CELL-ROW-INDICATOR {
+            display: table-cell;
+            background: darkgoldenrod;
+
+            cell-row-indicator {
+                display: none;
+            }
+        }
+    }
+
+    .ng-container-left {
+        width: 2px;
+        min-width: 2px;
+        --flex: unset;
+    }
+    col[data-col="0"], th[data-col="0"], td[data-col="0"] {
+        width: 2px;
+        min-width: 2px;
+        max-width: 2px;
+    }
+    col[data-col="1"], th[data-col="1"], td[data-col="1"] {
+        display: none;
+    }
+
+    .ng-container-right {
+        display: none;
+    }
+}
+
+:host(.multi) {
+
+    .ng-container-left {
+        width: 26px;
+        max-width: 26px;
+        /**
+        table {
+            width: 26px !important;
+            max-width: 26px !important;;
+        } */
+    }
+    /**
+    col[data-col="0"], th[data-col="0"] {
+        width: 2px !important;
+        max-width: 2px !important;
+    } */
+
+    col[data-col="0"], col[data-col="1"] {
+        display: table-column;
+    }
+    th[data-col="0"], td[data-col="1"] {
+        display: table-cell;
+        overflow: hidden;
+    }
+    col[data-col="1"], td[data-col="1"] {
+        width: 24px;
+        max-width: 24px;
+    }
+
+    th[data-col="0"] {
+        * {
+            display: none;
+        }
+    }
+
+    td[data-col="1"] {
+        padding: 0;
+        border-right: none;
+        cell-checkbox {
+            padding: 0;
+            width: 24px;
+            border-right: none;
+        }
     }
 }
 

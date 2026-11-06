@@ -38,6 +38,11 @@ cell-input, cell-input-number, cell-button, cell-input-color, cell-input-date, c
     }
 }
 
+.ng-container-left,.ng-container-right {
+    table {
+        width: 100%;
+    }
+}
 
 .empty-value {
     color: #999;
