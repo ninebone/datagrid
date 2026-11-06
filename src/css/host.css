@@ -15,7 +15,6 @@
 
 
 :host([theme="simple"]) {
-    /* 1. 불필요한 패널 및 컴포넌트 숨기기 */
     .ng-part-header, .ng-part-footer,
     nine-table-toolbar,
     nine-table-sheets-footer,
@@ -30,7 +29,7 @@
     }
 
     tr {
-        height: 32px;
+        height: 28px;
     }
 
     nine-table-sheet {
@@ -45,15 +44,19 @@
         border: none;
         padding: 0 8px;
     }
+
+    th[data-col="0"] {
+        * {
+            display: none;
+        }
+    }
 }
 
-/* 🎯 Toolbar 숨김 제어 */
 :host([theme="simple"]) nine-table-toolbar,
 :host([show-header="false"]) nine-table-toolbar {
     display: none;
 }
 
-/* 🎯 Footer(StatusBar) 숨김 제어 (show-statusbar="false") */
 :host([theme="simple"]) nine-table-sheets-footer,
 :host([show-footer="false"]) nine-table-sheets-footer,
 :host([show-statusbar="false"]) nine-table-sheets-footer {
@@ -62,10 +65,10 @@
 
 :host([theme="simple"]) {
     col[data-col="0"], th[data-col="0"], td[data-col="0"] {
-        /**display: none; */
+
     }
     .ng-container-right {
-        /**display: none; */
+
     }
     tr {
         height: 28px;
@@ -122,11 +125,11 @@
             max-width: 26px !important;;
         } */
     }
-    /**
+
     col[data-col="0"], th[data-col="0"] {
         width: 2px !important;
         max-width: 2px !important;
-    } */
+    }
 
     col[data-col="0"], col[data-col="1"] {
         display: table-column;
@@ -140,11 +143,7 @@
         max-width: 24px;
     }
 
-    th[data-col="0"] {
-        * {
-            display: none;
-        }
-    }
+
 
     td[data-col="1"] {
         padding: 0;
@@ -213,20 +212,19 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: rgba(255, 255, 255, 0.08); /* 은은한 화이트 트랙 배경 */
+    background: rgba(255, 255, 255, 0.08);
     z-index: 10000;
     display: none;
     overflow: hidden;
 }
 
-/* 🎯 아주 좁고 쨍한 빛 조각 형태로 압축 */
 .ng-loading-bar::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
-    width: 12%; /* 바의 전체 길이를 12%로 대폭 축소 */
+    width: 12%;
     background: linear-gradient(
             90deg,
             transparent 0%,
@@ -244,6 +242,6 @@
         transform: translateX(-150%);
     }
     100% {
-        transform: translateX(850%); /* 폭이 좁아진 만큼 이동 거리 확장 */
+        transform: translateX(850%);
     }
 }
