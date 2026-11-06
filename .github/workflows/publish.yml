@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -24,33 +26,50 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
 
-      # 1.
+      # 1. 의존성 설치
       - name: Install dependencies
         run: npm ci
 
-      # 2.
+      # 2. 코어 패키지 빌드 (최신 dist 생성)
       - name: Build Core Package
         run: npm run build:core
 
-      # 3.
+      # 3. 예제 앱이 로컬의 최신 코어 빌드 결과물을 확실히 참조하도록 강제 링크 후 빌드
       - name: Build Example App
-        run: npm --prefix example/react run build
+        run: |
+          cd example/react
+          npm install
+          npm run build
+          cd ../..
 
-      # 4.
+      # 4. 빌드된 결과물을 docs 폴더로 동기화
       - name: Sync build to docs
         run: |
           rm -rf docs/*
           cp -r example/react/dist/* docs/
 
-      # 5.
+      # 5. Git 변경사항(docs 업데이트) 커밋 및 푸시
       - name: Commit and push docs updates
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "ci: auto-build core & example, update docs [skip ci]"
+          commit_message: "docs: update example app and github pages preview"
           branch: main
 
-      # 6.
+      # 6. package.json의 version이 변경되었는지 확인
+      - name: Check version change
+        id: check-version
+        run: |
+          if git diff HEAD^ HEAD -- package.json | grep -q '"+   "version":'; then
+            echo "VERSION_CHANGED=true" >> $GITHUB_OUTPUT
+            echo "Version has changed. Will publish to npm."
+          else
+            echo "VERSION_CHANGED=false" >> $GITHUB_OUTPUT
+            echo "Version unchanged. Skipping npm publish."
+          fi
+
+      # 7. 버전이 변경된 경우에만 npm 배포 실행 (NPM_TOKEN이 있는 경우에만 동작)
       - name: Publish to npm
+        if: steps.check-version.outputs.VERSION_CHANGED == 'true'
         run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
