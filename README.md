@@ -71,6 +71,11 @@ npm install @ninebone/datagrid
             ]);
         });
     &lt;/script>
+    
+```
+
+```html
+<ninelab-table show-footer="true">
 ```
 
 

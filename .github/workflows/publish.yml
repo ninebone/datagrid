@@ -29,23 +29,27 @@ jobs:
         run: npm ci
 
       # 2.
-      - name: Build Core and Example
-        run: npm run build:ci
+      - name: Build Core Package
+        run: npm run build:core
 
       # 3.
+      - name: Build Example App
+        run: npm --prefix example/react run build
+
+      # 4.
       - name: Sync build to docs
         run: |
           rm -rf docs/*
           cp -r example/react/dist/* docs/
 
-      # 4.
+      # 5.
       - name: Commit and push docs updates
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "ci: auto-build core & example, update docs [skip ci]"
           branch: main
 
-      # 5.
+      # 6.
       - name: Publish to npm
         run: npm publish --access public --provenance
         env:
