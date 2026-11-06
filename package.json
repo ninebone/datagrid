@@ -41,18 +41,13 @@
     "dist",
     "README.md"
   ],
-  "workspaces": [
-    "example/react"
-  ],
   "scripts": {
     "dev": "vite",
     "build:css": "node scripts/bundle-css.js",
     "build:core": "vite build && npm run build:css",
-    "build:example:local": "npm --prefix example/react run build",
-    "build:local": "npm run build:core && npm run build:example:local",
-    "build:example:ci": "cd example/react && npm run build",
-    "build:ci": "npm install --package-lock-only && npm run build:core && cd example/react && npm run build",
-    "build": "npm run build:local",
+    "build:example": "cd example/react && npm install && npm run build",
+    "build:docs": "npm run build:core && npm run build:example && rm -rf docs/* && cp -r example/react/dist/* docs/ && git add docs/",
+    "build": "npm run build:core",
     "watch": "vite build --watch",
     "version": "npm run build",
     "release": "npm version patch && npm publish --access public"
