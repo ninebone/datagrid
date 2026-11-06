@@ -2,10 +2,13 @@ import { trace } from "@nopeer";
 
 export class CellSelection {
 	#sheet;
+	#host;
 	#range = { startRow: -1, startCol: -1, endRow: -1, endCol: -1 };
 
 	constructor(sheet) {
 		this.#sheet = sheet;
+		this.#host = sheet.getRootNode().host;
+
 		this.#initEvents();
 	}
 
@@ -48,6 +51,12 @@ export class CellSelection {
 		let c1 = Math.min(startCol, endCol);
 		let c2 = Math.max(startCol, endCol);
 
+
+		if (this.#host.tagName === "NINE-TABLE-SIMPLE") {
+			c1 = 1;
+			c2 = 10;
+		}
+
 		const containers = this.#sheet.querySelectorAll('.ng-container-left, .ng-container-body, .ng-container-right');
 
 		let expanded = true;
@@ -71,23 +80,26 @@ export class CellSelection {
 						const col = parseInt(cell.dataset.col, 10);
 						if (isNaN(col)) return;
 
-						const rowSpan = parseInt(cell.rowSpan || 1, 10);
-						const colSpan = parseInt(cell.colSpan || 1, 10);
+						const colEl = this.#sheet.querySelector(`col[data-col="${col}"]`);
+						if (colEl.style.display !== 'none') {
+							const rowSpan = parseInt(cell.rowSpan || 1, 10);
+							const colSpan = parseInt(cell.colSpan || 1, 10);
 
-						const cellEndRow = matrixRow + rowSpan - 1;
-						const cellEndCol = col + colSpan - 1;
+							const cellEndRow = matrixRow + rowSpan - 1;
+							const cellEndCol = col + colSpan - 1;
 
-						const isIntersecting = cellEndRow >= r1 && matrixRow <= r2 && cellEndCol >= c1 && col <= c2;
+							const isIntersecting = cellEndRow >= r1 && matrixRow <= r2 && cellEndCol >= c1 && col <= c2;
 
-						if (isIntersecting) {
-							const nsR = Math.min(r1, matrixRow);
-							const neR = Math.max(r2, cellEndRow);
-							const nsC = Math.min(c1, col);
-							const neC = Math.max(c2, cellEndCol);
+							if (isIntersecting) {
+								const nsR = Math.min(r1, matrixRow);
+								const neR = Math.max(r2, cellEndRow);
+								const nsC = Math.min(c1, col);
+								const neC = Math.max(c2, cellEndCol);
 
-							if (nsR !== r1 || neR !== r2 || nsC !== c1 || neC !== c2) {
-								r1 = nsR; r2 = neR; c1 = nsC; c2 = neC;
-								expanded = true;
+								if (nsR !== r1 || neR !== r2 || nsC !== c1 || neC !== c2) {
+									r1 = nsR; r2 = neR; c1 = nsC; c2 = neC;
+									expanded = true;
+								}
 							}
 						}
 					});
@@ -95,13 +107,23 @@ export class CellSelection {
 			});
 		}
 
-		this.#range = { startRow: r1, startCol: c1, endRow: r2, endCol: c2 };
+		const sanitize = (val) => (!Number.isFinite(val) ? -1 : val);
 
-		//this.#sheet.view.clearSelectedRange();
-		//this.#sheet.view.setSelectedRange(r1, r2, c1, c2);
+		this.#range = {
+			startRow: sanitize(r1),
+			startCol: sanitize(c1),
+			endRow: sanitize(r2),
+			endCol: sanitize(c2)
+		};
+
+		//trace.log(this.#range);
 
 		this.render();
 	}
+
+	clear = () => {
+		this.#range = { startRow: -1, startCol: -1, endRow: -1, endCol: -1 };
+	};
 
 	get minRow() {
 		return this.#range.startRow;

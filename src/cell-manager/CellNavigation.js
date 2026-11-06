@@ -48,7 +48,7 @@ export class CellNavigation {
 				}
 				break;
 			case "ArrowRight":
-				if (!this.#isCellRightVisible(cell)) {
+				if (!this.#isCellRightVisible(cell) || !this.#isCellLeftVisible(cell)) {
 					cell.scrollIntoView({ inline: 'nearest', block: 'nearest' });
 				}
 				break;
@@ -362,8 +362,20 @@ export class CellNavigation {
 		});
 
 		this.#sheet.addEventListener('keydown', (e) => {
-			if (["Enter", "Tab", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
-				this.moveCell(e);
+
+			const cell = e.target.closest('td,th');
+			if (!cell || !this.#sheet.contains(cell)) return;
+
+			if (this.#host.tagName === 'NINE-TABLE-SIMPLE') {
+				if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
+					this.moveCell(e);
+				}
+			} else {
+				if (["Enter", "Tab", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
+					this.moveCell(e);
+				} else if (["Space"].includes(e.code)) {
+					e.preventDefault();
+				}
 			}
 		});
 	}

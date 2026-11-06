@@ -297,7 +297,7 @@ export class PreCompiler {
 
     static #ensureRowIndicator(tbl, host) {
 
-        const w = tbl.getAttribute("row-indicator") === 'true' ? 48 : 0;
+        const w = tbl.getAttribute("row-indicator") === 'true' ? 48 : 4;
 
         const colgroup = tbl.querySelector('colgroup');
 
@@ -350,9 +350,9 @@ export class PreCompiler {
 
             if (totalWidth > 0) {
                 const widthVal = `${totalWidth}px`;
-                cell.style.width = widthVal;
-                cell.style.minWidth = widthVal;
-                cell.style.maxWidth = widthVal;
+                //cell.style.width = widthVal;
+                //cell.style.minWidth = widthVal;
+                //cell.style.maxWidth = widthVal;
             }
         });
     }

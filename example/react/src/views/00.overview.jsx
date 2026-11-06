@@ -237,8 +237,8 @@ const Overview = () => {
 			<nine-table ref={tableRef} show-footer="true" style={{width: '90%', height: '80%'}}>
 				<table row-indicator="true">
 					<colgroup>
+						<col width="50" background="red" fixed="left" />
 						<col width="50" background="red" />
-						<col width="50" background="red"/>
 						<col width="100" background="red" />
 						<col width="80" />
 						<col width="130" />

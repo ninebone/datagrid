@@ -492,6 +492,8 @@ export class Filtering {
 			record.m._[NINE_TABLE.META.INDEX.FILTER][sheetIndex] = isPass;
 		});
 
+		this.#sheet.selection.clear();
+
 		this.#sheet.invalidate();
 	}
 }

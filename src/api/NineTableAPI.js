@@ -5,7 +5,7 @@ export class NineTableAPI {
         this.#host = host;
 
         // 관리할 네임스페이스들을 배열로 정의
-        const namespaces = ["row"]; // 나중에 "col", "cell" 등만 추가하면 끝!
+        const namespaces = ["col", "row"]; // 나중에 "col", "cell" 등만 추가하면 끝!
 
         namespaces.forEach(ns => {
             this[ns] = new Proxy({}, {

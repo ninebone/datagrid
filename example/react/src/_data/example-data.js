@@ -4,6 +4,9 @@ const exampleData = {
             { group: 'DEPART', code: 'A', codename: 'Planning' },
             { group: 'DEPART', code: 'B', codename: 'Development' },
             { group: 'DEPART', code: 'C', codename: 'Design' },
+            { group: 'DEPART', code: 'D', codename: 'Marketing' },
+            { group: 'DEPART', code: 'E', codename: 'Sales' },
+            { group: 'DEPART', code: 'F', codename: 'HR' },
             { group: 'STATUS', code: 'C', codename: 'Completed' },
             { group: 'STATUS', code: 'W', codename: 'Wating' },
             { group: 'SEX', code: 'M', codename: 'Male' },
@@ -15,6 +18,26 @@ const exampleData = {
             { group: 'COLOR2', code: '#00ffff', codename: 'a' },
             { group: 'COLOR2', code: '#ffff00', codename: 'b' },
             { group: 'COLOR2', code: '#ff00ff', codename: 'c' },
+            { group: 'COLOR3', code: '#0000ff', codename: 'blue' },
+            { group: 'COLOR3', code: '#000000', codename: 'black' },
+            { group: 'COLOR3', code: '#808080', codename: 'gray' },
+            { group: 'COLOR3', code: '#c0c0c0', codename: 'silver' },
+            { group: 'COLOR3', code: '#ffff00', codename: 'yellow' },
+            { group: 'COLOR3', code: '#ffa500', codename: 'orange' },
+            { group: 'COLOR3', code: '#800080', codename: 'purple' },
+            { group: 'COLOR3', code: '#ffc0cb', codename: 'pink' },
+            { group: 'COLOR3', code: '#a52a2a', codename: 'brown' },
+            { group: 'COLOR3', code: '#00ffff', codename: 'cyan' },
+            { group: 'COLOR3', code: '#800000', codename: 'maroon' },
+            { group: 'COLOR3', code: '#008000', codename: 'darkgreen' },
+            { group: 'COLOR3', code: '#000080', codename: 'navy' },
+            { group: 'COLOR3', code: '#808000', codename: 'olive' },
+            { group: 'COLOR3', code: '#ffd700', codename: 'gold' },
+            { group: 'COLOR3', code: '#4b0082', codename: 'indigo' },
+            { group: 'COLOR3', code: '#ee82ee', codename: 'violet' },
+            { group: 'COLOR3', code: '#40e0d0', codename: 'turquoise' },
+            { group: 'COLOR3', code: '#faebd7', codename: 'antiquewhite' },
+            { group: 'COLOR3', code: '#f5f5dc', codename: 'beige' },
         ];
 
         return masterCommonCodes.filter(item => item.group === group);
@@ -66,6 +89,13 @@ const exampleData = {
             return "#" + nine.lpad(getRandomInt(255).toString(16), 2) + nine.lpad(getRandomInt(255).toString(16), 2) + nine.lpad(getRandomInt(255).toString(16), 2);
         };
 
+        const getRandomHearColor3 = () => {
+            const arr = exampleData.generateCommonCode("COLOR3");
+            //trace.log(exampleData.generateCommonCode("COLOR3"));
+            const index = getRandomInt(arr.length);
+            return arr[index].code;
+        };
+
         const getRandomRemark = () => {
             let v = "";
             for (var i = 0; i < getRandomInt(5); i++) {
@@ -88,6 +118,7 @@ const exampleData = {
                 TEL:       getRandomTel(),
                 COLOR1:     getRandomHearColor(),
                 COLOR2:     getRandomHearColor(),
+                COLOR3:    getRandomHearColor3(),
                 REC1:      getRandomInt(101),
                 REC2:      getRandomInt(101),
                 REC3:      getRandomInt(101),

@@ -39,7 +39,7 @@ export class NineTableSheet extends HTMLElement {
     };
 
     #elements;
-    #trTemplateHeight;
+
     #template = {
         length: 0,
         height: 0,
@@ -274,6 +274,18 @@ export class NineTableSheet extends HTMLElement {
 
     generateTemplate = ($table, index) => {
 
+        const activeParent = (v) => {
+
+            if (['NINE-TABLE-SIMPLE'].includes(this.#host.tagName)) {
+                const $parent = this.#host.closest("nine-table-filter-panel, cell-combo-panel");
+                if ($parent) {
+                    v ? $parent.classList.add('active') : $parent.classList.remove('active');
+                }
+            }
+        };
+
+        activeParent(true);
+
         this.#index = index;
 
         this.#source = {
@@ -288,8 +300,11 @@ export class NineTableSheet extends HTMLElement {
         this.#template.height = this.#template.length = 0;
         this.#template.heights = [];
         this.querySelectorAll(`.ng-container-body tbody.body tr`).forEach(($tr) => {
-            this.#template.height += $tr.offsetHeight || 0;
+            this.#template.height += Math.max($tr.offsetHeight || 0, 28);
             this.#template.heights.push($tr.offsetHeight || 0);
+            //if (['NINE-TABLE-SIMPLE'].includes(this.#host.tagName)) {
+            //    trace.log(this.#host, $tr.offsetHeight, $tr.clientHeight);
+            //}
         });
         this.#template.length = this.#template.heights.length;
 
@@ -318,9 +333,11 @@ export class NineTableSheet extends HTMLElement {
 
         this.querySelectorAll(("tbody.body tr")).forEach(($tr) => {
             $tr.style.display = "none";
-        })
+        });
 
         this.querySelector(`.ng-container-body table`).remove();
+
+        activeParent(false);
     };
 
     generate = () => {
@@ -361,6 +378,8 @@ export class NineTableSheet extends HTMLElement {
 
 
     #updateContainerWidths = () => {
+
+        if (this.#host.classList.contains("combo-list")) return;
 
         ['left', 'right', 'body'].forEach(type => {
             const containers = this.querySelectorAll(`.ng-container-${type}`);
@@ -478,7 +497,10 @@ export class NineTableSheet extends HTMLElement {
             this.#sorting = new Sorting(this);
         }
 
-        this.#elements.mainBody.addEventListener('scroll', () => {
+        this.#elements.mainBody.addEventListener('scroll', (e) => {
+            this.querySelectorAll("nine-table-filter-panel,cell-combo-panel").forEach($el => {
+               $el.classList.remove('active');
+            });
             this.querySelector("nine-table-hscrollbar").refresh();
         });
     };
@@ -486,6 +508,8 @@ export class NineTableSheet extends HTMLElement {
 
 
     #render = () => {
+
+        this.setAttribute("tabindex", "0");
 
         this.innerHTML = `
             <div class="ng-sheet-body">
@@ -506,6 +530,7 @@ export class NineTableSheet extends HTMLElement {
             <div class="scroll-edge"></div>
             
             <nine-table-col-resizer-panel></nine-table-col-resizer-panel>
+            
             
             <div class="ng-col-mover-grip"></div>
             <div class="ng-col-mover-indi"></div>

@@ -17,16 +17,9 @@ export class CellCombo extends EditableCellElement {
 
 	connectedCallback() {
 
-		this.#renderer();
 		super.connectedCallback();
 
-		this.#keyName = super.cell.getAttribute("key-name") || "k";
-		this.#valueName = super.cell.getAttribute("value-name") || "v";
-		this.#multi = super.cell.getAttribute('multi') === "true";
-		this.#multiSeparator = super.cell.getAttribute("multi-separator") || ",";
-
-		this.#initData();
-		this.#initEvent();
+		this.#init();
 	}
 
 	rerenderer = () => {
@@ -34,49 +27,6 @@ export class CellCombo extends EditableCellElement {
 		this.refresh();
 	};
 
-	#initData = () => {
-		if (!super.sheet || !super.cell) return;
-
-		const dataSource = super.cell?.getAttribute("data-source");
-		if (!dataSource) return;
-
-		this.#dataSource = super.getExprValue(dataSource, super.tr.data, super.tr.dataset.row);
-	}
-
-	#initEvent = () => {
-		this.querySelectorAll("button").forEach(btn => {
-			btn.addEventListener("click", (e) => {
-				e.stopPropagation();
-				this.#togglePanel();
-			});
-		});
-	}
-
-	#togglePanel = () => {
-
-		if (!this.#panel) {
-			this.#panel = super.sheet.querySelector("cell-combo-panel");
-			if (!this.#panel) {
-				this.#panel = document.createElement("cell-combo-panel");
-				super.sheet.appendChild(this.#panel);
-			}
-		}
-
-		if (this.#panel.isOpen && this.#panel.targetCell === this) {
-			this.#panel.close();
-		} else {
-			this.#panel.open(this, this.#dataSource, this.#keyName, this.#valueName, this.#multi, this.#multiSeparator);
-		}
-	}
-
-	#renderer = () => {
-		this.innerHTML = `
-            <button class="btn1" type="button" tabindex="-1">Select</button>
-            <button class="btn2" type="button" tabindex="-1"></button>
-        `;
-
-		this.#targetBtn = this.querySelector(".btn1");
-	};
 
 	refresh = () => {
 		const v = super.refresh();
@@ -120,6 +70,69 @@ export class CellCombo extends EditableCellElement {
 			}
 		}
 	};
+
+	#init = () => {
+		this.#renderer();
+
+		this.#keyName = this.cell.getAttribute("key-name") || "k";
+		this.#valueName = this.cell.getAttribute("value-name") || "v";
+		this.#multi = this.cell.getAttribute('multi') === "true";
+		this.#multiSeparator = this.cell.getAttribute("multi-separator") || ",";
+
+		this.#initData();
+		this.#initEvent();
+	}
+
+	#initData = () => {
+		if (!super.sheet || !super.cell) return;
+
+		const dataSource = super.cell?.getAttribute("data-source");
+		if (!dataSource) return;
+
+		this.#dataSource = super.getExprValue(dataSource, super.tr.data, super.tr.dataset.row);
+	}
+
+	#renderer = () => {
+		this.innerHTML = `
+            <button class="btn1" type="button" tabindex="-1">Select</button>
+            <button class="btn2" type="button" tabindex="-1"></button>
+        `;
+
+		this.#targetBtn = this.querySelector(".btn1");
+	};
+
+	#initEvent = () => {
+		this.querySelectorAll("button").forEach(btn => {
+			btn.addEventListener("click", (e) => {
+				e.stopPropagation();
+				this.#togglePanel();
+			});
+		});
+
+
+		this.cell.addEventListener('keydown', (e) => {
+			if (["Space"].includes(e.code)) {
+				this.#togglePanel();
+			}
+		});
+	}
+
+	#togglePanel = () => {
+
+		if (!this.#panel) {
+			this.#panel = super.sheet.querySelector("cell-combo-panel");
+			if (!this.#panel) {
+				this.#panel = document.createElement("cell-combo-panel");
+				super.sheet.appendChild(this.#panel);
+			}
+		}
+
+		if (this.#panel.isOpen && this.#panel.targetCell === this) {
+			this.#panel.close();
+		} else {
+			this.#panel.open(this, this.#dataSource, this.#keyName, this.#valueName, this.#multi, this.#multiSeparator);
+		}
+	}
 
 	get dataSource() {
 		return this.#dataSource;

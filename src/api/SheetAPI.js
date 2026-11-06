@@ -31,19 +31,87 @@ export class SheetAPI {
         return rows;
     } */
 
+    col = {
+        // 1. 특정 컬럼의 너비 설정 (ColResizer 활용)
+        setWidth: (colIndex, width, containerType = null) => {
+            const targetCols = Array.from(this.#sheet.querySelectorAll(`table colgroup col[data-col="${colIndex}"]`));
+            targetCols.forEach(col => {
+                col.setAttribute('width', width);
+                col.style.width = `${width}px`;
+            });
+
+        },
+
+        // 2. 특정 컬럼의 현재 너비 가져오기
+        getWidth: (colIndex) => {
+            const colEl = this.#sheet.querySelector(`table colgroup col[data-col="${colIndex}"]`);
+            if (!colEl) return 0;
+            return parseInt(colEl.getAttribute('width') || colEl.style.width, 10) || 0;
+        },
+        measureAutoFitColumnWidth: (cell, tbodyCell) => {
+
+            const fieldIdx = this.#host.fields.get().indexOf(tbodyCell.dataset.bind);
+            const computedStyle = window.getComputedStyle(tbodyCell);
+            const font = computedStyle.font || '12px sans-serif';
+            let maxTextWidth = 32;
+
+            this.#sheet.view.getArray().forEach((record, idx) => {
+                const val = String(tbodyCell.dataset.expr ? this.#host.exprEngine.evaluate(tbodyCell.dataset.expr, record, idx) : record.v[fieldIdx] ?? "").trim();
+                const size = nine.measureTextSize(val, font);
+                if (size.width && size.width > maxTextWidth) {
+                    maxTextWidth = size.width;
+                }
+            });
+
+            return maxTextWidth;
+        },
+        // 3. 특정 컬럼 자동 맞춤 (아까 분리한 measureAutoFitColumnWidth 연동)
+        autoFit: (colIndex) => {
+            const cell = this.#sheet.querySelector(`thead th[data-col="${colIndex}"]`);
+            const tbodyCell = this.#sheet.querySelector(`tbody.body [data-col="${colIndex}"]`);
+
+            if (!cell || !tbodyCell) return;
+
+            this.#host.execute(() => {
+                const calculatedWidth = this.col.measureAutoFitColumnWidth(cell, tbodyCell);
+                if (calculatedWidth !== null) {
+                    this.col.setWidth(colIndex, calculatedWidth);
+                }
+            });
+        },
+
+        // 4. 컬럼 표시/숨김 처리
+        setVisible: (colIndex, isVisible) => {
+            const targets = this.#sheet.querySelectorAll(`table colgroup col[data-col="${colIndex}"], th[data-col="${colIndex}"], td[data-col="${colIndex}"]`);
+            targets.forEach(el => {
+                el.style.display = isVisible ? '' : 'none';
+            });
+            this.#sheet.rowManager?.refresh();
+        }
+    };
 
     row = {
         at: () => {
-            return Math.floor(this.#sheet.selection.minRow / this.#sheet.template.length)
+            if (this.#sheet.selection.minRow < 0) return -1;
+            return Math.floor(this.#sheet.selection.minRow / this.#sheet.template.length);
         },
-        focus: (index) => {
+        focus: async (index, callback) => {
+            // 1. 화면에 안 보이면 moveTo 완료를 기다림
             if (!this.#sheet.row.isVisible(index)) {
-                this.#sheet.row.moveTo(index);
+                await new Promise((resolve) => {
+                    this.#sheet.row.moveTo(index, () => {
+                        resolve();
+                    });
+                });
+            } else {
+                // 2. 이미 보이더라도 브라우저 렌더링 큐에 한 템포 양보 (requestAnimationFrame)
+                await new Promise((resolve) => requestAnimationFrame(resolve));
             }
+
+            // 3. 렌더링이 완전히 안정화된 시점에 DOM 조회 및 선택 처리
             const $trs = this.#sheet.querySelectorAll(`tbody.body tr[data-index="${index}"]`);
             const matrixRows = Array.from($trs, $tr => parseInt($tr.dataset.matrixRow, 10)).filter(n => !isNaN(n));
 
-            // 2. col들도 마찬가지로 배열로 수집 (colSpan 고려)
             const cols = [];
             $trs.forEach($tr => {
                 $tr.querySelectorAll('td, th').forEach($cell => {
@@ -52,7 +120,15 @@ export class SheetAPI {
                 });
             });
 
-            return this.#sheet.selection.setRange(Math.min(...matrixRows), Math.min(...cols), Math.max(...matrixRows), Math.max(...cols));
+            if (matrixRows.length === 0 || cols.length === 0) return;
+
+            const result = this.#sheet.selection.setRange(Math.min(...matrixRows), Math.min(...cols), Math.max(...matrixRows), Math.max(...cols));
+
+            if (typeof callback === 'function') {
+                callback();
+            }
+
+            return result;
         },
         isVisible: (index) => {
 
@@ -89,9 +165,11 @@ export class SheetAPI {
         },
         moveTo: (index, callback) => {
             if (this.#sheet.row.isVisible(index)) {
-
+                if (typeof callback === 'function') callback();
             } else {
-                this.#sheet.scrollTo(index, callback);
+                this.#sheet.scrollTo(index, () => {
+                    if (typeof callback === 'function') callback();
+                });
             }
         },
         insert: (index, dataSource, updateState = true) => {

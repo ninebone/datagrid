@@ -83,9 +83,9 @@ export class ColResizer {
 
                         Object.entries(colWidths).forEach(([colIdx, w]) => {
                             tbl.querySelectorAll(`th[data-col="${colIdx}"], td[data-col="${colIdx}"]`).forEach(cell => {
-                                cell.style.width = `${w}px`;
-                                cell.style.minWidth = `${w}px`;
-                                cell.style.maxWidth = `${w}px`;
+                                //cell.style.width = `${w}px`;
+                                //cell.style.minWidth = `${w}px`;
+                                //cell.style.maxWidth = `${w}px`;
                             });
                         });
                     });

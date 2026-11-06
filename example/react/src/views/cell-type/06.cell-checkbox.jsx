@@ -59,7 +59,7 @@ const CheckBox = () => {
 					<tbody>
 					<tr>
 						<td data-bind="NAME"></td>
-						<td cell-type="checkbox" data-bind="sel1"></td>
+						<td cell-type="checkbox" data-bind="sel1" update-row-state="false"></td>
 						<td cell-type="checkbox" data-bind="sel2"></td>
 						<td cell-type="checkbox" data-bind="sel3" enable="data.REC1 > 70 ? true : false;"></td>
 						<td cell-type="checkbox" data-bind="sel4" visible="data.REC1 > 70 ? true : false;"></td>

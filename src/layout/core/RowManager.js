@@ -397,6 +397,11 @@ export class RowManager {
 
             bodyViewport.addEventListener('scroll', (e) => {
 
+                this.#sheet.querySelectorAll("cell-combo-panel").forEach($el => {
+                    $el.classList.remove('active');
+                });
+
+
                 if (this.#isProgrammaticScroll) return;
 
                 const rowHeight = this.#sheet.template.height || 0;
@@ -475,6 +480,7 @@ export class RowManager {
     };
 
     #measureAndCacheHeight = () => {
+        this.#updateRowCount();
         return;
         if (!this.#sheet.classList.contains('active')) return;
 
@@ -493,9 +499,7 @@ export class RowManager {
 
         const renderedTrs = $tbody.querySelectorAll('tr');
 
-
         renderedTrs.forEach(tr => tr.remove());
-
 
         this.#updateRowCount();
     };
@@ -528,12 +532,14 @@ export class RowManager {
     };
 
     #renderRows = (container) => {
+
         let targetFixedType = null;
         if (container.classList.contains('ng-container-left')) targetFixedType = 'left';
         else if (container.classList.contains('ng-container-right')) targetFixedType = 'right';
 
         const templateTrs = Array.from(this.#sheet.sourceTable.querySelectorAll('tbody.body tr')).map(tr => {
             const clonedTr = tr.cloneNode(true);
+
 
             if (targetFixedType === 'left') {
                 clonedTr.querySelectorAll('th,td').forEach($cell => {
@@ -555,7 +561,6 @@ export class RowManager {
         if (templateTrs.length === 0) return;
 
         const targetTbody = container.querySelector('tbody.body');
-        if (!targetTbody) return;
 
         targetTbody.querySelectorAll("tr").forEach(tr => tr.remove());
 
