@@ -13,11 +13,16 @@ const Combo = () => {
 		})
 	};
 
-	useEffect(() => {
-		tableRef.current.provider.add({
-			getCommonCode: (group) => exampleData.generateCommonCode(group),
+	const selectCode = async () => {
+		setTimeout( () => {
+			tableRef.current.getCommonCode = (group) => {
+				return exampleData.generateCommonCode(group);
+			};
 		});
+	};
 
+	useEffect(() => {
+		selectCode();
 		selectList();
 	}, []);
 
@@ -28,63 +33,83 @@ const Combo = () => {
 			<nine-table ref={tableRef} show-footer="true" style={{width: '90%', height: '80%'}}>
 				<table row-indicator="true">
 					<colgroup>
+						<col width="80" fixed="left"/>
+						<col width="100" />
+						<col width="200" />
+						<col width="50"/>
+						<col width="130"/>
+						<col width="70"/>
+						<col width="100"/>
+						<col width="50"/>
 						<col width="80"/>
 						<col width="50"/>
-						<col width="50"/>
-						<col width="50"/>
-						<col width="80"/>
-						<col width="80"/>
-						<col width="80"/>
-						<col width="80"/>
-						<col width="80"/>
-						<col width="80"/>
-						<col width="80"/>
-						<col width="80"/>
+						<col width="200"/>
+						<col width="100"/>
+						<col width="200"/>
 					</colgroup>
 					<thead>
 					<tr>
-						<th rowSpan="2">NAME</th>
-						<th colSpan="3">SAMPLE DATA</th>
-						<th colSpan="3">constraints & text-align</th>
-						<th colSpan="3">validate</th>
-						<th rowSpan="2">enable</th>
-						<th rowSpan="2">visible</th>
+						<th rowSpan="2" filtering="true">NAME</th>
+						<th colSpan="2">Complex</th>
+						<th colSpan="2">Few Items</th>
+						<th colSpan="2">with Search</th>
+						<th colSpan="2">with datalist</th>
+						<th colSpan="2">multi select</th>
+						<th colSpan="2">multi select (with Search)</th>
 					</tr>
 					<tr>
-						<th>REC1</th>
-						<th>REC2</th>
-						<th>REC3</th>
-						<th>min=10</th>
-						<th>max=90</th>
-						<th>scale=2</th>
-						<th>case #1</th>
-						<th>case #2</th>
-						<th>case #3</th>
+						<th style={{filter: 'brightness(0.95)'}}>code</th>
+						<th>combo</th>
+						<th style={{filter: 'brightness(0.95)'}}>code</th>
+						<th>combo</th>
+						<th style={{filter: 'brightness(0.95)'}}>code</th>
+						<th>combo</th>
+						<th style={{filter: 'brightness(0.95)'}}>code</th>
+						<th>combo</th>
+						<th style={{filter: 'brightness(0.95)'}}>code</th>
+						<th>combo</th>
+						<th style={{filter: 'brightness(0.95)'}}>code</th>
+						<th>combo</th>
 					</tr>
 					</thead>
 					<tbody>
 					<tr>
 						<td data-bind="NAME"></td>
-						<td data-bind="REC1" cell-type="input-number"></td>
-						<td data-bind="REC2" cell-type="input-number"></td>
-						<td data-bind="REC3" cell-type="input-number"></td>
-						<td cell-type="combo" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')"
-							key-name="code" value-name="codename"></td>
-						<td cell-type="combo" data-bind="DEPART" visible="data.REC1 > 50 ? true : false;"
-							enable="data.REC1 > 70 ? true : false;">
+
+						<td data-bind="COLOR3" text-align="center"
+							style={{background: 'white', filter: 'brightness(0.98)'}}></td>
+						<td cell-type="combo" data-bind="COLOR3" text-align="center" multi="true" items="codename,code"
+							data-source="provider.getCommonCode('COLOR3')" key-name="code" value-name="codename"></td>
+
+						<td data-bind="DEPART" text-align="center"
+							style={{background: 'white', filter: 'brightness(0.98)'}}></td>
+						<td cell-type="combo" data-bind="DEPART" text-align="center"
+							data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+
+						<td data-bind="COLOR3" text-align="center"
+							style={{background: 'white', filter: 'brightness(0.98)'}}></td>
+						<td cell-type="combo" data-bind="COLOR3" text-align="center"
+							data-source="provider.getCommonCode('COLOR3')" key-name="code" value-name="codename"></td>
+
+						<td data-bind="DEPART1" text-align="center"
+							style={{background: 'white', filter: 'brightness(0.98)'}}></td>
+						<td cell-type="combo" data-bind="DEPART2" text-align="center">
 							<datalist>
-								<option k="A" v="aaa a"/>
-								<option k="B" v="bb b"/>
-								<option k="C" v="c c"/>
+								<option k="A" v="#AAA"/>
+								<option k="B" v="#BBB"/>
+								<option k="C" v="#CCC"/>
 							</datalist>
 						</td>
-						<td data-bind="REC3" cell-type="input-number" text-align="right" scale="2"></td>
-						<td data-bind="REC1" cell-type="input-number" validator="data.REC1 < 50 ? true : false"></td>
-						<td data-bind="REC2" cell-type="input-number" validator="data.REC2 < 50 ? true : false"></td>
-						<td data-bind="REC3" cell-type="input-number"
-							validator="provider.checkNum(data.REC1,data.REC2,data.REC3)"></td>
-						<td data-bind="REC1" cell-type="input-number" enable="data.REC1 < 50 ? true : false"></td>
-						<td data-bind="REC2" cell-type="input-number" visible="data.REC2 < 50"></td>
+
+						<td data-bind="DEPART2" text-align="center"
+							style={{background: 'white', filter: 'brightness(0.98)'}}></td>
+						<td cell-type="combo" data-bind="DEPART2" text-align="center" multi="true"
+							data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
+
+						<td data-bind="COLOR3" text-align="center"
+							style={{background: 'white', filter: 'brightness(0.98)'}}></td>
+						<td cell-type="combo" data-bind="COLOR3" text-align="center" multi="true"
+							data-source="provider.getCommonCode('COLOR3')" key-name="code" value-name="codename"></td>
 					</tr>
 					</tbody>
 				</table>

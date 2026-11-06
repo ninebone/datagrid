@@ -91,6 +91,7 @@ export class LayoutManager {
             });
         });
 
+
         setTimeout(() => {
             this.#host.data.clear();
         });

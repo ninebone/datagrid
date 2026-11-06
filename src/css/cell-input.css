@@ -36,6 +36,7 @@ cell-input-color {
         -moz-appearance: none;
         appearance: none;
         background-color: transparent;
+        border-radius: 0;
     }
 
     input[type=color]::-webkit-color-swatch {

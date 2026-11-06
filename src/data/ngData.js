@@ -172,8 +172,6 @@ export class ngData {
 				loadData();
 			}, { once: true });
 		}
-
-
 	};
 
 	get nextId() {
@@ -375,7 +373,7 @@ export class ngData {
 		}));
 	};
 
-	setValue = (rowid, colnm, value) => {
+	setValue = (rowid, colnm, value, updateState = true) => {
 
 		rowid = parseInt(rowid, 10);
 		const fields = this.getHostFields();
@@ -389,7 +387,7 @@ export class ngData {
 		if (!rowData) return;
 
 		const oldValue = rowData.v[COL_IDX];
-		if (oldValue !== value && rowData.m._[NINE_TABLE.META.INDEX.ROW_STATE] !== NINE_TABLE.ROW_STATE.INSERT) {
+		if (oldValue !== value && updateState && rowData.m._[NINE_TABLE.META.INDEX.ROW_STATE] !== NINE_TABLE.ROW_STATE.INSERT) {
 			rowData.m._[NINE_TABLE.META.INDEX.ROW_STATE] = NINE_TABLE.ROW_STATE.UPDATE;
 		}
 

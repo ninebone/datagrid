@@ -108,7 +108,7 @@ const Radio = () => {
 					</colgroup>
 					<thead>
 					<tr className="first">
-						<th rowSpan="2">NAME</th>
+						<th rowSpan="2" filtering="true">NAME</th>
 						<th colSpan="2">INPUT</th>
 						<th colSpan="2">INPUT-RADIO</th>
 						<th colSpan="2">INPUT-CHECKBOX</th>

@@ -109,8 +109,8 @@ cell-combo-panel.active {
 }
 
 cell-combo-panel.expand {
-    .head {
-        display: flex;
+    input {
+        display: block;
     }
 }
 

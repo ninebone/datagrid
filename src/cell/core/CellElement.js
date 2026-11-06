@@ -14,6 +14,10 @@ export class CellElement extends BasicCellElement {
 		super();
 	}
 
+	get #updateRowState() {
+		return this.#cell.getAttribute("update-row-state") === "false";
+	}
+
 	get host() { return this.#host; }
 	get sheet() { return this.#sheet; }
 	get cell() { return this.#cell; }
@@ -146,7 +150,8 @@ export class CellElement extends BasicCellElement {
 		const bindKey = this.#cell.dataset.bind;
 		if (isNaN(row) || !bindKey) return;
 
-		this.#host.data.setValue(row, bindKey, v);
+		//update-row-state
+		this.#host.data.setValue(row, bindKey, v, this.#updateRowState);
 	}
 
 	get row() {

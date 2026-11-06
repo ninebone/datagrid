@@ -62,13 +62,13 @@
 
 :host([theme="simple"]) {
     col[data-col="0"], th[data-col="0"], td[data-col="0"] {
-        display: none;
+        /**display: none; */
     }
     .ng-container-right {
-        display: none;
+        /**display: none; */
     }
     tr {
-        height: 26px;
+        height: 28px;
     }
 }
 
