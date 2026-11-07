@@ -100,7 +100,7 @@ export class NineTableFilterPanel extends HTMLElement {
 			try {
 				this.#loadVirtualFilterItems();
 				this.#view.rowManager.scrollToDataRow(0);
-				searchBox.focus();
+				searchBox.focus({ preventScroll: true });
 			} finally {
 				this.classList.remove("loading");
 			}
@@ -108,6 +108,7 @@ export class NineTableFilterPanel extends HTMLElement {
 	}
 
 	#closeHandler = (e) => {
+
 		const path = e.composedPath ? e.composedPath() : [];
 		if (path.includes(this) || (this.#button && path.includes(this.#button))) {
 			return;

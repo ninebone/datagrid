@@ -347,8 +347,8 @@ export class EditableCellElement extends CellElement {
 	get tr() { return super.tr; }
 	get attr() { return super.attr; }
 
-	getExprValue(expr, data, row, cell) {
-		return super.getExprValue(expr, data, row, cell);
+	getExprValue(expr, data, row) {
+		return super.getExprValue(expr, data, row);
 	}
 
 	constructor() {
