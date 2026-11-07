@@ -26,6 +26,7 @@ class CellRadio extends EditableCellElement {
 
 			if (this.cell.hasAttribute("readonly") || this.cell.classList.contains("readonly")) return;
 			if (this.cell.getAttribute("disabled") === "true") return;
+			if (this.style.display === "none") return;
 
 			if (e.code === "Space") {
 				e.preventDefault();

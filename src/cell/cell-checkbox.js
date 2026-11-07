@@ -47,6 +47,21 @@ class CellCheckbox extends EditableCellElement {
 
             this.sheet.rowManager.refresh(true);
         });
+
+        this.cell.addEventListener("keydown", e => {
+
+            if (this.cell.hasAttribute("readonly") || this.cell.classList.contains("readonly")) return;
+            if (this.cell.getAttribute("disabled") === "true") return;
+            if (this.style.display === "none") return;
+
+            if (e.code === "Space") {
+                e.preventDefault();
+
+                this.value = this.#target.checked ? this.falseValue : this.trueValue;
+
+                this.sheet.rowManager.refresh(true);
+            }
+        });
     };
 
     #renderer = () => {
