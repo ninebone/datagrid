@@ -204,14 +204,91 @@ export class CellSelection {
 		});
 	}
 
+	#lastMatrixRow;
+	#lastCol;
+	#startRow;
+	#startCol;
+	//#dragStart;
+
+	#getCellFromPoint = (clientX, clientY) => {
+		const root = this.#sheet.getRootNode();
+		if (root && typeof root.elementsFromPoint === 'function') {
+			const elements = root.elementsFromPoint(clientX, clientY);
+			for (const el of elements) {
+				const c = el.closest('td, th');
+				if (c && this.#sheet.contains(c) && c.dataset.row !== undefined) {
+					return c;
+				}
+			}
+		}
+
+		const allCells = this.#sheet.querySelectorAll('.ng-sheet-body-content tbody tr td, .ng-sheet-body-content tbody tr:not(.nodata) th');
+		for (const c of allCells) {
+			const rect = c.getBoundingClientRect();
+			if (
+				clientX >= rect.left &&
+				clientX <= rect.right &&
+				clientY >= rect.top &&
+				clientY <= rect.bottom
+			) {
+				return c;
+			}
+		}
+		return null;
+	};
+
+	#onMouseMove = (moveEvent) => {
+
+		//if (!this.#dragStart) return;
+
+		const targetCell = this.#getCellFromPoint(moveEvent.clientX, moveEvent.clientY);
+		if (!targetCell) return;
+		if (targetCell.dataset.row === undefined || targetCell.dataset.col === undefined) return;
+
+		const targetTr = targetCell.closest('tr');
+		const { matrixRow: endRow } = this.#getMatrixRow(targetTr);
+		const endCol = parseInt(targetCell.dataset.col, 10);
+
+		if (endRow < 0) return;
+		if (this.#lastMatrixRow === endRow && this.#lastCol === endCol) return;
+
+		//trace.log(moveEvent);
+
+		this.#lastMatrixRow = endRow;
+		this.#lastCol = endCol;
+
+		this.setRange(this.#startRow, this.#startCol, endRow, endCol);
+	};
+
+	#onMouseUp = () => {
+		//this.#dragStart = false;
+
+		document.removeEventListener('mousemove', this.#onMouseMove);
+
+		//this.#sheet.style.userSelect = '';
+		//this.#sheet.style.webkitUserSelect = '';
+
+
+		//document.removeEventListener('mouseup', this.#onMouseUp);
+	};
+
 	#initEvents() {
 		const mainZone = this.#sheet.querySelector('.ng-sheet-body');
 		if (!mainZone) {
 			return;
 		}
 
+		document.addEventListener('mouseup', this.#onMouseUp);
+
 		mainZone.addEventListener('mousedown', (e) => {
+
 			if (e.button !== 0) return;
+
+			/**
+			setTimeout(() => {
+				this.#dragStart = true;
+			}, 100);
+			*/
 
 			const cell = e.target.closest('td, th');
 			if (!cell) return;
@@ -224,6 +301,9 @@ export class CellSelection {
 			const { matrixRow: startRow } = this.#getMatrixRow(tr);
 			const startCol = parseInt(cell.dataset.col, 10);
 
+			this.#startRow = startRow;
+			this.#startCol = startCol;
+
 			if (startRow < 0) {
 				this.#sheet.style.userSelect = '';
 				this.#sheet.style.webkitUserSelect = '';
@@ -233,55 +313,11 @@ export class CellSelection {
 			this.setFocus(startRow, startCol);
 			this.setRange(startRow, startCol, startRow, startCol);
 
-			let lastMatrixRow = startRow;
-			let lastCol = startCol;
+			this.#lastMatrixRow = startRow;
+			this.#lastCol = startCol;
 
-			const onMouseMove = (moveEvent) => {
-				const targetEl = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
-				let targetCell = targetEl?.closest('td, th');
-
-				if (!targetCell || !this.#sheet.contains(targetCell)) {
-					const allCells = this.#sheet.querySelectorAll('.ng-sheet-body-content tbody tr td, .ng-sheet-body-content tbody tr:not(.nodata) th');
-					for (const c of allCells) {
-						const rect = c.getBoundingClientRect();
-						if (
-							moveEvent.clientX >= rect.left &&
-							moveEvent.clientX <= rect.right &&
-							moveEvent.clientY >= rect.top &&
-							moveEvent.clientY <= rect.bottom
-						) {
-							targetCell = c;
-							break;
-						}
-					}
-				}
-
-				if (!targetCell) return;
-				if (targetCell.dataset.row === undefined || targetCell.dataset.col === undefined) return;
-
-				const targetTr = targetCell.closest('tr');
-				const { matrixRow: endRow } = this.#getMatrixRow(targetTr);
-				const endCol = parseInt(targetCell.dataset.col, 10);
-
-				if (endRow < 0) return;
-				if (lastMatrixRow === endRow && lastCol === endCol) return;
-
-				lastMatrixRow = endRow;
-				lastCol = endCol;
-
-				this.setRange(startRow, startCol, endRow, endCol);
-			};
-
-			const onMouseUp = () => {
-				this.#sheet.style.userSelect = '';
-				this.#sheet.style.webkitUserSelect = '';
-
-				document.removeEventListener('mousemove', onMouseMove);
-				document.removeEventListener('mouseup', onMouseUp);
-			};
-
-			document.addEventListener('mousemove', onMouseMove);
-			document.addEventListener('mouseup', onMouseUp);
+			// 드래그가 시작될 때만 document에 move/up 리스너를 붙여 낭비를 줄이고 확실하게 추적
+			document.addEventListener('mousemove', this.#onMouseMove);
 		});
 	}
 }

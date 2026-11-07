@@ -200,7 +200,7 @@ export class CellComboPanel extends HTMLElement {
 	close = () => {
 		this.classList.remove("active");
 		if (this.#parent && this.#parent.cell) {
-			this.#parent.cell.focus();
+			this.#parent.cell.focus({ preventScroll: true });
 		}
 	}
 
@@ -253,7 +253,7 @@ export class CellComboPanel extends HTMLElement {
 			case "Tab":
 				if (this.classList.contains("expand")) {
 					e.preventDefault();
-					this.querySelector("input[type='text']").focus();
+					this.querySelector("input[type='text']").focus({ preventScroll: true });
 				}
 				break;
 			case "ArrowDown":
@@ -320,7 +320,7 @@ export class CellComboPanel extends HTMLElement {
 				setTimeout(() => {
 					const cell = this.#sheet.querySelector(`tr[data-index="${index}"] td[data-col="2"]`);
 					this.#sheet.navigation.currentCell = cell;
-					cell.focus();
+					cell.focus({ preventScroll: true });
 					this.#sheet.invalidate();
 				});
 			});
@@ -332,7 +332,7 @@ export class CellComboPanel extends HTMLElement {
 				this.#sheet.selection.clear();
 
 				this.#sheet.navigation.currentCell = this.#sheet.querySelector(`tr[data-index="0"] td[data-col="2"]`);
-				this.#sheet.focus();
+				this.#sheet.focus({ preventScroll: true });
 				this.#sheet.invalidate();
 			});
 		}
@@ -392,6 +392,7 @@ export class CellComboPanel extends HTMLElement {
 		this.#sheet.addEventListener("click", this.#onClick);
 
 		document.addEventListener("mousedown", (e) => {
+
 			const path = e.composedPath ? e.composedPath() : [];
 
 			if (path.includes(this)) {

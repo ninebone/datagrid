@@ -30,6 +30,11 @@ col {
     width: attr(width px);
 }
 
+col:last-child {
+    width: 100% !important;
+}
+
+
 thead {
     display: table-header-group;
     position: sticky;
