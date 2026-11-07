@@ -1,15 +1,13 @@
 import { trace } from "@nopeer";
-import {NINE_TABLE} from "@";
+import { NINE_TABLE } from "@";
 
 export class CellComboPanel extends HTMLElement {
-	#parent;
-	#keyName;
-	#valueName;
-	#isOpen = false;
+	#EXPAND_ROW_COUNT = 10;
 
+	#parent;
 	#grd;
 	#sheet;
-	#separator;
+
 
 	constructor() {
 		super();
@@ -25,34 +23,20 @@ export class CellComboPanel extends HTMLElement {
 		})
 	}
 
-	#initData = (dataSource, keyName, valueName, multi) => {
+	#initData = (formattedData) => {
 
-		const grd = this.querySelector("nine-table-simple");
-		if (!grd || !dataSource || dataSource.length === 0) return;
+		if (!this.#grd || !this.#parent.dataSource || this.#parent.dataSource.length === 0) return;
 
-		const itemsAttr = this.#parent.closest("th,td").getAttribute("items");
-		let fieldKeys = [];
+		const activeColumnCount = this.#parent.items.length || 1;
 
-		if (itemsAttr) {
-			fieldKeys = itemsAttr.split(",").map(s => s.trim());
-		} else {
-			fieldKeys = [valueName].filter(Boolean);
-		}
-
-		const activeColumnCount = fieldKeys.length;
-
-		//grd.shadowRoot.querySelector(".ng-container-left").style.display = multi ? '' : 'none';
-
-		const sheet = grd.shadowRoot.querySelector("nine-table-sheet");
-
-		sheet.source.table.querySelectorAll('colgroup col, tbody td').forEach(($el, idx) => {
+		this.#sheet.source.table.querySelectorAll('colgroup col, tbody td').forEach(($el, idx) => {
 			const col = parseInt($el.dataset.col, 10);
 			if (col >= 2) {
 				$el.style.display = (col - 2 >= activeColumnCount) ? 'none' : '';
 			}
 		});
 
-		grd.shadowRoot.querySelectorAll('table colgroup col').forEach(($el, idx) => {
+		this.#sheet.querySelectorAll('table colgroup col').forEach(($el, idx) => {
 			const col = parseInt($el.dataset.col, 10);
 			if (col >= 2) {
 				$el.style.display = (col - 2 >= activeColumnCount) ? 'none' : '';
@@ -60,35 +44,23 @@ export class CellComboPanel extends HTMLElement {
 		});
 
 
-		const formattedData = dataSource.map(item => {
-			const row = {
-				CHK: "N",
-				k: keyName && item[keyName] !== undefined ? item[keyName] : (item[0] !== undefined ? item[0] : "")
-			};
-
-			fieldKeys.forEach((key, idx) => {
-				row[`tmp${idx + 1}`] = item[key] !== undefined ? item[key] : (item[idx] !== undefined ? item[idx] : "");
-			});
-			return row;
-		});
-
-		grd.addEventListener(NINE_TABLE.EVENT.ROW_ADDED, () => {
+		this.#grd.addEventListener(NINE_TABLE.EVENT.ROW_ADDED, () => {
 			setTimeout(() => {
 
 				this.style.opacity = "";
 				this.classList.add("active");
 
-				grd.shadowRoot.querySelectorAll('colgroup col').forEach(($el, idx) => {
+				this.#sheet.querySelectorAll('colgroup col').forEach(($el, idx) => {
 					const col = parseInt($el.dataset.col, 10);
 					if (col >= 2 && $el.style.display !== "none") {
-						sheet.col.autoFit(col);
+						this.#sheet.col.autoFit(col);
 					}
 				});
 
 				const fields = this.#grd.fields.get();
 
-				if (multi) {
-					const selectedKeys = this.#parent.value ? String(this.#parent.value).split(this.#separator).map(s => s.trim()) : [];
+				if (this.#parent.multi) {
+					const selectedKeys = this.#parent.value ? String(this.#parent.value).split(this.#parent.separator).map(s => s.trim()) : [];
 					const kIndex = fields.indexOf("k");
 					const chkIndex = fields.indexOf("CHK");
 
@@ -113,27 +85,13 @@ export class CellComboPanel extends HTMLElement {
 			})
 		}, {once: true});
 
-		if (multi && this.#parent.value) {
-			/**
-			const selectedKeys = String(this.#parent.value).split(separator || ",");
-			grd.data.getValidData().forEach(m => {
-				if (selectedKeys.includes(String(m.v[1]))) {
-					m.v[0] = "Y";
-				}
-			});
-			grd.refreshData();
-				*/
-		}
-
-		if (formattedData.length * this.#sheet.template.height >= this.offsetHeight) {
+		if (formattedData.length > this.#EXPAND_ROW_COUNT) {
 			this.classList.add("expand");
 		} else {
 			this.classList.remove("expand");
 		}
 
-		grd.data.set(formattedData);
-
-
+		this.#grd.data.set(formattedData);
 	};
 
 	#isPanelBelow = ($btn) => {
@@ -147,15 +105,17 @@ export class CellComboPanel extends HTMLElement {
 		return spaceBelow >= spaceAbove;
 	};
 
-	#calculatePanelHeight = ($btn, isDropDown = 0) => {
+	#calculatePanelHeight = ($btn, isDropDown, rows) => {
 		const $sheet = $btn.closest(".ng-sheet-body");
 
 		const btnRect = $btn.getBoundingClientRect();
 		const sheetRect = $sheet.getBoundingClientRect();
 
-		let h = (isDropDown ? (sheetRect.bottom - btnRect.bottom) : (btnRect.top - sheetRect.top)) - 5;
+		const searchInputHeight = 32;
+		const h1 = (isDropDown ? (sheetRect.bottom - btnRect.bottom) : (btnRect.top - sheetRect.top)) - 5;
+		const h2 = (rows * this.#sheet.template.height) + (rows > this.#EXPAND_ROW_COUNT ? searchInputHeight : 0) + 2;
 
-		return h;
+		return Math.min(h1, h2);
 	}
 
 	#calculatePanelLeft = ($btn) => {
@@ -181,20 +141,32 @@ export class CellComboPanel extends HTMLElement {
 		return left;
 	};
 
-	open = (parent, dataSource, keyName, valueName, multi, separator) => {
+	open = (parent) => {
 		this.#parent = parent;
-		this.#keyName = keyName;
-		this.#valueName = valueName;
-		this.#isOpen = true;
-
-		this.#separator = separator;
 
 		this.classList.add("active");
 		this.style.opacity = "0";
 
+		let items = this.#parent.items;
+		if (items.length === 0) {
+			items.push(this.#parent.valueName);
+		}
+
+		const formattedData = this.#parent.dataSource.map(item => {
+			const row = {
+				CHK: "N",
+				k: this.#parent.keyName && item[this.#parent.keyName] !== undefined ? item[this.#parent.keyName] : (item[0] !== undefined ? item[0] : "")
+			};
+
+			items.forEach((key, idx) => {
+				row[`tmp${idx + 1}`] = item[key] !== undefined ? item[key] : (item[idx] !== undefined ? item[idx] : "");
+			});
+			return row;
+		});
+
 		setTimeout(() => {
-			const grd = this.querySelector("nine-table-simple");
-			if (!grd || !dataSource) return;
+
+			if (!this.#grd || !this.#parent.dataSource) return;
 
 			this.querySelector(".search-input").value = "";
 			this.querySelector("#chkAll").checked = true;
@@ -204,7 +176,7 @@ export class CellComboPanel extends HTMLElement {
 			const sheetRect = sheet.getBoundingClientRect();
 
 			const isDropDown = this.#isPanelBelow(parent);
-			const h = this.#calculatePanelHeight(parent, isDropDown);
+			const h = this.#calculatePanelHeight(parent, isDropDown, formattedData.length);
 			const l = this.#calculatePanelLeft(parent);
 			const t = isDropDown ? (btnRect.bottom - sheetRect.top) : (btnRect.top - sheetRect.top - h);
 
@@ -213,7 +185,7 @@ export class CellComboPanel extends HTMLElement {
 			this.style.top = `${t}px`;
 			//this.style.opacity = "";
 
-			if (multi) {
+			if (this.#parent.multi) {
 				this.classList.add("multi");
 				this.#grd.classList.add("multi");
 			} else {
@@ -221,20 +193,16 @@ export class CellComboPanel extends HTMLElement {
 				this.#grd.classList.remove("multi");
 			}
 
-			this.#initData(dataSource, keyName, valueName, multi);
+			this.#initData(formattedData);
 		}, 100);
 	}
 
 	close = () => {
 		this.classList.remove("active");
-		this.#isOpen = false;
 		if (this.#parent && this.#parent.cell) {
 			this.#parent.cell.focus();
 		}
 	}
-
-
-
 
 
 	#onClick = (e) => {
@@ -317,7 +285,7 @@ export class CellComboPanel extends HTMLElement {
 			}
 		});
 
-		this.#parent.value = arr.join(this.#separator);
+		this.#parent.value = arr.join(this.#parent.separator);
 
 		this.#parent.sheet.rowManager.refresh(true);
 		this.close();
@@ -394,7 +362,7 @@ export class CellComboPanel extends HTMLElement {
 			const colnm = "tmp1";
 			const data2Idx = fields.indexOf(colnm);
 
-			const matchedValues = [];
+			let matchedValues = [];
 			rawRecords.forEach(record => {
 				const val = data2Idx >= 0 && record.v ? record.v[data2Idx] : "";
 				const textVal = String(val).replace(/<[^>]*>?/gm, '').toLowerCase();
@@ -408,10 +376,6 @@ export class CellComboPanel extends HTMLElement {
 				[colnm]: [...new Set(matchedValues)]
 			});
 		}
-	}
-
-	get isOpen() {
-		return this.#isOpen;
 	}
 
 	get targetCell() {

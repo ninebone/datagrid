@@ -3,12 +3,8 @@ import { EditableCellElement } from "./core/CellElement.js";
 import "./cell-combo-panel.js";
 
 export class CellCombo extends EditableCellElement {
-	#targetBtn;
+	#target;
 	#dataSource = [];
-	#keyName;
-	#valueName;
-	#multi;
-	#multiSeparator;
 	#panel;
 
 	constructor() {
@@ -29,27 +25,24 @@ export class CellCombo extends EditableCellElement {
 
 
 	refresh = () => {
-		const v = super.refresh();
-		if (!this.#targetBtn) return v;
+		super.refresh();
 
-		this.#targetBtn.textContent = this.#getDisplayText() || "Select";
+		this.#target.textContent = this.#getDisplayText() || "Select";
 		this.#validateInput();
-
-		return v;
 	};
 
 	#getDisplayText = () => {
 		if (!this.value || !Array.isArray(this.#dataSource)) return "";
 
-		if (this.#multi) {
-			const keys = String(this.value).split(this.#multiSeparator);
+		if (this.multi) {
+			const keys = String(this.value).split(this.multiSeparator);
 			return this.#dataSource
-				.filter(m => keys.includes(String(m[this.#keyName])))
-				.map(m => m[this.#valueName])
-				.join(this.#multiSeparator);
+				.filter(m => keys.includes(String(m[this.keyName])))
+				.map(m => m[this.valueName])
+				.join(this.multiSeparator);
 		} else {
-			const found = this.#dataSource.find(m => String(m[this.#keyName]) === String(this.value));
-			return found ? found[this.#valueName] : this.value;
+			const found = this.#dataSource.find(m => String(m[this.keyName]) === String(this.value));
+			return found ? found[this.valueName] : this.value;
 		}
 	}
 
@@ -61,9 +54,9 @@ export class CellCombo extends EditableCellElement {
 			return;
 		}
 
-		const list = this.#multi ? String(this.value).split(this.#multiSeparator) : [this.value];
+		const list = this.multi ? String(this.value).split(this.multiSeparator) : [this.value];
 		for (const v of list) {
-			const idx = this.#dataSource.findIndex(m => String(v) === String(m[this.#keyName]));
+			const idx = this.#dataSource.findIndex(m => String(v) === String(m[this.keyName]));
 			if (idx < 0) {
 				super.cell.classList.add("invalid");
 				break;
@@ -72,24 +65,20 @@ export class CellCombo extends EditableCellElement {
 	};
 
 	#init = () => {
-		this.#renderer();
 
-		this.#keyName = this.cell.getAttribute("key-name") || "k";
-		this.#valueName = this.cell.getAttribute("value-name") || "v";
-		this.#multi = this.cell.getAttribute('multi') === "true";
-		this.#multiSeparator = this.cell.getAttribute("multi-separator") || ",";
+		this.#renderer();
 
 		this.#initData();
 		this.#initEvent();
 	}
 
 	#initData = () => {
-		if (!super.sheet || !super.cell) return;
+		//if (!this.sheet || !this.cell) return;
 
-		const dataSource = super.cell?.getAttribute("data-source");
-		if (!dataSource) return;
-
-		this.#dataSource = super.getExprValue(dataSource, super.tr.data, super.tr.dataset.row);
+		const dataSource = this.cell.getAttribute("data-source");
+		if (dataSource) {
+			this.#dataSource = super.getExprValue(dataSource, super.tr.data, super.tr.dataset.row);
+		}
 	}
 
 	#renderer = () => {
@@ -98,12 +87,12 @@ export class CellCombo extends EditableCellElement {
             <button class="btn2" type="button" tabindex="-1"></button>
         `;
 
-		this.#targetBtn = this.querySelector(".btn1");
+		this.#target = this.querySelector(".btn1");
 	};
 
 	#initEvent = () => {
-		this.querySelectorAll("button").forEach(btn => {
-			btn.addEventListener("click", (e) => {
+		this.querySelectorAll("button").forEach($el => {
+			$el.addEventListener("click", (e) => {
 				e.stopPropagation();
 				this.#togglePanel();
 			});
@@ -120,22 +109,41 @@ export class CellCombo extends EditableCellElement {
 	#togglePanel = () => {
 
 		if (!this.#panel) {
-			this.#panel = super.sheet.querySelector("cell-combo-panel");
+			this.#panel = this.sheet.querySelector("cell-combo-panel");
 			if (!this.#panel) {
 				this.#panel = document.createElement("cell-combo-panel");
-				super.sheet.appendChild(this.#panel);
+				this.sheet.appendChild(this.#panel);
 			}
 		}
 
-		if (this.#panel.isOpen && this.#panel.targetCell === this) {
+		//if (this.#panel.isOpen && this.#panel.targetCell === this) {
+		if (this.#panel.classList.contains("active") && this.#panel.targetCell === this) {
 			this.#panel.close();
 		} else {
-			this.#panel.open(this, this.#dataSource, this.#keyName, this.#valueName, this.#multi, this.#multiSeparator);
+			this.#panel.open(this, this.#dataSource, this.keyName, this.valueName, this.multi, this.multiSeparator);
 		}
 	}
 
 	get dataSource() {
 		return this.#dataSource;
+	}
+	get keyName() {
+		return this.cell.getAttribute("key-name") || "k";
+	}
+	get valueName() {
+		return this.cell.getAttribute("value-name") || "v";
+	}
+	get multi() {
+		return this.cell.getAttribute('multi') === "true";
+	}
+	get multiSeparator() {
+		return this.cell.getAttribute("multi-separator") || ",";
+	}
+	get items() {
+		return this.cell.getAttribute("items")?.split(",").map(s => s.trim()) || [];
+	}
+	get separator() {
+		return this.multiSeparator;
 	}
 }
 

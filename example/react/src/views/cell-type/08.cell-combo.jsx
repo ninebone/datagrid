@@ -93,7 +93,7 @@ const Combo = () => {
 
 						<td data-bind="DEPART1" text-align="center"
 							style={{background: 'white', filter: 'brightness(0.98)'}}></td>
-						<td cell-type="combo" data-bind="DEPART2" text-align="center">
+						<td cell-type="combo" data-bind="DEPART1" text-align="center">
 							<datalist>
 								<option k="A" v="#AAA"/>
 								<option k="B" v="#BBB"/>
