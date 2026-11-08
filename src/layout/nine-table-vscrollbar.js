@@ -55,10 +55,11 @@ export class NineTableVScrollBar extends HTMLElement {
 
         if (!rawContentHeight || rawContentHeight <= 0) {
             const isGrouped = this.#sheet.sourceTable?.querySelector("tbody tr[grouping='true']") ? true : false;
-            if (isGrouped && this.#sheet.rowManager) {
-                rawContentHeight = (body.scrollHeight > body.clientHeight) ? body.scrollHeight : (totalCount * 30);
+            if (isGrouped) {
+                const rowHeight = this.#sheet.template.height;
+                rawContentHeight = totalCount * rowHeight;// (body.scrollHeight > body.clientHeight) ? body.scrollHeight : (totalCount * 30);
             } else {
-                const rowHeight = this.#sheet.getRowHeight() || 1;
+                const rowHeight = this.#sheet.template.height;
                 rawContentHeight = totalCount * rowHeight;
             }
         }
@@ -74,7 +75,7 @@ export class NineTableVScrollBar extends HTMLElement {
             contentHeight = MAX_BROWSER_HEIGHT;
         }
 
-        return { rawContentHeight, contentHeight, scaleFactor, useScaling, totalCount };
+        return { contentHeight, scaleFactor, useScaling, totalCount };
     };
 
 
@@ -175,7 +176,7 @@ export class NineTableVScrollBar extends HTMLElement {
 
                 this.#sheet.rowManager.scrollToDataRow(targetRow);
 
-                const { rawContentHeight, contentHeight } = this.#getScaleInfo();
+                const { contentHeight } = this.#getScaleInfo();
                 const currentScrollTop = this.#elements.container.scrollTop;
                 const maxScrollTop = Math.max(contentHeight - this.#sheet.rowManager.getRowHeight(), 0);
 

@@ -44,19 +44,25 @@ class CellRowIndicator extends CellElement {
 		const rawRecord = this.tr.data;
 
 		if (rawRecord) {
-			switch (rawRecord.m._[NINE_TABLE.META.INDEX.ROW_STATE]) {
-				case NINE_TABLE.ROW_STATE.INSERT:
-					this.classList.add("is-insert");
-					break;
-				case NINE_TABLE.ROW_STATE.UPDATE:
-					this.classList.add("is-update");
-					break;
-				case NINE_TABLE.ROW_STATE.DELETE:
-					this.classList.add("is-delete");
-					break;
-				default:
-					break;
+
+			if (rawRecord.m === undefined) {
+
+			} else {
+				switch (rawRecord.m._[NINE_TABLE.META.INDEX.ROW_STATE]) {
+					case NINE_TABLE.ROW_STATE.INSERT:
+						this.classList.add("is-insert");
+						break;
+					case NINE_TABLE.ROW_STATE.UPDATE:
+						this.classList.add("is-update");
+						break;
+					case NINE_TABLE.ROW_STATE.DELETE:
+						this.classList.add("is-delete");
+						break;
+					default:
+						break;
+				}
 			}
+
 		}
 
 		const displayNum = this.index + 1;

@@ -296,35 +296,69 @@ export class PreCompiler {
     }
 
     static #ensureRowIndicator(tbl, host) {
-
         const w = tbl.getAttribute("row-indicator") === 'true' ? 48 : 4;
-
         const colgroup = tbl.querySelector('colgroup');
 
-
-        const col = document.createElement('col');
-        //col.className = 'row-indicator-col';
-        col.setAttribute('fixed', 'left');
-        col.setAttribute('width', w);
-        col.style.width = `${w}px`;
-        colgroup.prepend(col);
-
+        // row-indicator용 col이 이미 없다면 추가
+        if (colgroup && !colgroup.querySelector('.row-indicator-col')) {
+            const col = document.createElement('col');
+            col.className = 'row-indicator-col';
+            col.setAttribute('fixed', 'left');
+            col.setAttribute('width', w);
+            col.style.width = `${w}px`;
+            colgroup.prepend(col);
+        }
 
         tbl.querySelectorAll('thead, tbody, tfoot').forEach(section => {
             const rows = Array.from(section.querySelectorAll('tr'));
             if (rows.length === 0) return;
 
-            const firstTr = rows[0];
+            // 1. 행들을 규칙에 맞게 그룹으로 묶기
+            const groups = [];
+            let currentGroup = null;
 
-            const indicatorCell = document.createElement('th');
-            indicatorCell.className = 'row-indicator';
-            indicatorCell.setAttribute('cell-type', 'row-indicator');
+            rows.forEach(tr => {
+                // col-indicator 전용 행 등은 제외 처리
+                if (tr.classList.contains('col-indicator-rowgroup')) return;
 
-            if (rows.length > 1) {
-                indicatorCell.rowSpan = rows.length;
-            }
+                const isGrouping = tr.getAttribute('grouping') === 'true';
 
-            firstTr.insertBefore(indicatorCell, firstTr.firstElementChild);
+                if (isGrouping) {
+                    // grouping="true"인 행은 연속 여부와 상관없이 '각각 독립된 단독 그룹'으로 분리
+                    groups.push({ isGrouping: true, rows: [tr] });
+                    currentGroup = null; // 일반 그룹 체이닝 끊기
+                } else {
+                    // 일반 행들은 연속되는 경우 하나의 그룹으로 묶음
+                    if (!currentGroup || currentGroup.isGrouping !== false) {
+                        currentGroup = { isGrouping: false, rows: [tr] };
+                        groups.push(currentGroup);
+                    } else {
+                        currentGroup.rows.push(tr);
+                    }
+                }
+            });
+
+            // 2. 각 그룹별로 첫 번째 tr에 row-indicator 삽입
+            groups.forEach(group => {
+                const groupRows = group.rows;
+                if (groupRows.length === 0) return;
+
+                const firstTr = groupRows[0];
+
+                // 이미 해당 행에 row-indicator가 존재하면 중복 생성 방지
+                if (firstTr.querySelector(':scope > th.row-indicator')) return;
+
+                const indicatorCell = document.createElement('th');
+                indicatorCell.className = 'row-indicator';
+                indicatorCell.setAttribute('cell-type', 'row-indicator');
+
+                // grouping 그룹은 항상 rowSpan=1, 일반 그룹은 연속된 행 개수(groupRows.length)만큼 지정
+                if (!group.isGrouping && groupRows.length > 1) {
+                    indicatorCell.rowSpan = groupRows.length;
+                }
+
+                firstTr.insertBefore(indicatorCell, firstTr.firstElementChild);
+            });
         });
     }
 

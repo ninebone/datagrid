@@ -442,6 +442,7 @@ export class NineTableSheet extends HTMLElement {
     };
 
     getRowHeight = () => {
+
         return this.#rowManager.getRowHeight();
     };
 

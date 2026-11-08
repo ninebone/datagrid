@@ -131,7 +131,7 @@ export class Grouping {
 			renderItems.push({
 				type: 'group',
 				record: groupRecord,
-				groupId: groupId
+				groupId: groupId,
 			});
 
 			if (!isLastLevel && subMapOrRecords instanceof Map) {

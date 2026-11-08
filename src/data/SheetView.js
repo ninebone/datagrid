@@ -35,7 +35,7 @@ export class SheetView {
 
 		const targetRecord = visibleRecords[at];
 		if (colnm != null) {
-			const fields = this.#host.data.getHostFields();
+			const fields = this.#host.fields.get();
 			const idx = fields.indexOf(colnm);
 			return (idx >= 0 && targetRecord.v) ? targetRecord.v[idx] : null;
 		}
@@ -105,6 +105,9 @@ export class SheetView {
 		const validRecords = indices.map(idx => rawRecords[idx]);
 
 		const groupColumns = this.#sheet.grouping?.columns || [];
+
+		trace.log(groupColumns);
+
 		if (groupColumns.length > 0) {
 			const groupResult = Grouping.apply(validRecords, groupColumns, this.#host.data.getHostFields());
 

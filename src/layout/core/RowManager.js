@@ -167,7 +167,7 @@ export class RowManager {
 
 
         const bodyContent = this.#sheet.querySelector('.ng-sheet-body .ng-sheet-body-content');
-        const templateLength = this.#sheet.templateLength || 1;
+        const templateLength = this.#sheet.template.length;
 
         const getItemHeight = (item) => {
             if (item.type === 'group') {
@@ -265,13 +265,14 @@ export class RowManager {
                     tr.dataset.row = (item.type === 'data') ? dataIndex : '';
 
                     const isTrGroup = tr.getAttribute('grouping') === 'true';
-
+trace.log(item.type, isTrGroup);
                     if (item.type === 'group') {
                         if (isTrGroup) {
                             const depth = item.record[GROUP_IDX.DEPTH];
+                            trace.log(subIdx, itemIndex, depth);
                             if (subIdx === depth) {
                                 tr.style.display = '';
-                                this.#bindGroupRowData(tr, allRenderItems, item.record, virtualIndex);
+                                this.#bindGroupRowData(tr, allRenderItems, item, virtualIndex);
                             } else {
                                 tr.style.display = 'none';
                                 tr.dataset.matrixRow = null;
@@ -293,8 +294,12 @@ export class RowManager {
                         } else {
                             tr.style.display = '';
 
-                            const rowid = item.record.m?.rowid ?? 0;
-                            this.#bindRowData(tr, item.record, rowid, virtualIndex);
+
+                            //if (item) {
+                                const rowid = item.record.m._[NINE_TABLE.META.INDEX.ROWID];
+                                this.#bindRowData(tr, item.record, rowid, virtualIndex);
+                            //}
+
                         }
                     }
                 });
