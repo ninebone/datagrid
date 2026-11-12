@@ -121,13 +121,13 @@ export class ColResizer {
 
         targetCols.forEach(col => {
             col.setAttribute('width', width);
-            col.style.width = `${width}px`;
+            col.style.width = col.style.minWidth = col.style.maxWidth = `${width}px`;
         });
 
         const sourceCol = this.#sheet.sourceTable?.querySelector(`colgroup col[data-col="${globalColIndex}"]`);
         if (sourceCol) {
             sourceCol.setAttribute('width', width);
-            sourceCol.style.width = `${width}px`;
+            sourceCol.style.width = sourceCol.style.minWidth = sourceCol.style.maxWidth  = `${width}px`;
         }
 
         this.refreshLayout(resolvedContainerType);

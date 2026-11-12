@@ -23,9 +23,10 @@ export class CellSelection {
 
 		const sameGroupTrs = trs.filter(t => parseInt(t.dataset.index, 10) === dataRow);
 		const subRowIndex = sameGroupTrs.indexOf(tr);
-		const templateLength = sameGroupTrs.length > 0 ? sameGroupTrs.length : 1;
 
-		const matrixRow = (dataRow * templateLength) + (subRowIndex >= 0 ? subRowIndex : (tr.sectionRowIndex % templateLength));
+		//const matrixRow = (dataRow * templateLength) + (subRowIndex >= 0 ? subRowIndex : (tr.sectionRowIndex % templateLength));
+		//const matrixRow = (dataRow * this.#sheet.template.length) + subRowIndex;//(subRowIndex >= 0 ? subRowIndex : (tr.sectionRowIndex % this.#sheet.template.length));
+		const matrixRow = parseInt(tr.dataset.matrixRow, 10);
 
 		return { dataRow, subRowIndex, matrixRow };
 	}
@@ -52,10 +53,13 @@ export class CellSelection {
 		let c2 = Math.max(startCol, endCol);
 
 
+
 		if (this.#host.tagName === "NINE-TABLE-SIMPLE") {
 			c1 = 1;
 			c2 = 10;
 		}
+
+
 
 		const containers = this.#sheet.querySelectorAll('.ng-container-left, .ng-container-body, .ng-container-right');
 
@@ -116,6 +120,8 @@ export class CellSelection {
 			endCol: sanitize(c2)
 		};
 
+
+
 		//trace.log(this.#range);
 
 		this.render();
@@ -159,6 +165,7 @@ export class CellSelection {
 			});
 		});
 
+
 		if (startRow < 0 || startCol < 0) return;
 
 		containers.forEach((container) => {
@@ -168,10 +175,16 @@ export class CellSelection {
 
 			visibleTrs.forEach(tr => {
 				const { matrixRow } = this.#getMatrixRow(tr);
+
+				//trace.log(tr.dataset.matrixRow);
+
 				if (matrixRow < 0) return;
 
+				//trace.log(matrixRow, this.#range, startRow, endRow);
 
 				if (matrixRow >= startRow && matrixRow <= endRow) {
+
+
 					container.querySelectorAll(`tbody tr[data-index="${tr.dataset.index}"]`).forEach(tr => {
 						tr.classList.add('selected');
 					});
@@ -256,6 +269,8 @@ export class CellSelection {
 
 		this.#lastMatrixRow = endRow;
 		this.#lastCol = endCol;
+
+		//trace.log(this.#startRow, this.#startCol, endRow, endCol);
 
 		this.setRange(this.#startRow, this.#startCol, endRow, endCol);
 	};

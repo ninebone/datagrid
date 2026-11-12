@@ -64,32 +64,20 @@ export class CellNavigation {
 	};
 
 	#moveCellV = (e, cell) => {
+		// 1. 만약 다음 이동할 셀이 이미 DOM에 존재한다면
 		if (cell) {
 			let isVisible = false;
 			switch (e.code) {
 				case "Enter":
-					if (e.shiftKey) {
-						if (this.#isCellBelowVisible(cell)) {
-							isVisible = true;
-						}
-					} else {
-						if (this.#isCellBelowVisible(cell)) {
-							isVisible = true;
-						}
-					}
-					break;
 				case "ArrowDown":
-					if (this.#isCellBelowVisible(cell)) {
-						isVisible = true;
-					}
+					if (this.#isCellBelowVisible(cell)) isVisible = true;
 					break;
 				case "ArrowUp":
-					if (this.#isCellAboveVisible(cell)) {
-						isVisible = true;
-					}
+					if (this.#isCellAboveVisible(cell)) isVisible = true;
 					break;
 			}
 
+			// 화면 안 영역에 있다면 가볍게 포커스 및 선택 범위 지정 후 리턴
 			if (isVisible) {
 				this.currentCell = cell;
 				this.#sheet.selection.setRange(this.#currentTr.dataset.matrixRow, cell.dataset.col, this.#currentTr.dataset.matrixRow, cell.dataset.col);
@@ -97,47 +85,46 @@ export class CellNavigation {
 			}
 		}
 
-		const dataIndex = parseInt(this.#currentTr.dataset.index, 10);
-		let scrollTopIndex = -1;
+		// 2. 셀이 화면에 없거나 잘려 있다면(뷰포트 밖),
+		//    현재 셀(또는 대상 셀)과 .ng-sheet-body의 상대적 위치(top) 차이를 이용해 scrollTop을 직접 조절
+		const bodyViewport = this.#sheet.querySelector('.ng-sheet-body');
+		if (!bodyViewport) return;
+
+		// 만약 nextCell이 존재하면 그 셀을 기준으로, 아니면 현재 셀 기준으로 계산
+		const targetCell = cell || this.#currentCell;
+		if (!targetCell) return;
+
+		const viewportRect = bodyViewport.getBoundingClientRect();
+		const cellRect = targetCell.getBoundingClientRect();
+		const theadHeight = bodyViewport.querySelector('thead')?.offsetHeight || 0;
+
+		let delta = 0;
+
 		switch (e.code) {
 			case "Enter":
-				if (e.shiftKey) {
-					const visibleRowCount = this.#getVisibleRowCount();
-					scrollTopIndex = Math.max(dataIndex - visibleRowCount + 0, 0);
-				} else {
-					scrollTopIndex = Math.min(dataIndex, this.#sheet.view.count());
+			case "ArrowDown":
+				delta = (cellRect.top - cellRect.height) - (viewportRect.top + theadHeight);
+				break;
+			case "ArrowUp":
+				delta = (cellRect.bottom + cellRect.height) - (viewportRect.bottom);
+				break;
+		}
+
+		const targetMatrixRow = cell ? parseInt(cell.closest("tr")?.dataset.matrixRow, 10) : parseInt(this.#currentTr.dataset.matrixRow, 10);
+		const targetCol = cell ? parseInt(cell.dataset.col, 10) : parseInt(this.#currentCell.dataset.col, 10);
+
+		if (delta !== 0) {
+			bodyViewport.scrollTop += delta;
+		}
+
+		setTimeout(() => {
+			const foundCell = this.#findCell(targetMatrixRow, targetCol);
+			if (foundCell) {
+				this.currentCell = foundCell;
+				const targetTr = foundCell.closest("tr");
+				if (targetTr) {
+					this.#sheet.selection.setRange(targetTr.dataset.matrixRow, foundCell.dataset.col, targetTr.dataset.matrixRow, foundCell.dataset.col);
 				}
-				break;
-			case "ArrowDown":
-				scrollTopIndex = Math.min(dataIndex, this.#sheet.view.count());
-				break;
-			case "ArrowUp":
-				const visibleRowCount = this.#getVisibleRowCount();
-				scrollTopIndex = Math.max(dataIndex - visibleRowCount + 0, 0);
-				break;
-		}
-
-		if (scrollTopIndex < 0) return;
-
-		let matrixRow = parseInt(this.#currentTr.dataset.matrixRow, 10);
-		const col = parseInt(this.#currentCell.dataset.col, 10);
-		const rowSpan = parseInt(this.#currentCell.rowSpan, 10) || 1;
-
-		switch (e.code) {
-			case "ArrowDown":
-				matrixRow += rowSpan;
-				break;
-			case "ArrowUp":
-				matrixRow --;
-				break;
-		}
-
-		this.#sheet.rowManager.scrollToDataRow(scrollTopIndex, null, () => {
-			const currentCell = this.#findCell(matrixRow, col);
-
-			if (currentCell) {
-				this.currentCell = currentCell;
-				this.#sheet.selection.setRange(this.#currentTr.dataset.matrixRow, currentCell.dataset.col, this.#currentTr.dataset.matrixRow, currentCell.dataset.col);
 			}
 		});
 	}
@@ -232,9 +219,14 @@ export class CellNavigation {
 	#findCell = (matrixRow, col) => {
 
 		const $tr = this.#sheet.querySelector(`tbody tr[data-matrix-row="${matrixRow}"]`);
+
 		if (!$tr) return;
 
+
+
 		const dataIndex = parseInt($tr.dataset.index, 10);
+
+
 
 		let targetCell = this.#sheet.querySelector(`tbody tr[data-matrix-row="${matrixRow}"] td[data-col="${col}"]`);
 		if (!targetCell) {
@@ -270,7 +262,15 @@ export class CellNavigation {
 		const col = parseInt(this.#currentCell.dataset.col, 10);
 		const matrixRow = parseInt(this.#currentTr.dataset.matrixRow, 10);
 
-		return this.#findCell(matrixRow - 1, col);
+		let $nextCell = null
+		for (let i = 0; i < 100; i++) {
+			$nextCell = this.#findCell(matrixRow - 1 - i, col);
+			if ($nextCell) break;
+		}
+
+		return $nextCell;// this.#findCell(matrixRow + rowSpan, col);
+
+		//return this.#findCell(matrixRow - 1, col);
 	}
 
 	#getDownCell = () => {
@@ -278,7 +278,13 @@ export class CellNavigation {
 		const matrixRow = parseInt(this.#currentTr.dataset.matrixRow, 10);
 		const rowSpan = parseInt(this.#currentCell.rowSpan, 10) || 1;
 
-		return this.#findCell(matrixRow + rowSpan, col);
+		let $nextCell = null
+		for (let i = 0; i < 100; i++) {
+			$nextCell = this.#findCell(matrixRow + rowSpan + i, col);
+			if ($nextCell) break;
+		}
+
+		return $nextCell;// this.#findCell(matrixRow + rowSpan, col);
 	}
 
 	// 1. 위쪽 잘림 체크 (기준: bodyViewport)

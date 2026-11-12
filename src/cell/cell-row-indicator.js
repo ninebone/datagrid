@@ -1,6 +1,7 @@
 import { trace } from "@nopeer";
 import { CellElement } from "./core/CellElement.js";
 import {NINE_TABLE} from "@";
+import {CellTree} from "@/cell/cell-tree.js";
 
 class CellRowIndicator extends CellElement {
 	#mainTarget;
@@ -34,12 +35,10 @@ class CellRowIndicator extends CellElement {
 	}
 
 	refresh = () => {
+
 		if (!this.cell || !this.tr) return;
 
 		this.classList.remove("is-insert", "is-update", "is-delete");
-
-		const row = this.row;
-		if (isNaN(row)) return;
 
 		const rawRecord = this.tr.data;
 
@@ -62,7 +61,6 @@ class CellRowIndicator extends CellElement {
 						break;
 				}
 			}
-
 		}
 
 		const displayNum = this.index + 1;
@@ -86,7 +84,7 @@ class CellRowIndicator extends CellElement {
 		const isSorted = this.sheet.querySelector("thead .asc,thead .desc") ? true : false;
 		const isFitered = this.sheet.querySelector("thead nine-table-filter-button.filtered") ? true : false;
 
-		this.#subTarget.innerHTML = row;
+		this.#subTarget.innerHTML = this.row;
 		this.#subTarget.style.display = (isSorted || isFitered) ? "" : "none";
 	};
 }

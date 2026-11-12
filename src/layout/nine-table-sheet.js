@@ -44,6 +44,11 @@ export class NineTableSheet extends HTMLElement {
         length: 0,
         height: 0,
         heights: [],
+        group: {
+            length: 0,
+            height: 0,
+            heights: [],
+        },
     };
 
     static SCROLLBAR_SIZE = 16;
@@ -163,7 +168,9 @@ export class NineTableSheet extends HTMLElement {
     #adjustOverlay = () => {
         const $thead = this.querySelector('.ng-container-body thead');
         const $overlay = this.querySelector('.nodata-overlay');
-        $overlay.style.top = `${$thead?.offsetHeight}px`;
+        if ($overlay) {
+            $overlay.style.top = `${$thead?.offsetHeight}px`;
+        }
     }
 
     get view() {
@@ -297,16 +304,31 @@ export class NineTableSheet extends HTMLElement {
 
         this.querySelector(`.ng-container-body`).appendChild(this.#source.table);
 
-        this.#template.height = this.#template.length = 0;
-        this.#template.heights = [];
+        this.#template = {
+            height: 0,
+            heights: [],
+            length: 0,
+            group: {
+                height: 0,
+                heights: [],
+                length: 0,
+            }
+        }
+
         this.querySelectorAll(`.ng-container-body tbody.body tr`).forEach(($tr) => {
-            this.#template.height += Math.max($tr.offsetHeight || 0, 28);
-            this.#template.heights.push($tr.offsetHeight || 0);
-            //if (['NINE-TABLE-SIMPLE'].includes(this.#host.tagName)) {
-            //    trace.log(this.#host, $tr.offsetHeight, $tr.clientHeight);
-            //}
+            const h = Math.max($tr.offsetHeight || 0, 28);
+            this.#template.height += h;
+            this.#template.heights.push(h);
         });
+
+        this.querySelectorAll(`.ng-container-body tbody.body tr[grouping="true"]`).forEach(($tr) => {
+            const h = Math.max($tr.offsetHeight || 0, 28);
+            this.#template.group.height += h;
+            this.#template.group.heights.push(h);
+        });
+
         this.#template.length = this.#template.heights.length;
+        this.#template.group.length = this.#template.group.heights.length;
 
         if (this.#index === 0) {
             const minRows = parseInt(this.#host.getAttribute('display-min-rows'), 10);

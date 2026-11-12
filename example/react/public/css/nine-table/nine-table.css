@@ -92,3 +92,10 @@ cell-button {
     --cell-button-active-background: #d1d5db;
 }
 
+
+
+
+
+tbody.head {
+    position: sticky;
+}

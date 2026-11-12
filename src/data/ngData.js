@@ -52,6 +52,10 @@ export class ngData {
 		return rawRecords.filter(item => item.m._[NINE_TABLE.META.INDEX.ROW_STATE] !== NINE_TABLE.ROW_STATE.DELETE);
 	};
 
+	getRawRecords = () => {
+		return this.#parent.rawRecords || [];
+	};
+
 	get count() {
 		return this.length;
 	}

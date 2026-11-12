@@ -4,32 +4,101 @@ import { NINE_TABLE } from "@/core/constants.js";
 export class SheetAPI {
     #sheet;
     #host;
+    #elements;
 
     constructor(sheet) {
         this.#sheet = sheet;
         this.#host = sheet.getRootNode().host;
+
+        //this.#resetElements();
     }
 
-    /**
-    currentRow = () => {
-        let rows = this.currentRows();
-        return (rows.length === 0) ? -1 : rows[0];
+    #resetElements = () => {
+        this.#elements = {
+            viewport: this.#sheet.querySelector('.ng-sheet-body'),
+            thead: this.#sheet.querySelector('thead'),
+            tbody: this.#sheet.querySelector('tbody.body'),
+            tfoot: this.#sheet.querySelector('tfoot'),
+            thead_foot: this.#sheet.querySelector('thead.foot'),
+            tbody_head: this.#sheet.querySelector('tbody.head'),
+            tbody_foot: this.#sheet.querySelector('tbody.foot'),
+        }
+    };
+
+    get elem() {
+
+        if (this.#elements?.tbody_foot) return this.#elements;
+
+        this.#elements = {
+            viewport: this.#sheet.querySelector('.ng-sheet-body'),
+            thead: this.#sheet.querySelector('thead'),
+            tbody: this.#sheet.querySelector('tbody.body'),
+            tfoot: this.#sheet.querySelector('tfoot'),
+            thead_foot: this.#sheet.querySelector('thead.foot'),
+            tbody_head: this.#sheet.querySelector('tbody.head'),
+            tbody_foot: this.#sheet.querySelector('tbody.foot'),
+        }
+
+        return this.#elements;
     }
-    currentRows = () => {
 
-        let rows = [];
-        this.#shadowRoot.querySelectorAll('nine-table-sheet.active').forEach($sheet => {
+    get viewport() {
+        const self = this;
 
-            const arr = $sheet.view.getArray($sheet.selection.minRow);
-            const rowid = arr.m._[NINE_TABLE.META.INDEX.ROWID];
+        return {
+            get tr() {
+                return {
+                    get length() {
+                        return Math.ceil(self.#sheet.querySelector('.ng-container-body tbody.body tr:last-child').sectionRowIndex / self.#sheet.template.length);
+                    },
+                    count() {
+                        return this.length;
+                    }
+                };
+            },
+            get group() {
+                return {
+                    get length() {
+                        return self.#sheet.source.table.querySelectorAll("tbody tr[grouping='true']").length;
+                    },
+                    count() {
+                        return this.length;
+                    }
+                };
+            },
+            get fixedHeight() {
+                const getHeight = () => {
+                    return (self.elem.thead?.offsetHeight || 0) +
+                        (self.elem.thead_foot?.offsetHeight || 0) +
+                        (self.elem.tfoot?.offsetHeight || 0) +
+                        (self.elem.tbody_head?.offsetHeight || 0);
+                }
 
-            //trace.log(this.data.getArray($sheet.selection.minRow));
+                let h = getHeight();
 
-            rows.push(rowid);
-        });
+                if (h === 0) {
+                    self.#resetElements();
+                    h = getHeight();
+                }
 
-        return rows;
-    } */
+                return h;
+            },
+            get height() {
+                return self.elem.viewport.offsetHeight;
+            },
+            get innerHeight() {
+                const viewPortHeight = self.elem.viewport.clientHeight;
+                return viewPortHeight - this.fixedHeight; // 💡 동일 객체 내부이므로 this.fixedHeight 사용
+            },
+            get outerHeight() {
+                return self.elem.viewport.offsetHeight;
+            }
+        };
+    };
+
+
+
+
 
     col = {
         // 1. 특정 컬럼의 너비 설정 (ColResizer 활용)

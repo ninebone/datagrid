@@ -138,22 +138,32 @@ export class PreCompiler {
             col.setAttribute('width', width);
 
             const widthVal = String(width).includes('px') ? width : `${width}px`;
-            col.style.width = widthVal;
+            col.style.width = col.style.minWidth = col.style.maxWidth = widthVal;
         });
     }
 
     static #ensureThead(tbl) {
-        if (tbl.querySelector('thead')) return;
+        // 1. 기본 메인 thead (not .foot) 보장
+        let thead = tbl.querySelector('thead:not(.foot)');
+        if (!thead) {
+            thead = document.createElement('thead');
+        }
 
-        const thead = document.createElement('thead');
         const colgroup = tbl.querySelector('colgroup');
-
         if (colgroup) {
             colgroup.after(thead);
         } else {
             tbl.prepend(thead);
         }
+
+        let theadFoot = tbl.querySelector('thead.foot');
+        if (!theadFoot) {
+            theadFoot = document.createElement('thead');
+            theadFoot.classList.add('foot');
+            thead.after(theadFoot); // 메인 thead 바로 뒤에 위치하도록 배치
+        }
     }
+
 
     static #normalizeCollapsibleAttributes(tbl) {
         const headers = tbl.querySelectorAll('thead th, thead td');
@@ -197,9 +207,10 @@ export class PreCompiler {
                 $datalist.remove();
             }
 
+            const $tr = $cell.closest('tr');
             const expr = $cell.dataset.expr;
             if (expr) {
-                $cell.setAttribute('data-expr', host.exprEngine.precompile(expr));
+                $cell.setAttribute('data-expr', host.exprEngine.precompile(expr, $tr.getAttribute("grouping") === "true"));
             }
 
             Array.from($cell.attributes).forEach(attr => {
@@ -282,7 +293,7 @@ export class PreCompiler {
                         const targetCol = tbl.querySelector(`colgroup col[data-col="${colIndex + i}"]`);
                         if (targetCol) {
                             targetCol.setAttribute('width', targetWidth);
-                            targetCol.style.width = `${targetWidth}px`;
+                            targetCol.style.width = targetCol.style.minWidth = targetCol.style.maxWidth`${targetWidth}px`;
                         }
                     }
                 }
@@ -305,7 +316,7 @@ export class PreCompiler {
             col.className = 'row-indicator-col';
             col.setAttribute('fixed', 'left');
             col.setAttribute('width', w);
-            col.style.width = `${w}px`;
+            col.style.width = col.style.minWidth = col.style.maxWidth = `${w}px`;
             colgroup.prepend(col);
         }
 
@@ -380,13 +391,6 @@ export class PreCompiler {
                 if (col) {
                     totalWidth += parseInt(col.getAttribute('width'), 10) || 100;
                 }
-            }
-
-            if (totalWidth > 0) {
-                const widthVal = `${totalWidth}px`;
-                //cell.style.width = widthVal;
-                //cell.style.minWidth = widthVal;
-                //cell.style.maxWidth = widthVal;
             }
         });
     }
