@@ -30,23 +30,29 @@ col {
     width: attr(width px);
 }
 
-col:last-child {
-    width: 100% !important;
-}
 
+.ng-container-left {
+    col:last-child {
+        width: 100% !important;
+    }
+}
 
 thead {
     display: table-header-group;
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 2;
+}
+
+thead.foot {
+    z-index: 1;
 }
 
 tfoot {
     display: table-footer-group;
     position: sticky;
     bottom: 0;
-    z-index: 10;
+    z-index: 2;
 }
 
 tbody {

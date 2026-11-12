@@ -35,7 +35,7 @@ export class SheetView {
 
 		const targetRecord = visibleRecords[at];
 		if (colnm != null) {
-			const fields = this.#host.data.getHostFields();
+			const fields = this.#host.fields.get();
 			const idx = fields.indexOf(colnm);
 			return (idx >= 0 && targetRecord.v) ? targetRecord.v[idx] : null;
 		}
@@ -104,19 +104,21 @@ export class SheetView {
 		this.#viewIndexes = indices;
 		const validRecords = indices.map(idx => rawRecords[idx]);
 
-		const groupColumns = this.#sheet.grouping?.columns || [];
+		// 💡 시트별 그룹핑 설정 및 접힘 상태(collapsedMap) 가져오기
+		const groupingManager = this.#sheet.grouping;
+		const groupColumns = groupingManager?.columns || [];
+
 		if (groupColumns.length > 0) {
-			const groupResult = Grouping.apply(validRecords, groupColumns, this.#host.data.getHostFields());
+			// 각 시트별 그룹핑 매니저에 관리되는 collapsedMap을 전달하여 접힌 상태 유지
+			const collapsedMap = groupingManager.collapsedMap || new Map();
+			const groupResult = Grouping.apply(validRecords, groupColumns, this.#host.data.getHostFields(), collapsedMap);
 
-			this.#cachedVisibleRecords = groupResult.renderItems; // 최종 렌더링 아이템
+			this.#cachedVisibleRecords = groupResult.renderItems; // 최종 렌더링 아이템 (접힌 항목 자동 제외됨)
 
-			this.#sheet.grouping.setGroupMap(groupResult.groupMap); // 자식 매핑 공유
+			groupingManager.setGroupMap(groupResult.groupMap); // 자식 매핑 공유
 		} else {
 			this.#cachedVisibleRecords = validRecords;
 		}
-
-
-
 	}
 
 	setSorting = (columns) => {

@@ -94,7 +94,7 @@ const Radio = () => {
 			<nine-table ref={tableRef} show-footer="true" style={{width: '90%', height: '80%'}}>
 				<table row-indicator="true">
 					<colgroup>
-						<col width="80"/>
+						<col width="130"/>
 						<col width="50"/>
 						<col width="80"/>
 						<col width="50"/>

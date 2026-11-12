@@ -15,7 +15,7 @@ export class CellElement extends BasicCellElement {
 	}
 
 	get #updateRowState() {
-		return this.#cell.getAttribute("update-row-state") === "false";
+		return !(this.#cell.getAttribute("update-row-state") === "false");
 	}
 
 	get host() { return this.#host; }
@@ -171,7 +171,10 @@ export class CellElement extends BasicCellElement {
 
 	getDisplayText = (defaultValue = "") => {
 
-		if (!this.#cell || !this.#cell.closest("tbody")) return defaultValue;
+		//if (!this.#cell || !this.#cell.closest("tbody")) return defaultValue;
+		if (!this.#cell || (!this.#cell.closest("tbody") && !this.#cell.closest("thead.foot") && !this.#cell.closest("tfoot"))) {
+			return defaultValue;
+		}
 
 		const rawRecord = this.#tr.data;
 
@@ -183,20 +186,20 @@ export class CellElement extends BasicCellElement {
 
 		if (expr) {
 			try {
-				if (this.#tr.getAttribute("grouping") === "true") {
-
-					return this.getGroupExprValue(expr, this.#tr.data, row, this.#cell);
-				} else {
-					return this.#host.exprEngine.evaluate(expr, this.#tr.data, row);
-				}
+				return this.#host.exprEngine.evaluate(expr, this.#tr.data, row, this.#tr.getAttribute("grouping") === "true");
 			} catch (e) {
 				return defaultValue;
 			}
 		}
 
 		if (bindKey) {
-			const val = this.value;
-			return val !== null && val !== undefined ? val : defaultValue;
+			if (this.#tr.getAttribute("grouping") === "true") {
+				const idx = this.#host.fields.get().indexOf(bindKey);
+				return this.#tr.data[0].v[idx];
+			} else {
+				const val = this.value;
+				return val !== null && val !== undefined ? val : defaultValue;
+			}
 		}
 
 		return defaultValue;
@@ -216,7 +219,7 @@ export class CellElement extends BasicCellElement {
 
 			const expr = this.#attr[v];
 			if (expr) {
-				const result = this.#host.exprEngine.evaluate(expr, this.#tr.data, parseInt(this.#cell.dataset.row, 10));
+				const result = this.#host.exprEngine.evaluate(expr, this.#tr.data, parseInt(this.#cell.dataset.row, 10), this.#tr.getAttribute("grouping") === "true");
 
 				if (v === "validator") {
 					if (!result) {
@@ -246,7 +249,7 @@ export class CellElement extends BasicCellElement {
 	getExprValue(expr, data, row) {
 		if (!this.#host || !this.#host.exprEngine || expr === undefined || expr === null || expr === "") return expr;
 
-		return this.#host.exprEngine.evaluate(expr, data, row);
+		return this.#host.exprEngine.evaluate(expr, data, row, this.#tr.getAttribute("grouping") === "true");
 	}
 
 	getGroupExprValue = (expr, groupRecord, row, cell) => {

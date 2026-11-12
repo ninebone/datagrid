@@ -35,6 +35,10 @@ export class LayoutManager {
         const rawTables = rawElements.filter(el => (el.tagName.toUpperCase() === 'TABLE') );
         const sheetCount = rawTables.length;
 
+        rawTables.forEach($el => {
+            PreCompiler.initializeTable(this.#host, $el);
+        });
+
         const sheetsHtml = rawTables.map((tbl, idx) => {
             const className = idx === 0 ? 'active' : '';
             const sheetId = tbl.id || `sheet${idx + 1}`;
@@ -74,9 +78,7 @@ export class LayoutManager {
             <nine-table-footer></nine-table-footer>
         `;
 
-        rawTables.forEach($el => {
-            PreCompiler.initializeTable(this.#host, $el);
-        })
+
 
         this.#host.shadowRoot.querySelectorAll('nine-table-sheet').forEach(($sheet, idx) => {
             $sheet.classList.add('active');

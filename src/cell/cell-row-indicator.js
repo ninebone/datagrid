@@ -1,6 +1,7 @@
 import { trace } from "@nopeer";
 import { CellElement } from "./core/CellElement.js";
 import {NINE_TABLE} from "@";
+import {CellTree} from "@/cell/cell-tree.js";
 
 class CellRowIndicator extends CellElement {
 	#mainTarget;
@@ -34,28 +35,31 @@ class CellRowIndicator extends CellElement {
 	}
 
 	refresh = () => {
+
 		if (!this.cell || !this.tr) return;
 
 		this.classList.remove("is-insert", "is-update", "is-delete");
 
-		const row = this.row;
-		if (isNaN(row)) return;
-
 		const rawRecord = this.tr.data;
 
 		if (rawRecord) {
-			switch (rawRecord.m._[NINE_TABLE.META.INDEX.ROW_STATE]) {
-				case NINE_TABLE.ROW_STATE.INSERT:
-					this.classList.add("is-insert");
-					break;
-				case NINE_TABLE.ROW_STATE.UPDATE:
-					this.classList.add("is-update");
-					break;
-				case NINE_TABLE.ROW_STATE.DELETE:
-					this.classList.add("is-delete");
-					break;
-				default:
-					break;
+
+			if (rawRecord.m === undefined) {
+
+			} else {
+				switch (rawRecord.m._[NINE_TABLE.META.INDEX.ROW_STATE]) {
+					case NINE_TABLE.ROW_STATE.INSERT:
+						this.classList.add("is-insert");
+						break;
+					case NINE_TABLE.ROW_STATE.UPDATE:
+						this.classList.add("is-update");
+						break;
+					case NINE_TABLE.ROW_STATE.DELETE:
+						this.classList.add("is-delete");
+						break;
+					default:
+						break;
+				}
 			}
 		}
 
@@ -80,7 +84,7 @@ class CellRowIndicator extends CellElement {
 		const isSorted = this.sheet.querySelector("thead .asc,thead .desc") ? true : false;
 		const isFitered = this.sheet.querySelector("thead nine-table-filter-button.filtered") ? true : false;
 
-		this.#subTarget.innerHTML = row;
+		this.#subTarget.innerHTML = this.row;
 		this.#subTarget.style.display = (isSorted || isFitered) ? "" : "none";
 	};
 }
