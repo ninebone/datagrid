@@ -225,6 +225,89 @@ const Overview = () => {
 					</div>
 			  	`;
 			},
+			summary: () => {
+				const data = tableRef.current.data.getArray();
+				const fields = tableRef.current.fields.get();
+
+				const departIdx = fields.indexOf("DEPART");
+				const rec1Idx = fields.indexOf("REC1");
+				const rec2Idx = fields.indexOf("REC2");
+				const rec3Idx = fields.indexOf("REC3");
+
+				if (departIdx === -1) return `<div style="padding: 8px; font-size: 13px; color: #64748b;">DEPART field not found.</div>`;
+
+				// 1. 공통 코드 목록 및 매핑 맵 생성
+				const departCodes = exampleData.generateCommonCode("DEPART"); // 예: [{code: 'D01', codename: 'Planning'}, ...]
+				const departNameMap = departCodes.reduce((acc, item) => {
+					acc[item.code] = item.codename;
+					return acc;
+				}, {});
+
+				// 코드 순서대로 정렬하기 위한 인덱스 맵 생성 (예: { 'D01': 0, 'D02': 1, ... })
+				const codeOrderMap = departCodes.reduce((acc, item, index) => {
+					acc[item.code] = index;
+					return acc;
+				}, {});
+
+				// 부서별 데이터 그룹화 및 합계 집계
+				const departmentSummary = {};
+				const colors = ['#0284c7', '#059669', '#d97706', '#7c3aed', '#db2777', '#2563eb'];
+
+				data.forEach(r => {
+					if (!r.v) return;
+					const rawDepart = r.v[departIdx] || "Unassigned";
+					const departName = departNameMap[rawDepart] || rawDepart;
+
+					if (!departmentSummary[rawDepart]) {
+						departmentSummary[rawDepart] = {
+							code: rawDepart,
+							name: departName,
+							count: 0,
+							rec1: 0,
+							rec2: 0,
+							rec3: 0
+						};
+					}
+
+					departmentSummary[rawDepart].count += 1;
+					departmentSummary[rawDepart].rec1 += Number(r.v[rec1Idx]) || 0;
+					departmentSummary[rawDepart].rec2 += Number(r.v[rec2Idx]) || 0;
+					departmentSummary[rawDepart].rec3 += Number(r.v[rec3Idx]) || 0;
+				});
+
+				// 2. 부서 코드 순서(codeOrderMap)에 맞춰 소팅
+				const sortedSummary = Object.values(departmentSummary).sort((a, b) => {
+					const orderA = codeOrderMap[a.code] !== undefined ? codeOrderMap[a.code] : 999;
+					const orderB = codeOrderMap[b.code] !== undefined ? codeOrderMap[b.code] : 999;
+					return orderA - orderB;
+				});
+
+				// 3. 정렬된 데이터를 기반으로 HTML 항목 생성
+				const departItems = sortedSummary.map((stats, index) => {
+					const totalSum = stats.rec1 + stats.rec2 + stats.rec3;
+					const dotColor = colors[index % colors.length];
+
+					return `
+						<div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+						  <span style="width: 8px; height: 8px; border-radius: 50%; background: ${dotColor}; display: inline-block;"></span>
+						  <span style="font-size: 12px; font-weight: 700; color: #0f172a;">${stats.name}</span>
+						  <span style="font-size: 10px; color: #64748b; background: #f1f5f9; padding: 1px 5px; border-radius: 8px;">${stats.count.toLocaleString()} rows</span>
+						  <span style="font-size: 11px; color: #334155;">
+							Total: <b style="color: ${dotColor};">${totalSum.toLocaleString()}</b> 
+							<span style="color: #94a3b8; font-size: 10px;">(${stats.rec1.toLocaleString()} + ${stats.rec2.toLocaleString()} + ${stats.rec3.toLocaleString()})</span>
+						  </span>
+						</div>
+					  `;
+					}).join('<span style="color: #cbd5e1; margin: 0 8px;">|</span>');
+
+					return `
+					  <div style="display: flex; align-items: center; overflow-x: auto; width: 100%; padding: 0px 12px; box-sizing: border-box; font-family: inherit; gap: 8px;">
+						<div style="display: flex; align-items: center; gap: 12px; overflow-x: auto; padding-bottom: 2px; width: 100%;">
+						  ${departItems || '<span style="color: #94a3b8; font-size: 12px;">No data available</span>'}
+						</div>
+					  </div>
+				   `;
+			}
 		});
 
 		selectList();
@@ -237,11 +320,11 @@ const Overview = () => {
 			<nine-table ref={tableRef} show-footer="true" style={{width: '90%', height: '80%'}}>
 				<table row-indicator="true">
 					<colgroup>
-						<col width="50" background="red" fixed="left" />
-						<col width="50" background="red" />
-						<col width="100" background="red" />
-						<col width="80" />
-						<col width="130" />
+						<col width="50" background="red" fixed="left"/>
+						<col width="50" background="red"/>
+						<col width="100" background="red"/>
+						<col width="80"/>
+						<col width="130"/>
 						<col width="100"/>
 						<col width="100"/>
 						<col width="100"/>
@@ -252,7 +335,7 @@ const Overview = () => {
 						<col width="100"/>
 					</colgroup>
 					<thead>
-					<tr style={{ height:'32px' }}>
+					<tr style={{height: '32px'}}>
 						<th rowSpan="2" cell-type="checkbox"></th>
 						<th rowSpan="2">Single<br/>Select</th>
 						<th colSpan="3">Renderer</th>
@@ -275,16 +358,19 @@ const Overview = () => {
 					</tr>
 					</thead>
 					<tbody>
-					<tr style={{ height:'42px' }}>
+					<tr style={{height: '42px'}}>
 						<td data-bind="sel" rowSpan="2" cell-type="checkbox"></td>
 						<td data-bind="sel2" rowSpan="2" cell-type="checkbox" is-radio="true"></td>
-						<td data-bind="NAME" rowSpan="2" data-expr="provider.renderImage(data.PIC, data.REC1, data.REC2, data.REC3)" html="true"></td>
+						<td data-bind="NAME" rowSpan="2"
+							data-expr="provider.renderImage(data.PIC, data.REC1, data.REC2, data.REC3)"
+							html="true"></td>
 						<td data-bind="NAME" rowSpan="2"></td>
 						<td data-expr="'<font color=\'#999\'>' + data.REC1 + '+' + data.REC2 + '+' + data.REC3 + ' (Avg.<font color=\'green\'><b>' + Math.round((data.REC1 + data.REC2 + data.REC3) / 3) + '</b></font>)</font>'"
 							html="true"></td>
 
 
-						<td colSpan="3" cell-type="radio" data-bind="DEPART" data-source="provider.getCommonCode('DEPART')"
+						<td colSpan="3" cell-type="radio" data-bind="DEPART"
+							data-source="provider.getCommonCode('DEPART')"
 							key-name="code" value-name="codename"></td>
 
 						<td cell-type="checkbox" data-bind="SEX" true-value="M" false-value="F"></td>
@@ -312,10 +398,16 @@ const Overview = () => {
 						<td colSpan="2" data-bind="BIRTH_DT" cell-type="input-date" date-type="datetime-local"></td>
 					</tr>
 					</tbody>
+					<tfoot>
+					<tr style={{height: '48px'}}>
+						<td></td>
+						<td colSpan="12" data-expr="provider.summary()" html="true"></td>
+					</tr>
+					</tfoot>
 				</table>
 				<table row-indicator="true">
 					<colgroup>
-						<col width="100" background="red" />
+						<col width="100" background="red"/>
 						<col width="50"/>
 						<col width="50"/>
 						<col width="50"/>

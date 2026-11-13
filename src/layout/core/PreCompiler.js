@@ -16,8 +16,8 @@ export class PreCompiler {
         PreCompiler.#normalizeColAttributes(tbl);
 
         TableCompiler.resetColIndex(tbl, tbl.querySelectorAll('thead tr'));
-        TableCompiler.resetColIndex(tbl, tbl.querySelectorAll('tbody.body tr[grouping="true"]'));
-        TableCompiler.resetColIndex(tbl, tbl.querySelectorAll('tbody.body tr:not([grouping="true"])'));
+        TableCompiler.resetColIndex(tbl, tbl.querySelectorAll('tbody.body tr[group-by]'));
+        TableCompiler.resetColIndex(tbl, tbl.querySelectorAll('tbody.body tr:not([group-by])'));
         TableCompiler.resetColIndex(tbl, tbl.querySelectorAll('tfoot tr'));
 
         PreCompiler.#createColIndicator(tbl);
@@ -180,7 +180,7 @@ export class PreCompiler {
         const targetAttributes = ['data-bind', 'data-expr', 'type'];
         let autoIdCounter = 0;
 
-        $tbl.querySelectorAll('tbody th, tbody td').forEach($cell => {
+        $tbl.querySelectorAll('tbody th,tbody td,tfoot th, tfoot td').forEach($cell => {
             const cellType = $cell.getAttribute('cell-type') || "renderer";
             const tagName = `cell-${cellType}`;
 
@@ -210,7 +210,7 @@ export class PreCompiler {
             const $tr = $cell.closest('tr');
             const expr = $cell.dataset.expr;
             if (expr) {
-                $cell.setAttribute('data-expr', host.exprEngine.precompile(expr, $tr.getAttribute("grouping") === "true"));
+                $cell.setAttribute('data-expr', host.exprEngine.precompile(expr, $tr.getAttribute("group-by") ? true : false));
             }
 
             Array.from($cell.attributes).forEach(attr => {
@@ -228,7 +228,7 @@ export class PreCompiler {
             $cell.setAttribute('tabindex', '0');
         });
 
-        $tbl.querySelectorAll('thead th, thead td, tfoot th, tfoot td').forEach($cell => {
+        $tbl.querySelectorAll('thead th, thead td').forEach($cell => {
             const cellType = $cell.getAttribute('cell-type');
             if (cellType) {
                 const originalContent = $cell.innerHTML;
@@ -332,10 +332,7 @@ export class PreCompiler {
                 // col-indicator 전용 행 등은 제외 처리
                 if (tr.classList.contains('col-indicator-rowgroup')) return;
 
-                const isGrouping = tr.getAttribute('grouping') === 'true';
-
-                if (isGrouping) {
-                    // grouping="true"인 행은 연속 여부와 상관없이 '각각 독립된 단독 그룹'으로 분리
+                if (tr.getAttribute('group-by')) {
                     groups.push({ isGrouping: true, rows: [tr] });
                     currentGroup = null; // 일반 그룹 체이닝 끊기
                 } else {
@@ -363,7 +360,6 @@ export class PreCompiler {
                 indicatorCell.className = 'row-indicator';
                 indicatorCell.setAttribute('cell-type', 'row-indicator');
 
-                // grouping 그룹은 항상 rowSpan=1, 일반 그룹은 연속된 행 개수(groupRows.length)만큼 지정
                 if (!group.isGrouping && groupRows.length > 1) {
                     indicatorCell.rowSpan = groupRows.length;
                 }

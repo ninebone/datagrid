@@ -54,32 +54,30 @@ export class NineTableVScrollBar extends HTMLElement {
         const scrollHolder = this.#sheet.elements.scrollHolder;
         let rawContentHeight = scrollHolder ? parseFloat(scrollHolder.style.height) || 0 : 0;
 
-       // if (!rawContentHeight || rawContentHeight <= 0) {
-            const isGrouped = this.#sheet.sourceTable?.querySelector("tbody tr[grouping='true']") ? true : false;
-            if (isGrouped) {
+        if (this.#sheet.isGroupBy) {
 
-                const getItemHeight = (item) => {
-                    if (item.type === 'group') {
-                        const depth = item.record[GROUP_IDX.DEPTH];
-                        return this.#sheet.template.heights[depth];
-                    } else {
-                        // 정상적인 마이너스 연산자(-)가 포함된 데이터 행 높이 산출
-                        const dataRowsHeight = this.#sheet.template.height - this.#sheet.template.group.height;
-                        return dataRowsHeight > 0 ? dataRowsHeight : this.#sheet.template.height;
-                    }
-                };
-
-                let sumHeight = 0;
-                for (let i = 0; i < viewRecords.length; i++) {
-                    sumHeight += getItemHeight(viewRecords[i]);
+            const getItemHeight = (item) => {
+                if (item.type === 'group') {
+                    const depth = item.record[GROUP_IDX.DEPTH];
+                    return this.#sheet.template.heights[depth];
+                } else {
+                    // 정상적인 마이너스 연산자(-)가 포함된 데이터 행 높이 산출
+                    const dataRowsHeight = this.#sheet.template.height - this.#sheet.template.group.height;
+                    return dataRowsHeight > 0 ? dataRowsHeight : this.#sheet.template.height;
                 }
+            };
 
-                rawContentHeight = sumHeight;
-            } else {
-                const rowHeight = this.#sheet.template.height;
-                rawContentHeight = totalCount * rowHeight;
+            let sumHeight = 0;
+            for (let i = 0; i < viewRecords.length; i++) {
+                sumHeight += getItemHeight(viewRecords[i]);
             }
-       // }
+
+            rawContentHeight = sumHeight;
+        } else {
+            const rowHeight = this.#sheet.template.height;
+            rawContentHeight = totalCount * rowHeight;
+        }
+
 
         const MAX_BROWSER_HEIGHT = 15000000;
         const useScaling = rawContentHeight > MAX_BROWSER_HEIGHT;
@@ -289,7 +287,7 @@ export class NineTableVScrollBar extends HTMLElement {
                 const groupTop = Math.min(...rects.map(r => r.top));
 
                 // 3. 첫 번째 tr이 그룹 행인지 판단
-                const isGroupRow = firstTr.getAttribute('grouping') === 'true';
+                const isGroupRow = firstTr.getAttribute('group-by') ? true : false;
 
                 let targetScrollTop = scrollTop;
                 let targetStepSize = 0;

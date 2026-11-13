@@ -58,6 +58,11 @@ const exampleData = {
             return Math.floor(Math.random() * v);
         };
 
+        const getRandomAmount = (min = 100000, max = 50000000, step = 10000) => {
+            const steps = Math.floor((max - min) / step);
+            return Math.floor(Math.random() * steps) * step + min;
+        };
+
         const getRandom = (arr) => {
             return arr[Math.floor(Math.random() * arr.length)];
         };
@@ -131,6 +136,11 @@ const exampleData = {
                 REC10:      getRandomInt(101),
                 REC11:      getRandomInt(101),
                 REC12:      getRandomInt(101),
+
+                AMT1:      getRandomAmount(100000, 100000000, 10000),
+                AMT2:      getRandomAmount(500000, 50000000, 10000),
+                AMT3:      getRandomAmount(1000000, 300000000, 50000),
+
                 STATUS:     getRandom(["", "C", "W"]),
                 DEPART:    getRandom(["", "A", "B", "C", "D", "E", "F", "G"]),
                 DEPART1:    getRandom(["", "A", "B", "C", "D", "E", "F", "G"]),

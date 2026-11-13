@@ -77,7 +77,6 @@ export class CellNavigation {
 					break;
 			}
 
-			// 화면 안 영역에 있다면 가볍게 포커스 및 선택 범위 지정 후 리턴
 			if (isVisible) {
 				this.currentCell = cell;
 				this.#sheet.selection.setRange(this.#currentTr.dataset.matrixRow, cell.dataset.col, this.#currentTr.dataset.matrixRow, cell.dataset.col);
@@ -85,12 +84,9 @@ export class CellNavigation {
 			}
 		}
 
-		// 2. 셀이 화면에 없거나 잘려 있다면(뷰포트 밖),
-		//    현재 셀(또는 대상 셀)과 .ng-sheet-body의 상대적 위치(top) 차이를 이용해 scrollTop을 직접 조절
 		const bodyViewport = this.#sheet.querySelector('.ng-sheet-body');
 		if (!bodyViewport) return;
 
-		// 만약 nextCell이 존재하면 그 셀을 기준으로, 아니면 현재 셀 기준으로 계산
 		const targetCell = cell || this.#currentCell;
 		if (!targetCell) return;
 
@@ -226,8 +222,6 @@ export class CellNavigation {
 
 		const dataIndex = parseInt($tr.dataset.index, 10);
 
-
-
 		let targetCell = this.#sheet.querySelector(`tbody tr[data-matrix-row="${matrixRow}"] td[data-col="${col}"]`);
 		if (!targetCell) {
 			this.#sheet.querySelectorAll(`tbody tr[data-matrix-row="${matrixRow}"] td`).forEach($cell => {
@@ -268,9 +262,7 @@ export class CellNavigation {
 			if ($nextCell) break;
 		}
 
-		return $nextCell;// this.#findCell(matrixRow + rowSpan, col);
-
-		//return this.#findCell(matrixRow - 1, col);
+		return $nextCell;
 	}
 
 	#getDownCell = () => {
@@ -296,23 +288,19 @@ export class CellNavigation {
 		const viewportRect = bodyViewport.getBoundingClientRect();
 		const theadHeight = bodyViewport.querySelector('thead')?.offsetHeight || 0;
 
-		// 셀의 상단이 헤더 아래쪽보다 위에 있으면 잘린(안 보이는) 상태
 		return cellRect.top >= (viewportRect.top + theadHeight);
 	}
 
-	// 2. 아래쪽 잘림 체크 (기준: bodyViewport)
 	#isCellBelowVisible = (cell) => {
 		const bodyViewport = this.#sheet.querySelector('.ng-sheet-body');
 		if (!bodyViewport || !cell) return true;
 
 		const cellRect = cell.getBoundingClientRect();
 		const viewportRect = bodyViewport.getBoundingClientRect();
-
-		// 셀의 하단이 뷰포트 하단보다 아래에 있으면 잘린 상태
-		return cellRect.bottom <= viewportRect.bottom;
+		const tfootHeight = this.#sheet.querySelector('.ng-container-body tfoot')?.offsetHeight || 0;
+		return cellRect.bottom <= (viewportRect.bottom - tfootHeight);
 	}
 
-	// 3. 왼쪽 잘림 체크 (기준: bodyViewport2)
 	#isCellLeftVisible = (cell) => {
 		const bodyViewport2 = this.#sheet.querySelector('.ng-container-body'); // 또는 좌우 스크롤을 담당하는 뷰포트
 		if (!bodyViewport2 || !cell) return true;
@@ -320,11 +308,9 @@ export class CellNavigation {
 		const cellRect = cell.getBoundingClientRect();
 		const viewportRect = bodyViewport2.getBoundingClientRect();
 
-		// 셀의 좌측이 뷰포트 좌측보다 왼쪽에 있으면 잘린 상태
 		return cellRect.left >= viewportRect.left;
 	}
 
-	// 4. 오른쪽 잘림 체크 (기준: bodyViewport2)
 	#isCellRightVisible = (cell) => {
 		const bodyViewport2 = this.#sheet.querySelector('.ng-container-body');
 		if (!bodyViewport2 || !cell) return true;
@@ -332,11 +318,9 @@ export class CellNavigation {
 		const cellRect = cell.getBoundingClientRect();
 		const viewportRect = bodyViewport2.getBoundingClientRect();
 
-		// 셀의 우측이 뷰포트 우측보다 오른쪽에 있으면 잘린 상태
 		return cellRect.right <= viewportRect.right;
 	}
 
-	// 💡 필요하다면 이 4개를 조합해서 전체 가시성을 판단하는 통합 함수도 쉽게 구성할 수 있습니다.
 	#isCellVisible = (cell) => {
 		return this.#isCellAboveVisible(cell) &&
 			this.#isCellBelowVisible(cell) &&

@@ -49,7 +49,10 @@ export class SheetAPI {
             get tr() {
                 return {
                     get length() {
-                        return Math.ceil(self.#sheet.querySelector('.ng-container-body tbody.body tr:last-child').sectionRowIndex / self.#sheet.template.length);
+                        const $tr = self.#sheet.querySelector('.ng-container-body tbody.body tr:last-child');
+                        if (!$tr) return null;
+
+                        return Math.ceil($tr.sectionRowIndex / self.#sheet.template.length);
                     },
                     count() {
                         return this.length;
@@ -59,7 +62,7 @@ export class SheetAPI {
             get group() {
                 return {
                     get length() {
-                        return self.#sheet.source.table.querySelectorAll("tbody tr[grouping='true']").length;
+                        return self.#sheet.source.table.querySelectorAll("tbody tr[group-by]").length;
                     },
                     count() {
                         return this.length;

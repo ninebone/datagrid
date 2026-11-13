@@ -9,8 +9,8 @@ export class TableCompiler {
         const $table = $srcTable.cloneNode(true);
 
         TableCompiler.resetColIndex($table, $table.querySelectorAll('thead tr'));
-        TableCompiler.resetColIndex($table, $table.querySelectorAll('tbody.body tr[grouping="true"]'));
-        TableCompiler.resetColIndex($table, $table.querySelectorAll('tbody.body tr:not([grouping="true"])'));
+        TableCompiler.resetColIndex($table, $table.querySelectorAll('tbody.body tr[group-by]'));
+        TableCompiler.resetColIndex($table, $table.querySelectorAll('tbody.body tr:not([group-by])'));
         TableCompiler.resetColIndex($table, $table.querySelectorAll('tfoot tr'));
 
         TableCompiler.#syncColAttributes($table);
@@ -22,8 +22,8 @@ export class TableCompiler {
 
 
         TableCompiler.resetColIndex($table, $table.querySelectorAll('thead tr'));
-        TableCompiler.resetColIndex($table, $table.querySelectorAll('tbody.body tr[grouping="true"]'));
-        TableCompiler.resetColIndex($table, $table.querySelectorAll('tbody.body tr:not([grouping="true"])'));
+        TableCompiler.resetColIndex($table, $table.querySelectorAll('tbody.body tr[group-by]'));
+        TableCompiler.resetColIndex($table, $table.querySelectorAll('tbody.body tr:not([group-by])'));
         TableCompiler.resetColIndex($table, $table.querySelectorAll('tfoot tr'));
 
         TableCompiler.#syncColAttributes($table);
