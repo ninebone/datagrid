@@ -82,6 +82,11 @@ export class NineTableSheet extends HTMLElement {
 
     get elements() { return this.#elements; }
 
+    get isGroupBy() {
+        return this.source.table.querySelector("tbody tr[group-by]") ? true : false;
+    }
+
+
     /**
     get template() {
         return {
@@ -189,6 +194,8 @@ export class NineTableSheet extends HTMLElement {
         if (this.isAutoFitCol) {
             this.autoFit(true);
         }
+
+
     };
 
     autoFit = (enable = true) => {
@@ -321,7 +328,7 @@ export class NineTableSheet extends HTMLElement {
             this.#template.heights.push(h);
         });
 
-        this.querySelectorAll(`.ng-container-body tbody.body tr[grouping="true"]`).forEach(($tr) => {
+        this.querySelectorAll(`.ng-container-body tbody.body tr[group-by]`).forEach(($tr) => {
             const h = Math.max($tr.offsetHeight || 0, 28);
             this.#template.group.height += h;
             this.#template.group.heights.push(h);

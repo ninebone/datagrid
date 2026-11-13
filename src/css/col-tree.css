@@ -52,7 +52,7 @@ cell-tree {
 
 
 
-tr[grouping="true"] {
+tr[group-by] {
     filter: brightness(99%);
     td:not(.selected-right) {
         border-right: none;

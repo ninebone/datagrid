@@ -171,14 +171,13 @@ export class CellElement extends BasicCellElement {
 
 	getDisplayText = (defaultValue = "") => {
 
-		//if (!this.#cell || !this.#cell.closest("tbody")) return defaultValue;
 		if (!this.#cell || (!this.#cell.closest("tbody") && !this.#cell.closest("thead.foot") && !this.#cell.closest("tfoot"))) {
 			return defaultValue;
 		}
 
 		const rawRecord = this.#tr.data;
 
-		if (!rawRecord) return defaultValue;
+		if (this.closest("tbody") && !rawRecord) return defaultValue;
 
 		const expr = this.#cell.dataset.expr;
 		const bindKey = this.#cell.dataset.bind;
@@ -186,14 +185,14 @@ export class CellElement extends BasicCellElement {
 
 		if (expr) {
 			try {
-				return this.#host.exprEngine.evaluate(expr, this.#tr.data, row, this.#tr.getAttribute("grouping") === "true");
+				return this.#host.exprEngine.evaluate(expr, this.#tr.data, row, this.#tr.getAttribute("group-by"));
 			} catch (e) {
 				return defaultValue;
 			}
 		}
 
 		if (bindKey) {
-			if (this.#tr.getAttribute("grouping") === "true") {
+			if (this.#tr.getAttribute("group-by")) {
 				const idx = this.#host.fields.get().indexOf(bindKey);
 				return this.#tr.data[0].v[idx];
 			} else {
@@ -219,7 +218,7 @@ export class CellElement extends BasicCellElement {
 
 			const expr = this.#attr[v];
 			if (expr) {
-				const result = this.#host.exprEngine.evaluate(expr, this.#tr.data, parseInt(this.#cell.dataset.row, 10), this.#tr.getAttribute("grouping") === "true");
+				const result = this.#host.exprEngine.evaluate(expr, this.#tr.data, parseInt(this.#cell.dataset.row, 10), this.#tr.getAttribute("group-by"));
 
 				if (v === "validator") {
 					if (!result) {
@@ -249,7 +248,7 @@ export class CellElement extends BasicCellElement {
 	getExprValue(expr, data, row) {
 		if (!this.#host || !this.#host.exprEngine || expr === undefined || expr === null || expr === "") return expr;
 
-		return this.#host.exprEngine.evaluate(expr, data, row, this.#tr.getAttribute("grouping") === "true");
+		return this.#host.exprEngine.evaluate(expr, data, row, this.#tr.getAttribute("group-by"));
 	}
 
 	getGroupExprValue = (expr, groupRecord, row, cell) => {
@@ -310,23 +309,20 @@ export class CellElement extends BasicCellElement {
                    
                    let childRecords = [];
                    if (Array.isArray(indices)) {
-                      // indices가 숫자 인덱스 배열인지, rowid 문자열 배열인지 판별하여 안전하게 추출
                       childRecords = indices.map(idx => {
                          if (typeof idx === 'number') {
                             return allRecords[idx];
                          } else {
-                            // rowid 등 문자열 식별자인 경우 전체 배열에서 찾거나 dataManager 활용
                             return allRecords.find(r => r?.__ng?.rowid === idx || r?.m?._?.[0] === idx);
                          }
                       }).filter(Boolean);
                    }
                    
-                   // 만약 위에서 못 찾았는데 host.grouping을 쓸 수 있다면 매니저 위임 시도
                    if (childRecords.length === 0 && host?.grouping?.getChildrenRecords && groupRecord[0]) {
                       childRecords = host.grouping.getChildrenRecords(groupRecord[0]);
                    }
 
-                   const data = childRecords; // data.length 등을 쓸 수 있도록 호환
+                   const data = childRecords;
                    return ${expr};
                 `);
 					exprCache.set("grp_" + expr, evalFn);

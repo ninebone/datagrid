@@ -52,11 +52,8 @@ export class GroupingManager {
 		let groupColumns = [];
 		const sourceTable = this.#sheet.sourceTable;
 		if (sourceTable) {
-			sourceTable.querySelectorAll('tbody tr[grouping="true"]').forEach(($tr) => {
-				const $cell = $tr.querySelector(`[cell-type="tree"]`);
-				if ($cell && $cell.dataset.bind) {
-					groupColumns.push($cell.dataset.bind);
-				}
+			sourceTable.querySelectorAll('tbody tr[group-by]').forEach(($tr) => {
+				groupColumns.push($tr.getAttribute('group-by'));
 			});
 		}
 		this.#groupColumns = groupColumns;

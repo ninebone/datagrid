@@ -9,7 +9,7 @@ table {
     --th-border-right: 1px solid #e5e7eb;
     --th-border-bottom: 1px solid #e5e7eb;
     --td-border-left: none;
-    --tD-border-top: none;
+    --td-border-top: none;
     --td-border-right: 1px solid #e5e7eb;
     --td-border-bottom: 1px solid #e5e7eb;
 
@@ -53,6 +53,26 @@ tfoot {
     position: sticky;
     bottom: 0;
     z-index: 2;
+    filter: brightness(98%);
+
+    tr {
+        height: 32px;
+    }
+
+    tr:first-child {
+        th, td{
+            border-top: 1px solid #e5e7eb;
+        }
+    }
+
+    th:not(.CELL-ROW-INDICATOR), td {
+        border-right: none;
+    }
+}
+
+
+tbody.head {
+    position: sticky;
 }
 
 tbody {
@@ -69,9 +89,7 @@ thead tr {
 tbody tr {
     height: 32px;
 }
-tfoot tr {
-    height: 32px;
-}
+
 
 tr.hover th, tr.hover td {
     background-color: rgba(37, 99, 235, 0.06);

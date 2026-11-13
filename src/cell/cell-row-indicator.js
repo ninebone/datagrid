@@ -38,6 +38,8 @@ class CellRowIndicator extends CellElement {
 
 		if (!this.cell || !this.tr) return;
 
+		if (!this.closest("tbody")) return;
+
 		this.classList.remove("is-insert", "is-update", "is-delete");
 
 		const rawRecord = this.tr.data;

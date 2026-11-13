@@ -17,7 +17,6 @@ export class RowManager {
     #cachedRowCount;
 
     #isProgrammaticScroll = false;
-    #isGrouped = false;
 
     constructor(sheet) {
         this.#host = sheet.getRootNode().host;
@@ -50,15 +49,29 @@ export class RowManager {
 
         this.#handleScroll(bodyViewport.scrollTop, force);
 
+        this.#refreshFixed();
+
         this.#sheet.querySelector('nine-table-vscrollbar')?.refresh();
     };
+
+    #refreshFixed = () => {
+
+        this.#sheet.querySelectorAll("thead tr, tfoot tr").forEach(($tr) => {
+            Array.from($tr.cells).forEach(($cell) => {
+                const customComp = Array.from($cell.children).find($el =>
+                    $el.tagName.toLowerCase().startsWith('cell-') || typeof $el.refresh === 'function'
+                );
+                customComp?.refresh?.();
+            });
+        });
+    }
 
     #handleScroll = (scrollTop, force = false) => {
 
         const rowHeight = this.#sheet.template.height;
         if (!rowHeight || rowHeight <= 0) return;
 
-        if (this.#isGrouped) {
+        if (this.#sheet.isGroupBy) {
             this.#handleGroupedScroll(scrollTop, force);
             return;
         }
@@ -579,7 +592,7 @@ trace.log(firstItem.groupId, siblingGroupId);
                     tr.dataset.virtualIndex = vIndex;
                     tr.dataset.row = (item.type === 'data') ? dataIndex : '';
 
-                    const isTrGroup = tr.getAttribute('grouping') === 'true';
+                    const isTrGroup = tr.getAttribute('group-by') ? true : false;
 
                     if (item.type === 'group') {
                         if (isTrGroup) {
@@ -888,7 +901,7 @@ trace.log(firstItem.groupId, siblingGroupId);
                     tr.dataset.virtualIndex = vIndex;
                     tr.dataset.row = (item.type === 'data') ? dataIndex : '';
 
-                    const isTrGroup = tr.getAttribute('grouping') === 'true';
+                    const isTrGroup = tr.getAttribute('group-by') ? true : false;
 
                     if (item.type === 'group') {
                         if (isTrGroup) {
@@ -1022,8 +1035,6 @@ trace.log(firstItem.groupId, siblingGroupId);
 
     initialize = () => {
 
-        this.#isGrouped = this.#sheet.sourceTable.querySelector("tbody tr[grouping='true']") ? true : false;
-
         //this.#cachedTemplateHeight = null;
         this.#containerTemplates.clear();
 
@@ -1093,7 +1104,7 @@ trace.log(firstItem.groupId, siblingGroupId);
 
         const MAX_BROWSER_HEIGHT = 15000000;
 
-        if (this.#isGrouped) {
+        if (this.#sheet.isGroupBy) {
             const allRenderItems = this.#sheet.view.getArray() || [];
             const templateTrs = Array.from(this.#sheet.sourceTable?.querySelectorAll('tbody.body tr') || []);
             const templateLength = templateTrs.length || 1;
@@ -1115,7 +1126,7 @@ trace.log(firstItem.groupId, siblingGroupId);
                     const tmplTr = templateTrs[subIdx];
                     if (!tmplTr) continue;
 
-                    const isTrGroup = tmplTr.getAttribute('grouping') === 'true';
+                    const isTrGroup = tmplTr.getAttribute('group-by') ? true : false;
                     let isVisible = false;
 
                     if (item.type === 'group') {
@@ -1235,7 +1246,7 @@ trace.log(firstItem.groupId, siblingGroupId);
             const visibleRows = Math.ceil(this.#sheet.viewport.innerHeight / (this.#sheet.template.height - this.#sheet.template.group.height));
 
             let dynamicBuffer = this.#BUFFER_ROW_COUNT;
-            if (this.#isGrouped) {
+            if (this.#sheet.isGroupBy) {
                 const groupRows = Math.ceil(this.#sheet.viewport.innerHeight / this.#sheet.template.group.height) + this.#BUFFER_ROW_COUNT;
                 dynamicBuffer += (this.#sheet.viewport.group.length * groupRows);
             }
@@ -1295,22 +1306,17 @@ trace.log(firstItem.groupId, siblingGroupId);
 
         targetTbody.appendChild(fragment);
 
-        /****
-         */
         const fragment2 = document.createDocumentFragment();
         let trIndex = 0;
 
-// 전체 grouping tr 개수 미리 파악 (역순 z-index 부여를 위해)
-        const groupingTrs = templateTrs.filter(tmpl => tmpl.getAttribute("grouping") === "true");
+        const groupingTrs = templateTrs.filter(tmpl => tmpl.getAttribute('group-by') ? true : false);
         const totalGroupingCount = groupingTrs.length;
 
         templateTrs.forEach(tmpl => {
-            if (tmpl.getAttribute("grouping") === "true") {
+            if (tmpl.getAttribute('group-by')) {
                 const $clonedTr = tmpl.cloneNode(true);
 
                 $clonedTr.style.position = 'relative';
-                // 💡 핵심: 아래로 내려올수록 z-index가 작아지도록 설정 (대분류가 가장 위!)
-                // 예: 3단 구조면 첫 번째 행 z-index: 30, 두 번째 행: 20, 세 번째 행: 10
                 $clonedTr.style.zIndex = (totalGroupingCount - trIndex) * 10;
 
                 fragment2.appendChild($clonedTr);

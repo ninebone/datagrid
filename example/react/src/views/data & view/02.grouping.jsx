@@ -104,7 +104,7 @@ const Renderer = () => {
 					</tr>
 					</thead>
 					<tbody>
-					<tr grouping="true" style={{height: '40px'}}>
+					<tr grouping="true" group-by="NAME" style={{height: '40px'}}>
 						<td data-bind="NAME" cell-type="tree" colSpan="2"></td>
 						<td data-bind="REC1" text-align="right" data-expr="provider.avg(childrenItems, 'REC1')"></td>
 						<td data-bind="REC2" text-align="right" data-expr="provider.avg(childrenItems, 'REC2')"></td>
@@ -118,7 +118,7 @@ const Renderer = () => {
 						<td></td>
 						<td></td>
 					</tr>
-					<tr grouping="true" style={{height: '40px'}}>
+					<tr group-by="AGE" style={{height: '40px'}}>
 						<td data-bind="AGE" cell-type="tree" colSpan="2"></td>
 						<td data-bind="REC1" text-align="right" data-expr="host.avg(childrenItems, 'REC1')"></td>
 						<td data-bind="REC2" text-align="right" data-expr="host.avg(childrenItems, 'REC2')"></td>
@@ -132,11 +132,82 @@ const Renderer = () => {
 						<td></td>
 						<td></td>
 					</tr>
-					<tr grouping="true" style={{height: '40px'}}>
+					<tr style={{height: '40px'}}>
 						<td data-bind="REC1" cell-type="tree" colSpan="2"></td>
 						<td data-bind="REC1" text-align="right" data-expr="host.avg(childrenItems, 'REC1')"></td>
 						<td data-bind="REC2" text-align="right" data-expr="host.avg(childrenItems, 'REC2')"></td>
 						<td data-bind="REC3" text-align="right" data-expr="host.avg(childrenItems, 'REC3')"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr style={{height: '40px'}}>
+						<td data-bind="NAME" cell-type="tree"></td>
+						<td data-bind="AGE"></td>
+						<td data-bind="REC1" text-align="right"></td>
+						<td data-bind="REC2" cell-type="input" text-align="right"></td>
+						<td data-bind="REC3" text-align="right"></td>
+						<td data-expr="data.NAME + ' (' + data.AGE + ')'"></td>
+						<td data-expr="'[<b><font color=blue>' + data.AGE + '</font></b>] ' + data.NAME"
+							html="true"></td>
+						<td data-expr="Math.round((Number(data.REC1) + Number(data.REC2) + Number(data.REC3)) / 3)"></td>
+						<td data-expr="provider.formatDecimalNumber((data.REC1 + data.REC2 + data.REC3) / 3, 2)"></td>
+						<td data-expr="provider.renderBadge(data.REC1)" html="true"></td>
+						<td data-bind="REC1" color="data.REC1 < 50 ? 'red' : ''"></td>
+						<td data-bind="REC1" background-color="data.REC1 < 50 ? 'rgba(255,0,0,0.5)' : ''"></td>
+						<td data-bind="REC1" visible="data.REC1 < 50 ? true : false"></td>
+					</tr>
+					</tbody>
+				</table>
+				<table row-indicator="true">
+					<colgroup>
+						<col width="200"/>
+						<col width="50"/>
+						<col width="50"/>
+						<col width="50"/>
+						<col width="50"/>
+						<col width="150"/>
+						<col width="150"/>
+						<col width="120"/>
+						<col width="120"/>
+						<col width="120"/>
+						<col width="80"/>
+						<col width="80"/>
+						<col width="80"/>
+					</colgroup>
+					<thead>
+					<tr>
+						<th rowSpan="2" filtering="true">NAME</th>
+						<th rowSpan="2" filtering="true">AGE</th>
+						<th colSpan="3">text-align</th>
+						<th colSpan="5">data-expr</th>
+						<th colSpan="2">color</th>
+						<th rowSpan="2">visible</th>
+					</tr>
+					<tr>
+						<th>left</th>
+						<th>center</th>
+						<th>right</th>
+						<th>case #1 (combine)</th>
+						<th>case #2 (html)</th>
+						<th>case #3 (calculate)</th>
+						<th>case #4 (with host)</th>
+						<th>case #5 (html + host)</th>
+						<th>color</th>
+						<th>background</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr grouping="true">
+						<td data-bind="NAME" cell-type="tree" colSpan="2"></td>
+						<td data-bind="REC1" text-align="right" data-expr="provider.avg(childrenItems, 'REC1')"></td>
+						<td data-bind="REC2" text-align="right" data-expr="provider.avg(childrenItems, 'REC2')"></td>
+						<td data-bind="REC3" text-align="right" data-expr="provider.avg(childrenItems, 'REC3')"></td>
 						<td></td>
 						<td></td>
 						<td></td>
@@ -179,10 +250,26 @@ const Renderer = () => {
 						<td data-bind="REC1" visible="data.REC1 < 50 ? true : false"></td>
 					</tr>
 					</tbody>
+					<tfoot>
+					<tr>
+						<td data-bind="NAME" cell-type="tree" colSpan="2"></td>
+						<td data-bind="REC1" text-align="right" data-expr="provider.avg(childrenItems, 'REC1')"></td>
+						<td data-bind="REC2" text-align="right" data-expr="provider.avg(childrenItems, 'REC2')"></td>
+						<td data-bind="REC3" text-align="right" data-expr="provider.avg(childrenItems, 'REC3')"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					</tfoot>
 				</table>
 			</nine-table>
 		</>
-	);
+);
 };
 
 export default Renderer;
