@@ -92,4 +92,9 @@ cell-button {
     --cell-button-active-background: #d1d5db;
 }
 
+cell-tree,cell-tree-thead {
+    --cell-tree-icon-color: #666;
+}
+
+
 
