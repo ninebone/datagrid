@@ -54,6 +54,21 @@ return expr;
                             const children = childrenItems || [];
                             const fields = ${JSON.stringify(this.#fields)};
                             
+                            children.extract = (colnm, predicate) => {
+                                if (!Array.isArray(children) || children.length === 0) return [];
+                                const idx = fields.indexOf(colnm);
+                                if (idx === -1) return [];
+                            
+                                let target = children;
+                                if (typeof predicate === 'function') {
+                                    target = children.filter(predicate);
+                                }
+                            
+                                return target
+                                    .filter(r => r && (r.v || r.record?.v))
+                                    .map(r => (r.v || r.record.v)[idx]);
+                            };
+                            
                             const data = new Proxy(children, {
                                 get(target, prop) {
                                     if (prop in target || typeof prop === 'symbol') return target[prop];
@@ -68,19 +83,17 @@ return expr;
                             });
                 
                             const provider = host;
-                
-                            // 💡 1. 수식 안에서 바로 쓸 수 있는 집계 함수들 선언
                             
                             const sum = (arr) => Array.isArray(arr) ? arr.reduce((a, b) => a + (Number(b) || 0), 0) : 0;
                             const avg = (arr) => Array.isArray(arr) && arr.length > 0 ? sum(arr) / arr.length : 0;
                             const max = (arr) => Array.isArray(arr) && arr.length > 0 ? Math.max(...arr.map(Number)) : 0;
                             const min = (arr) => Array.isArray(arr) && arr.length > 0 ? Math.min(...arr.map(Number)) : 0;
                             
-                            // 만약 꼭 'Math.sum' 형태로 쓰고 싶다면 아래처럼 Math 객체에 잠시 붙여줄 수도 있습니다.
                             if (!Math.sum) Math.sum = sum;
                             if (!Math.avg) Math.avg = avg;
                 
                             if (!data && !host) return "";
+                            
                             return ${compiledExpr};
                         `);
 
@@ -106,10 +119,10 @@ return expr;
 
             return compiledExpr;
         } catch (e) {
-            /**
-            if (expr.includes("getCommonCode")) {
-                console.trace("ExprEngine evaluation error:", e);
-            } */
+
+            //if (expr.includes("getCommonCode")) {
+                //console.trace("ExprEngine evaluation error:", e);
+            //}
             return expr;
         }
     }

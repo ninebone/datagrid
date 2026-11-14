@@ -1003,11 +1003,7 @@ trace.log(firstItem.groupId, siblingGroupId);
         const subRowIndex = parseInt($tr.dataset.subrow, 10) || 0;
         const matrixRow = (virtualIndex * templateLength) + subRowIndex;
 
-        //trace.log(matrixRow);
-
         const indices = groupRecord[GROUP_IDX.CHILDREN];
-        //const allRecords = this.#host.data.getArray();
-        //trace.log(this.#chchedAllRecords, indices);
         const childrenRecords = indices ? indices.map(idx => this.#chchedAllRecords[idx]).filter(Boolean) : [];
 
         $tr.dataset.virtualIndex = virtualIndex;

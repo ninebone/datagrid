@@ -28,12 +28,63 @@ export class GroupingManager {
 		return this.#groupMap;
 	}
 
-	// 💡 누락되었던 setGroupMap 메서드 추가
 	setGroupMap(map) {
 		this.#groupMap = map;
 	}
 
-	// 특정 그룹의 접기/펴기 상태 토글
+	#setDepthCollapse(targetDepth, collapse) {
+		const validRaw = this.#sheet.view.getValidRecords ? this.#sheet.view.getValidRecords() : this.#host.data.getRawRecords();
+		const groupColumns = this.#groupColumns;
+		const fields = this.#host.fields.get();
+
+		if (!groupColumns || groupColumns.length === 0) return;
+
+		const updateMapByDepth = (mapOrArray, currentDepth, parentId) => {
+			let counter = 0;
+			for (let [groupKey, subMapOrRecords] of mapOrArray.entries()) {
+				const groupId = parentId ? `${parentId}_${counter++}` : `g_${counter++}`;
+
+				if (currentDepth === targetDepth) {
+					this.#collapsedMap.set(groupId, collapse);
+				}
+
+				if (currentDepth < groupColumns.length - 1 && subMapOrRecords instanceof Map) {
+					updateMapByDepth(subMapOrRecords, currentDepth + 1, groupId);
+				}
+			}
+		};
+
+		const nestedTree = Grouping.buildNestedMap(validRaw.filter(o => !o.__ng?.deleted), groupColumns, fields);
+		updateMapByDepth(nestedTree, 0, "");
+	}
+
+	expand(depth) {
+		if (depth === null || depth === undefined) {
+			this.#collapsedMap.clear();
+		}
+		else {
+			this.#setDepthCollapse(depth, false);
+		}
+
+		this.#sheet.invalidate();
+	}
+
+	collapse(depth) {
+
+		trace.log(depth);
+
+		if (depth === null || depth === undefined) {
+			for (const groupId of this.#groupMap.keys()) {
+				this.#collapsedMap.set(groupId, true);
+			}
+		}
+		else {
+			this.#setDepthCollapse(depth, true);
+		}
+
+		this.#sheet.invalidate();
+	}
+
 	toggleGroup(groupId) {
 		const currentState = this.#collapsedMap.get(groupId) || false;
 		this.#collapsedMap.set(groupId, !currentState);
@@ -49,6 +100,7 @@ export class GroupingManager {
 	}
 
 	initialize = () => {
+
 		let groupColumns = [];
 		const sourceTable = this.#sheet.sourceTable;
 		if (sourceTable) {
@@ -60,6 +112,7 @@ export class GroupingManager {
 	};
 
 	apply() {
+
 		if (this.#isApplying) return;
 		this.#isApplying = true;
 		this.initialize();
@@ -69,6 +122,7 @@ export class GroupingManager {
 	}
 
 	clear() {
+
 		this.#groupColumns = [];
 		this.#groupMap.clear();
 		this.#collapsedMap.clear();
@@ -159,7 +213,9 @@ export class Grouping {
 		}
 	}
 
-
+	static buildNestedMap(records, groupColumns, fields) {
+		return Grouping.#buildNestedMap(records, groupColumns, fields);
+	}
 
 	static #buildNestedMap(records, groupColumns, fields) {
 		const colIndex = fields.indexOf(groupColumns[0]);

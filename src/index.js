@@ -10,11 +10,15 @@ import "./cell/cell-input-number.js";
 import "./cell/cell-input-color.js";
 import "./cell/cell-input-date.js";
 import "./cell/cell-checkbox.js";
+import "./cell/cell-checkbox-thead.js";
 import "./cell/cell-radio.js";
 import "./cell/cell-combo.js";
 import "./cell/cell-renderer.js";
+import "./cell/cell-renderer-thead.js";
 import "./cell/cell-button.js";
 import "./cell/cell-row-indicator.js";
+import "./cell/cell-tree.js";
+import "./cell/cell-tree-thead.js";
 
 import "./col/col-expand.js";
 import "./menu/nine-table-menu.js";

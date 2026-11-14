@@ -22,54 +22,60 @@ export class Sorting {
 
 			$el.addEventListener('dblclick', (e) => {
 
-				const cell = e.target.closest('th, td');
-				if (!cell || cell.classList.contains('resizable-edge')) return;
+				const $cell = e.target.closest('th, td');
+				if (!$cell || $cell.classList.contains('resizable-edge')) return;
 
 				if (["INPUT","CELL-CHECKBOX"].includes(e.target.tagName)) return;
 
-				if (e.offsetX <= 2 || e.offsetX >= cell.offsetWidth - 2) return;
+				if (e.offsetX <= 2 || e.offsetX >= $cell.offsetWidth - 2) return;
 
-				const host = this.#sheet.getRootNode().host;
-
-				host.loading = true;
+				this.#host.loading = true;
 				setTimeout(() => {
 					try {
-						this.#handleSort(e, cell);
+						this.#handleSort(e, $cell);
 					} finally {
-						host.loading = false;
+						this.#host.loading = false;
 					}
 				});
 			});
 		});
 	}
 
-	#handleSort(e, cell) {
-		const colIndex = cell.dataset.col;
-		const tr = cell.closest('tr');
+	#handleSort(e, $cell) {
+		const colIndex = $cell.dataset.col;
+		const tr = $cell.closest('tr');
 		const subRowIndex = tr ? tr.dataset.subrow || String(tr.sectionRowIndex) : '0';
-
-		if (colIndex === undefined) return;
-
-		const sourceTable = this.#sheet.sourceTable;
-		if (!sourceTable) return;
 
 		let colName = null;
 		let exprVal = null;
 
-		sourceTable.querySelectorAll(`tbody [data-col="${colIndex}"]`).forEach($td => {
-			if ($td.dataset.bind) {
-				colName = $td.dataset.bind;
+		const $tbodyTrs = Array.from(this.#sheet.source.table.querySelectorAll('tbody tr:not([group-by])'));
+
+		if ($tbodyTrs.length > 0) {
+			let $targetTr = $tbodyTrs.find(t => String(t.sectionRowIndex) === subRowIndex || t.dataset.subrow === subRowIndex);
+
+			if (!$targetTr) {
+				$targetTr = $tbodyTrs[0];
 			}
 
-			if ($td.dataset.expr) {
-				exprVal = $td.dataset.expr;
+			const $td = $targetTr.querySelector(`[data-col="${colIndex}"]`);
+			if ($td) {
+				if ($td.dataset.bind) {
+					colName = $td.dataset.bind;
+				}
+
+				const colType = this.#host.data.getColumnType ? this.#host.data.getColumnType(colName) : 'string';
+
+				if (colType !== "number" && $td.dataset.expr) {
+					exprVal = $td.dataset.expr;
+				}
 			}
-		});
+		}
 
 		if (!colName && !exprVal) return;
 
-		const isAsc = cell.classList.contains('asc');
-		const isDesc = cell.classList.contains('desc');
+		const isAsc = $cell.classList.contains('asc');
+		const isDesc = $cell.classList.contains('desc');
 
 		if (!e.ctrlKey && !e.shiftKey) {
 			this.#columns = [];
@@ -107,34 +113,36 @@ export class Sorting {
 			);
 		}
 
-		this.#applySorting(cell);
+		this.#applySorting($cell);
 	}
 
-	#applySorting(cell) {
+	#applySorting($cell) {
 
 		this.#sheet.view.setSorting(this.#columns);
 		this.#syncHeaderUI();
+		this.#sheet.grouping.expand();
 		this.#sheet.invalidate();
-		requestAnimationFrame(() => {
-		const cells = this.#sheet.querySelectorAll('tbody.body th, tbody.body td');
-
-		cells.forEach($td => {
-			$td.classList.remove('sorting-anim-asc', 'sorting-anim-desc', 'sorting-anim-none');
-
-			if (cell.classList.contains('asc')) {
-				$td.classList.add('sorting-anim-asc');
-			} else if (cell.classList.contains('desc')) {
-				$td.classList.add('sorting-anim-desc');
-			} else {
-				$td.classList.add('sorting-anim-none');
-			}
-		});
 
 		requestAnimationFrame(() => {
+			const cells = this.#sheet.querySelectorAll('tbody.body th, tbody.body td');
+
 			cells.forEach($td => {
 				$td.classList.remove('sorting-anim-asc', 'sorting-anim-desc', 'sorting-anim-none');
+
+				if ($cell.classList.contains('asc')) {
+					$td.classList.add('sorting-anim-asc');
+				} else if ($cell.classList.contains('desc')) {
+					$td.classList.add('sorting-anim-desc');
+				} else {
+					$td.classList.add('sorting-anim-none');
+				}
 			});
-		});
+
+			requestAnimationFrame(() => {
+				cells.forEach($td => {
+					$td.classList.remove('sorting-anim-asc', 'sorting-anim-desc', 'sorting-anim-none');
+				});
+			});
 		});
 	}
 
@@ -157,8 +165,8 @@ export class Sorting {
 				}
 
 				const targetHeaderCells = this.#sheet.querySelectorAll(selector);
-				targetHeaderCells.forEach(cell => {
-					cell.classList.add(asc ? 'asc' : 'desc');
+				targetHeaderCells.forEach($cell => {
+					$cell.classList.add(asc ? 'asc' : 'desc');
 				});
 			}
 		});

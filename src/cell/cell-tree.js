@@ -17,14 +17,6 @@ export class CellTree extends CellElement {
 		this.#init();
 	}
 
-	#groupExprValue = () => {
-		const records = this.data;
-
-		return "...";
-	}
-	/**
-	 * 데이터그리드 셀 표준 refresh 사이클에 맞춰 호출
-	 */
 	refresh() {
 
 		if (this.tr.style.display === "none") return;
@@ -38,28 +30,46 @@ export class CellTree extends CellElement {
 
 		this.style.setProperty('--tree-level', level);
 
-		// 2. 텍스트 표시 (data-bind 또는 data-expr 결과 등)
-		this.#textElement.textContent = this.getDisplayText();//this.textContent || record[this.getAttribute("data-bind")] || '';
 
-		// 3. 트리 아이콘 및 상태 반영
+		if (this.cell.getAttribute("html") === "true") {
+			this.#textElement.innerHTML = this.getDisplayText();
+		} else {
+			this.#textElement.textContent = this.getDisplayText();
+		}
+
+
 		this.#updateTreeState(record);
 	}
 
 	#updateTreeState(record) {
 		const hasChildren = this.#checkHasChildren(record);
+		if (!hasChildren) {
+			this.#iconElement.className = "icon node";
+			return;
+		}
 
-		const isCollapsed = this.sheet.grouping.isCollapsed(this.tr.dataset.groupId);
+		const groupId = this.tr.dataset.groupId;
+		const collapseState = this.#getGroupCollapseState(groupId);
 
 		this.#iconElement.className = "icon";
+		this.#iconElement.classList.remove("expand-on", "expand-off", "expand-mix");
 
-		this.#iconElement.classList.remove("expand-on,expand-off");
-
-		if (hasChildren) {
-			this.#iconElement.classList.add(isCollapsed ? "expand-off" : "expand-on");
+		if (collapseState === true) {
+			this.#iconElement.classList.add("expand-off");
+		} else if (collapseState === false) {
+			this.#iconElement.classList.add("expand-on");
 		} else {
-			this.#iconElement.classList.add("node");
+			this.#iconElement.classList.add("expand-mix");
 		}
 	}
+
+	#getGroupCollapseState(groupId) {
+		const grouping = this.sheet?.grouping;
+		if (!grouping || !groupId) return false;
+
+		return grouping.isCollapsed(groupId);
+	}
+
 
 	#checkHasChildren(record) {
 		// 자식 존재 여부 판단 로직
@@ -84,9 +94,73 @@ export class CellTree extends CellElement {
 	}
 
 	#initEvent = () => {
-		this.#iconElement.addEventListener("click", (e) => {
+		this.#iconElement.addEventListener("click", async (e) => {
 			e.stopPropagation();
-			this.sheet.grouping.toggleGroup(this.tr.dataset.groupId);
+
+			const groupId = this.tr.dataset.groupId;
+			const currentIndex = parseInt(this.tr.dataset.index, 10);
+			if (isNaN(currentIndex)) return;
+
+			const isCollapsed = this.sheet.grouping.isCollapsed(groupId);
+
+			const visibleTrs = Array.from(this.sheet.querySelectorAll('.ng-container-body tbody.body tr'))
+				.filter($tr => $tr.style.display !== 'none');
+
+			const targetTrs = visibleTrs.filter($tr => {
+				const trIndex = parseInt($tr.dataset.index, 10);
+				return !isNaN(trIndex) && trIndex > currentIndex;
+			});
+
+
+			if (targetTrs.length === 0) {
+				this.sheet.grouping.toggleGroup(groupId);
+				return;
+			}
+
+			if (!isCollapsed) {
+				let totalHeight = 0;
+				targetTrs.forEach($tr => {
+					$tr.classList.remove('tree-expand', 'tree-collapse');
+					void $tr.offsetWidth;
+					totalHeight += $tr.getBoundingClientRect().height;
+				});
+
+				targetTrs.forEach($tr => {
+					$tr.style.transform = `translateY(-${totalHeight}px)`;
+					$tr.classList.add('tree-collapse');
+				});
+
+				setTimeout(() => {
+					this.sheet.grouping.toggleGroup(groupId);
+
+					targetTrs.forEach($tr => {
+						$tr.classList.remove('tree-collapse');
+						$tr.style.transform = '';
+					});
+				}, 500);
+
+			} else {
+
+				const viewRect = this.sheet.querySelector(".ng-sheet-body").getBoundingClientRect();
+				const cellRect = this.tr.getBoundingClientRect();
+				const totalHeight = viewRect.bottom - cellRect.bottom;
+
+				targetTrs.forEach($tr => {
+					$tr.style.transform = `translateY(${totalHeight}px)`;
+					$tr.classList.add('tree-expand');
+				});
+
+				targetTrs.forEach($tr => void $tr.offsetWidth);
+
+				setTimeout(() => {
+					this.sheet.grouping.toggleGroup(groupId);
+
+					targetTrs.forEach($tr => {
+						$tr.classList.remove('tree-expand');
+						$tr.style.transform = '';
+					});
+				}, 500);
+			}
 		});
 	}
 }

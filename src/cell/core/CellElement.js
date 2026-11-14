@@ -338,6 +338,43 @@ export class CellElement extends BasicCellElement {
 	};
 }
 
+export class TheadCellElement extends CellElement {
+
+	get host() { return super.host; }
+	get sheet() { return super.sheet; }
+	get cell() { return super.cell; }
+	get tr() { return super.tr; }
+	get attr() { return super.attr; }
+
+	getExprValue(expr, data, row) {
+		return super.getExprValue(expr, data, row);
+	}
+
+	constructor() {
+		super();
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
+	}
+
+	refresh() {
+		return super.refresh();
+	}
+
+	getExprValue = (expr, data, row, cell) => {
+		return super.getExprValue(expr, data, row, cell);
+	}
+
+	isValid = () => {
+		return super.isValid();
+	}
+
+	isInvalid = () => {
+		return super.isInvalid();
+	}
+}
+
 export class EditableCellElement extends CellElement {
 
 	get host() { return super.host; }

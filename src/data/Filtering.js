@@ -209,7 +209,7 @@ export class NineTableFilterPanel extends HTMLElement {
 		this.#host.loading = true;
 
 		const filterRecords = this.#view.view.getArray();
-		const fields = this.#nineTable.data.getHostFields();
+		const fields = this.#nineTable.fields.get();
 
 		const checkedRecords = filterRecords.filter(record => {
 			const chk = record.v[fields.indexOf("CHK")];
@@ -263,7 +263,7 @@ export class NineTableFilterPanel extends HTMLElement {
 			this.#view.filtering.clear();
 		} else {
 			const rawRecords = this.#nineTable.data.getArray();
-			const fields = this.#nineTable.data.getHostFields();
+			const fields = this.#nineTable.fields.get();
 			const data2Idx = fields.indexOf("DATA2");
 
 			const matchedValues = [];
@@ -285,7 +285,7 @@ export class NineTableFilterPanel extends HTMLElement {
 	#onSelectAll = (e) => {
 		const isChecked = e.target.checked;
 		const rawRecords = this.#nineTable?.data?.getArray() || [];
-		const fields = this.#nineTable.data.getHostFields();
+		const fields = this.#nineTable.fields.get();
 		const chkIdx = fields.indexOf("CHK");
 
 		if (chkIdx >= 0) {
@@ -439,7 +439,7 @@ export class Filtering {
 	#applyFiltering() {
 		const hostData = this.#host.data;
 		const rawRecords = hostData.getArray();
-		const fields = this.#host.data.getHostFields();
+		const fields = this.#host.fields.get();
 		const sheetIndex = this.#sheet.index;
 		const exprEngine = this.#host.exprEngine;
 
