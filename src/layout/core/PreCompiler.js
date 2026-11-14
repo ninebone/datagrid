@@ -233,16 +233,17 @@ export class PreCompiler {
             const cellType = $cell.getAttribute('cell-type') || "renderer";
             const tagName = `cell-${cellType}-thead`;
 
-            //const cellType = $cell.getAttribute('cell-type');
-            //if (cellType) {
-                const originalContent = $cell.innerHTML;
-                //const tagName = `cell-${cellType}`;
-                const innerAttrs = targetAttributes
-                    .filter(attr => $cell.hasAttribute(attr))
-                    .map(attr => `${attr}="${$cell.getAttribute(attr)}"`);
+            const originalContent = $cell.innerHTML;
+            const innerAttrs = targetAttributes
+                .filter(attr => $cell.hasAttribute(attr))
+                .map(attr => `${attr}="${$cell.getAttribute(attr)}"`);
 
-                $cell.innerHTML = `<${tagName} ${innerAttrs.join(' ')} content="${originalContent}"></${tagName}>`;
-            //}
+            $cell.innerHTML = `<${tagName} ${innerAttrs.join(' ')} content="${originalContent}"></${tagName}>`;
+            /**
+            const expr = $cell.dataset.expr;
+            if (expr) {
+                $cell.setAttribute('data-expr', host.exprEngine.precompile(expr, false));
+            } */
         });
     }
 

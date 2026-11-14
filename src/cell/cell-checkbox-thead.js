@@ -20,133 +20,75 @@ class CellCheckboxThead extends TheadCellElement {
         this.#initEvent();
     }
 
-    get dataSource() {
-        return [
-            { value: this.trueValue, text: this.#trueText },
-            { value: this.falseValue, text: this.#falseText }
-        ];
-    }
-
     #initEvent = () => {
-        if (this.closest("thead")) {
-            this.#target.addEventListener("change", (e) => {
-                super.sheet.querySelector(`tbody.body [data-col="${super.cell.dataset.col}"] cell-checkbox`)?.selectAll(e.target.checked);
-            });
-        }
-
-        this.#target.addEventListener("change", (event) => {
-            if (!this.closest("tbody")) return;
-
-            if (this.#isRadio) {
-                this.selectAll(false);
-                this.value = this.trueValue;
-            }
-            else {
-                this.value = event.target.checked ? this.trueValue : this.falseValue;
-            }
-
-            this.sheet.rowManager.refresh(true);
-        });
-
-        this.cell.addEventListener("keydown", e => {
-
-            if (this.cell.hasAttribute("readonly") || this.cell.classList.contains("readonly")) return;
-            if (this.cell.getAttribute("disabled") === "true") return;
-            if (this.style.display === "none") return;
-
-            if (e.code === "Space") {
-                e.preventDefault();
-
-                this.value = this.#target.checked ? this.falseValue : this.trueValue;
-
-                this.sheet.rowManager.refresh(true);
-            }
+        this.#target.addEventListener("change", (e) => {
+            super.sheet.querySelector(`tbody.body [data-col="${super.cell.dataset.col}"] cell-checkbox`)?.selectAll(e.target.checked);
+            this.#updateState();
         });
     };
 
     #renderer = () => {
-
-        const trueValue = this.trueValue;//this.cell.getAttribute("true-value") || false;
-        //const selectedBorderColor = this.getAttribute("selected-border-color") || "dimgray";
-
         const originalContent = this.cell.getAttribute("content") || "";
-        const childHtml = this.#isRadio ? `<input type="radio" value="${trueValue}" />` : `<label><input type="checkbox" /><span>${originalContent}</span></label>`;
 
         this.innerHTML = `
-            ${childHtml}
+            <label><input type="checkbox" /><span>${originalContent}</span></label>
         `;
     }
 
-    refresh = () => {
-        const val = super.refresh();
+    #updateState = () => {
+        const $sourceCell = this.sheet.source.table.querySelector(`tbody.body [data-col="${this.cell.dataset.col}"]`);
+        const $bodyCell = this.sheet.querySelector(`tbody.body [data-col="${this.cell.dataset.col}"]`);
+        if (!$sourceCell || !$bodyCell || !$bodyCell.dataset.bind) return;
 
-        this.#target.checked = (val === this.trueValue);
+        const $bodyCheckbox = $bodyCell.querySelector(`cell-checkbox`);
+        if (!$bodyCheckbox) return;
 
-        if (this.isValid()) {
-            this.#validate(val);
-        }
+        const data = this.sheet.view.getArray();
+        if (!data || data.length === 0) return;
 
-        const displayText = (val === this.trueValue) ? this.#trueText : ((val === this.falseValue) ? this.#falseText : val);
+        const visibleExpr = $sourceCell.getAttribute("visible");
+        const enableExpr = $sourceCell.getAttribute("enable");
 
-        if (this.#label) {
-            this.#label.textContent = displayText;
-        }
-    };
+        const fieldIdx = this.host.fields.get().indexOf($bodyCell.dataset.bind);
 
-    #validate = (val) => {
+        let validItems = [];
+        if (visibleExpr || enableExpr) {
+            for (let i = 0; i < data.length; i++) {
+                let isEnabled = true;
+                let isVisible = true;
 
-        this.cell.classList.remove("invalid");
+                if (enableExpr) {
+                    isEnabled = this.host.exprEngine.evaluate(enableExpr, data[i], i);
+                }
+                if (visibleExpr) {
+                    isVisible = this.host.exprEngine.evaluate(visibleExpr, data[i], i);
+                }
 
-        if (val !== "" && val !== null && val !== undefined) {
-            if (val !== this.trueValue && val !== this.falseValue) {
-                this.cell.classList.add("invalid");
+                if (isEnabled && isVisible) {
+                    validItems.push(data[i].v[fieldIdx]);
+                }
             }
         }
-    };
-
-    selectAll = (v) => {
-        if (this.closest("thead")) return; // 헤더 자신은 제외
-
-        const data = this.host.data.getArray();
-        const colIndex = this.host.fields.indexOf(this.cell.dataset.bind);
-
-        if (colIndex < 0) return;
-
-        for (let i = 0; i < data.length; i++) {
-            if (this.#enable && super.getExprValue(this.#enable, data[i], i, this.cell) === false) continue;
-            if (this.#readonly && super.getExprValue(this.#readonly, data[i], i, this.cell) === true) continue;
-            if (this.#visible && super.getExprValue(this.#visible, data[i], i, this.cell) === false) continue;
-
-            data[i].v[colIndex] = v ? this.trueValue : this.falseValue;
+        else {
+            validItems = data.extract($bodyCell.dataset.bind);
         }
 
-        super.sheet.invalidate();
-    };
+        if (validItems.length === 0) {
+            this.#target.checked = false;
+            this.#target.indeterminate = false;
+            return;
+        }
 
-    get trueValue() {
-        return this.cell.getAttribute("true-value") || "Y";
+        const totalCount = validItems.length;
+        const checkedCount = validItems.filter(item => item === $bodyCheckbox.trueValue).length;
+
+        this.#target.checked = (checkedCount === totalCount) ? true : false;
+        this.#target.indeterminate = (checkedCount === 0 || checkedCount === totalCount) ? false : true;
     }
-    get falseValue() {
-        return this.cell.getAttribute("false-value")|| "N";
-    }
-    get #trueText() {
-        return this.cell.getAttribute("true-text") || "";
-    }
-    get #falseText() {
-        return this.cell.getAttribute("false-text") || "";
-    }
-    get #isRadio() {
-        return this.cell.getAttribute("is-radio") || false;
-    }
-    get #enable() {
-        return this.cell.getAttribute("enable") || false;
-    }
-    get #readonly() {
-        return this.cell.getAttribute("readonly") || false;
-    }
-    get #visible() {
-        return this.cell.getAttribute("visible") || false;
-    }
+
+    refresh = () => {
+        this.#updateState();
+    };
 }
 
 if (!customElements.get('cell-checkbox-thead')) {

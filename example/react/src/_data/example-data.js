@@ -42,6 +42,17 @@ const exampleData = {
 
         return masterCommonCodes.filter(item => item.group === group);
     },
+    getMessage(lang, code) {
+        const messages = [
+            { lang: 'en', code: 'Renderer', codename: 'Renderer' },
+            { lang: 'ko', code: 'Renderer', codename: '한국어 렌더러' },
+            { lang: 'en', code: 'Radio Button', codename: 'Radio Button' },
+            { lang: 'ko', code: 'Radio Button', codename: '라디오 버튼' },
+        ];
+
+        const found = messages.find(item => item.lang === lang && item.code === code);
+        return found ? found.codename : code;
+    },
     generateRandomData(cnt) {
         const getRandomString = (len, an) => {
             an = an && an.toLowerCase();
@@ -162,6 +173,24 @@ const exampleData = {
     }
 };
 
+// _data/messages.js
+const messageStore = {
+    en: {
+        'Renderer': 'Renderer',
+        'Radio Button': 'Radio Button'
+    },
+    ko: {
+        'Renderer': '한국어 렌더러',
+        'Radio Button': '라디오 버튼'
+    }
+};
+
+// 실제 DB 조회처럼 비동기(Promise)로 시뮬레이션
+async function fetchMessages(lang) {
+    // 네트워크 지연 흉내 (원하면 제거 가능)
+    await new Promise(resolve => setTimeout(resolve, 10));
+    return messageStore[lang] || messageStore['en'];
+}
 
 
-export { exampleData };
+export { exampleData, fetchMessages };

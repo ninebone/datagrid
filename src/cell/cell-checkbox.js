@@ -28,11 +28,6 @@ class CellCheckbox extends EditableCellElement {
     }
 
     #initEvent = () => {
-        if (this.closest("thead")) {
-            this.#target.addEventListener("change", (e) => {
-                super.sheet.querySelector(`tbody.body [data-col="${super.cell.dataset.col}"] cell-checkbox`)?.selectAll(e.target.checked);
-            });
-        }
 
         this.#target.addEventListener("change", (event) => {
             if (!this.closest("tbody")) return;
@@ -105,9 +100,8 @@ class CellCheckbox extends EditableCellElement {
     };
 
     selectAll = (v) => {
-        if (this.closest("thead")) return; // 헤더 자신은 제외
 
-        const data = this.host.data.getArray();
+        const data = this.sheet.view.getArray();
         const colIndex = this.host.fields.indexOf(this.cell.dataset.bind);
 
         if (colIndex < 0) return;

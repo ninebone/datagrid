@@ -17,25 +17,26 @@ class CellRendererThead extends TheadCellElement {
 		this.#target = this.querySelector("span");
 	}
 
-	/**
 	refresh = () => {
 
-		super.refresh();
+		//super.refresh();
 
 		if (this.cell.getAttribute("html") === "true") {
-			this.#target.innerHTML = this.getDisplayText();
+			this.#target.innerHTML = this.getDisplayText(this.#content);
 		} else {
-			this.#target.textContent = this.getDisplayText();
+			this.#target.textContent = this.getDisplayText(this.#content);
 		}
-	}; */
+	};
 
 	#renderer = () => {
-		const content = this.getAttribute("content") || "";
-
 		this.innerHTML = `
-            <span class="wrapper">${content}</span>
+            <span class="wrapper">${this.#content}</span>
        `;
 	};
+
+	get #content() {
+		return this.getAttribute("content") || "";
+	}
 }
 
 if (!customElements.get("cell-renderer-thead")) {

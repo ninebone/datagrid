@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { exampleData } from '@/_data/example-data.js';
+import { exampleData, fetchMessages } from '@/_data/example-data.js';
 import "@ninebone/datagrid";
 
 const Overview = () => {
@@ -13,10 +13,23 @@ const Overview = () => {
 		})
 	};
 
+	const handleEn = () => {
+		localStorage.setItem("lang", "en");
+		tableRef.current.refresh();
+	};
+
+	const handleKo = () => {
+		localStorage.setItem("lang", "ko");
+		tableRef.current.refresh();
+	};
+
 	useEffect(() => {
 
 		tableRef.current?.provider.add({
 			getCommonCode: (group) => exampleData.generateCommonCode(group),
+			getMessage: (code) => {
+				return exampleData.getMessage(localStorage.getItem("lang"), code);
+			},
 			renderImage: (imageUrl, ...values) => {
 
 				// 1. 가변 인자 값들의 평균 계산 (값이 없으면 0)
@@ -317,6 +330,11 @@ const Overview = () => {
 		<>
 			<h1>NineTable Overview</h1>
 
+			<div style={{width: '90%', display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '10px'}}>
+				<button onClick={handleEn} style={{...buttonStyle, background: '#ff4d4f'}}>English</button>
+				<button onClick={handleKo} style={{...buttonStyle, background: '#1890ff'}}>Korean</button>
+			</div>
+
 			<nine-table ref={tableRef} show-footer="true" style={{width: '90%', height: '80%'}}>
 				<table row-indicator="true">
 					<colgroup>
@@ -338,7 +356,7 @@ const Overview = () => {
 					<tr style={{height: '32px'}}>
 						<th rowSpan="2" cell-type="checkbox"></th>
 						<th rowSpan="2">Single<br/>Select</th>
-						<th colSpan="3">Renderer</th>
+						<th colSpan="3" data-expr="provider.getMessage('Renderer')">Renderer</th>
 						<th colSpan="3">Radio Button</th>
 						<th colSpan="2">CheckBox</th>
 						<th>input</th>
@@ -459,6 +477,17 @@ const Overview = () => {
 			</nine-table>
 		</>
 	);
+};
+
+const buttonStyle = {
+	padding: '6px 14px',
+	color: 'white',
+	cursor: 'pointer',
+	borderRadius: '4px',
+	border: '1px solid #d9d9d9',
+	background: 'green',
+	fontWeight: '500',
+	fontSize: '13px'
 };
 
 export default Overview;
