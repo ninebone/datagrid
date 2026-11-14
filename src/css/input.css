@@ -1,3 +1,4 @@
+
 input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -12,10 +13,19 @@ input[type="checkbox"] {
     justify-content: center;
     transition: background-color 0.15s ease, border-color 0.15s ease;
 }
+
 input[type="checkbox"]:checked {
-    background-color: #2563eb; /* 체크 시 파란색 배경 */
+    background-color: #2563eb;
     border-color: #2563eb;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+input[type="checkbox"]:indeterminate {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>'); /* 마이너스(-) 아이콘 */
     background-repeat: no-repeat;
     background-position: center;
 }

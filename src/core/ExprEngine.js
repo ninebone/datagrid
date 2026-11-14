@@ -10,7 +10,7 @@ export class ExprEngine {
         this.#fields = host.fields.get();
     }
 
-    rewriteExpr(expr) {
+    #rewriteExpr(expr) {
 
         if (!expr || !this.#fields.length) return expr;
 
@@ -20,19 +20,9 @@ export class ExprEngine {
         });
     }
 
-    rewriteExprGroup(expr) {
-return expr;
-        if (!expr || !this.#fields.length) return expr;
-
-        return expr.replace(/data\.([a-zA-Z_$][\w$]*)/g, (match, fieldName) => {
-            const idx = this.#fields.indexOf(fieldName);
-            return idx >= 0 ? `childrenItems` : match;
-        });
-    }
-
     precompile(expr, isGroup) {
         if (!expr) return expr;
-        return isGroup ?  this.rewriteExprGroup(expr) : this.rewriteExpr(expr);
+        return isGroup ?  expr : this.#rewriteExpr(expr);
     }
 
     evaluate(expr, rowItem, row = 0, isGroup = false) {
@@ -42,7 +32,7 @@ return expr;
         try {
 
             const trimmedExpr = String(expr).trim();
-            const compiledExpr = isGroup ? this.rewriteExprGroup(trimmedExpr) : this.rewriteExpr(trimmedExpr);
+            const compiledExpr = isGroup ? trimmedExpr : this.#rewriteExpr(trimmedExpr);
 
             if (compiledExpr.includes("provider.") || compiledExpr.includes("host.") || compiledExpr.includes("data.") || compiledExpr.includes("rowItem.v") || compiledExpr.includes("(")) {
 
@@ -113,16 +103,15 @@ return expr;
                     }
                 }
 
-
                 return evalFn(rowItem, row, this.#host);
             }
 
             return compiledExpr;
         } catch (e) {
 
-            //if (expr.includes("getCommonCode")) {
-                //console.trace("ExprEngine evaluation error:", e);
-            //}
+            if (expr.includes("getLabel")) {
+                console.trace("ExprEngine evaluation error:getLabel", e);
+            }
             return expr;
         }
     }

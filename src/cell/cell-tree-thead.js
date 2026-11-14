@@ -24,7 +24,7 @@ export class CellTreeThead extends TheadCellElement {
 
 	refresh() {
 
-		this.#updateTreeState();
+		this.#updateState();
 	}
 
 	#renderer = () => {
@@ -81,11 +81,11 @@ export class CellTreeThead extends TheadCellElement {
 				grouping.collapse(depth);
 			}
 
-			this.#updateTreeState();
+			this.#updateState();
 		});
 	}
 
-	#updateTreeState() {
+	#updateState() {
 		const icons = this.querySelectorAll(".expand-off,.expand-on,.expand-mix");
 		if (!icons || icons.length === 0) return;
 

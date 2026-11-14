@@ -49,7 +49,6 @@ export class CellElement extends BasicCellElement {
 
 		const root = this.shadowRoot || this;
 
-		// 🎯 버튼 이벤트 연결
 		root.querySelectorAll("button, ng-expand-button").forEach(button => {
 			button.addEventListener("click", () => {
 				let fn = this.getAttribute("onbuttonclick") || this.getAttribute("onButtonClick") || this.#cell?.getAttribute("onbuttonclick") || this.#cell?.getAttribute("onButtonClick");
@@ -77,7 +76,6 @@ export class CellElement extends BasicCellElement {
 			});
 		});
 
-		// 🎯 링크 이벤트 연결
 		const renderer = root.querySelector(".renderer");
 		if (renderer && this.getAttribute("link") === "true") {
 			renderer.classList.add("link");
@@ -150,7 +148,6 @@ export class CellElement extends BasicCellElement {
 		const bindKey = this.#cell.dataset.bind;
 		if (isNaN(row) || !bindKey) return;
 
-		//update-row-state
 		this.#host.data.setValue(row, bindKey, v, this.#updateRowState);
 	}
 
@@ -171,13 +168,16 @@ export class CellElement extends BasicCellElement {
 
 	getDisplayText = (defaultValue = "") => {
 
-		if (!this.#cell || (!this.#cell.closest("tbody") && !this.#cell.closest("thead.foot") && !this.#cell.closest("tfoot"))) {
+		/**
+		if (!this.#cell || (!this.#cell.closest("thead") && !this.#cell.closest("tbody") && !this.#cell.closest("thead.foot") && !this.#cell.closest("tfoot"))) {
 			return defaultValue;
-		}
+		} */
 
-		const rawRecord = this.#tr.data;
+		if (!this.#cell) return defaultValue;
 
-		if (this.closest("tbody") && !rawRecord) return defaultValue;
+		//const rawRecord = this.#tr.data;
+
+		//if (this.closest("tbody") && !rawRecord) return defaultValue;
 
 		const expr = this.#cell.dataset.expr;
 		const bindKey = this.#cell.dataset.bind;
