@@ -181,6 +181,7 @@ export class PreCompiler {
         let autoIdCounter = 0;
 
         $tbl.querySelectorAll('tbody th,tbody td,tfoot th, tfoot td').forEach($cell => {
+
             const cellType = $cell.getAttribute('cell-type') || "renderer";
             const tagName = `cell-${cellType}`;
 
@@ -229,16 +230,19 @@ export class PreCompiler {
         });
 
         $tbl.querySelectorAll('thead th, thead td').forEach($cell => {
-            const cellType = $cell.getAttribute('cell-type');
-            if (cellType) {
+            const cellType = $cell.getAttribute('cell-type') || "renderer";
+            const tagName = `cell-${cellType}-thead`;
+
+            //const cellType = $cell.getAttribute('cell-type');
+            //if (cellType) {
                 const originalContent = $cell.innerHTML;
-                const tagName = `cell-${cellType}`;
+                //const tagName = `cell-${cellType}`;
                 const innerAttrs = targetAttributes
                     .filter(attr => $cell.hasAttribute(attr))
                     .map(attr => `${attr}="${$cell.getAttribute(attr)}"`);
 
                 $cell.innerHTML = `<${tagName} ${innerAttrs.join(' ')} content="${originalContent}"></${tagName}>`;
-            }
+            //}
         });
     }
 

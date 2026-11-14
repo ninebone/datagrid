@@ -64,11 +64,86 @@ export class ngData {
 		return this.length;
 	};
 
+	enhanceArray = (arr) => {
+		if (!Array.isArray(arr)) return arr;
+
+		const host = this.#host;
+
+		arr.extract = (colnm) => {
+			const fields = host.fields.get();
+			const idx = fields.indexOf(colnm);
+			if (idx === -1) return [];
+
+			return arr
+				.filter(r => r && (r.v || r.record?.v))
+				.map(r => {
+					const rowValues = r.v || r.record?.v;
+					return rowValues ? rowValues[idx] : undefined;
+				});
+		};
+		/**
+		const originalFilter = arr.filter.bind(arr);
+		arr.filter = (predicate) => {
+			if (typeof predicate !== 'function') {
+				return this.enhanceArray(originalFilter(predicate));
+			}
+
+			const fields = host.fields.get();
+			const fnStr = predicate.toString();
+
+			let rewrittenStr = fnStr;
+			fields.forEach((fieldName, idx) => {
+				// 💡 r.DEPART를 만나면 일반 행(r.v)과 그루핑 행(r.record.v)을 모두 안전하게 탐색하도록 변환
+				const regex = new RegExp(`\\b([a-zA-Z_$][\\w$]*)\\.${fieldName}\\b`, 'g');
+				rewrittenStr = rewrittenStr.replace(regex, (match, paramName) => {
+					return `(${paramName}?.v ? ${paramName}.v[${idx}] : (${paramName}?.record?.v ? ${paramName}.record.v[${idx}] : undefined))`;
+				});
+			});
+
+			let compiledPredicate;
+			try {
+				compiledPredicate = (0, eval)(`(${rewrittenStr})`);
+			} catch (e) {
+				compiledPredicate = predicate;
+			}
+
+			const filteredArr = originalFilter(compiledPredicate);
+			return this.enhanceArray(filteredArr);
+		};
+		*/
+
+		return arr;
+	};
+
+	getColumnType = (colnm) => {
+
+		const rawRecords = this.#parent.rawRecords || [];
+		const colIdx = this.#host.fields.get().indexOf(colnm);
+		if (colIdx === -1 || !Array.isArray(rawRecords)) return 'unknown';
+
+		for (const record of rawRecords) {
+			if (!record || !record.v) continue;
+			const val = record.v[colIdx];
+
+			if (val !== null && val !== undefined && val !== "") {
+				if (typeof val === 'number') return 'number';
+				if (typeof val === 'string') {
+					return 'string';
+				}
+				if (typeof val === 'boolean') return 'boolean';
+				return typeof val;
+			}
+		}
+
+		return 'string';
+	};
+
 	getArray = (at, colnm) => {
 		const validRecords = this.#getValidRecords();
 
 		if (at === undefined || at === null) {
-			return validRecords; // 변환 없이 배열 그대로 반환 (렌더링 최적화)
+			return this.enhanceArray(validRecords);
+			//return validRecords; // 변환 없이 배열 그대로 반환 (렌더링 최적화)
 		}
 
 		if (at < 0 || at >= validRecords.length) return null;
@@ -76,7 +151,7 @@ export class ngData {
 		const targetRecord = validRecords[at];
 
 		if (colnm != null) {
-			const fields = this.getHostFields();
+			const fields = this.#host.fields.get();
 			const idx = fields.indexOf(colnm);
 			return (idx >= 0) ? targetRecord.v[idx] : null;
 		}
@@ -107,7 +182,7 @@ export class ngData {
 		if (at < 0 || at >= validRecords.length) return null;
 
 		const targetRecord = validRecords[at];
-		const fields = this.getHostFields();
+		const fields = this.#host.fields.get();
 
 		if (colnm != null) {
 			const idx = fields.indexOf(colnm);
@@ -119,10 +194,6 @@ export class ngData {
 
 	getAll = () => {
 		return this.#parent.rawRecords || [];
-	};
-
-	getHostFields = () => {
-		return typeof this.#host.fields?.get === 'function' ? this.#host.fields.get() : [];
 	};
 
 	#initialize = () => {
@@ -195,6 +266,7 @@ export class ngData {
 	}
 
 	#getDefaultMeta = (rowid = 0) => {
+
 		return {
 			rowState: ngData.ROW_STATE.EMPTY,
 			deleted: false,
@@ -226,7 +298,7 @@ export class ngData {
 	#json2Array = (jsonArray) => {
 		if (!Array.isArray(jsonArray)) jsonArray = [jsonArray];
 
-		const fields = this.getHostFields().length > 0 ? this.getHostFields() : Object.keys(jsonArray[0] || {});
+		const fields = this.#host.fields.get().length > 0 ? this.#host.fields.get() : Object.keys(jsonArray[0] || {});
 		const arr = [];
 
 		jsonArray.forEach(json => {
@@ -380,7 +452,7 @@ export class ngData {
 	setValue = (rowid, colnm, value, updateState = true) => {
 
 		rowid = parseInt(rowid, 10);
-		const fields = this.getHostFields();
+		const fields = this.#host.fields.get();
 		const COL_IDX = fields.indexOf(colnm);
 		if (COL_IDX < 0) return;
 
@@ -419,7 +491,7 @@ export class ngData {
 
 		const isSingle = !Array.isArray(arr);
 		const targetArr = isSingle ? [arr] : arr;
-		const fields = this.getHostFields();
+		const fields = this.#host.fields.get();
 
 		const result = targetArr.filter(o => !o.__ng?.deleted).map(o => {
 			const t = {};

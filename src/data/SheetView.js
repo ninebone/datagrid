@@ -18,6 +18,7 @@ export class SheetView {
 		this.refresh();
 	}
 
+
 	getArray = (at, colnm) => {
 
 		if (!this.#cachedVisibleRecords) {
@@ -28,7 +29,7 @@ export class SheetView {
 		const visibleRecords = this.#cachedVisibleRecords;
 
 		if (at === undefined || at === null) {
-			return visibleRecords;
+			return this.#host.data.enhanceArray(visibleRecords);
 		}
 
 		if (at < 0 || at >= visibleRecords.length) return null;
@@ -54,7 +55,7 @@ export class SheetView {
 
 	get = (at, colnm) => {
 		const visibleRecords = this.getArray();
-		const fields = this.#host.data.getHostFields?.() || [];
+		const fields = this.#host.fields.get();
 
 		if (at === undefined || at === null) {
 			return visibleRecords.map(record => this.#convSingle(record, fields));
@@ -111,7 +112,7 @@ export class SheetView {
 		if (groupColumns.length > 0) {
 			// 각 시트별 그룹핑 매니저에 관리되는 collapsedMap을 전달하여 접힌 상태 유지
 			const collapsedMap = groupingManager.collapsedMap || new Map();
-			const groupResult = Grouping.apply(validRecords, groupColumns, this.#host.data.getHostFields(), collapsedMap);
+			const groupResult = Grouping.apply(validRecords, groupColumns, this.#host.fields.get(), collapsedMap);
 
 			this.#cachedVisibleRecords = groupResult.renderItems; // 최종 렌더링 아이템 (접힌 항목 자동 제외됨)
 
@@ -138,7 +139,7 @@ export class SheetView {
 
 	#applySorting = (indices, validRecords) => {
 
-		const fields = typeof this.#host.data.getHostFields === 'function' ? this.#host.data.getHostFields() : [];
+		const fields = this.#host.fields.get();
 
 		const rulesWithIdx = this.#sortingColumns.map(rule => ({
 			...rule,

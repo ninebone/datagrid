@@ -120,9 +120,9 @@ const Renderer = () => {
 					</tr>
 					<tr group-by="AGE" style={{height: '40px'}}>
 						<td data-bind="AGE" cell-type="tree" colSpan="2"></td>
-						<td data-bind="REC1" text-align="right" data-expr="host.avg(childrenItems, 'REC1')"></td>
-						<td data-bind="REC2" text-align="right" data-expr="host.avg(childrenItems, 'REC2')"></td>
-						<td data-bind="REC3" text-align="right" data-expr="host.avg(childrenItems, 'REC3')"></td>
+						<td data-bind="REC1" text-align="right" data-expr="provider.avg(childrenItems, 'REC1')"></td>
+						<td data-bind="REC2" text-align="right" data-expr="provider.avg(childrenItems, 'REC2')"></td>
+						<td data-bind="REC3" text-align="right" data-expr="provider.avg(childrenItems, 'REC3')"></td>
 						<td></td>
 						<td></td>
 						<td></td>
@@ -134,9 +134,9 @@ const Renderer = () => {
 					</tr>
 					<tr style={{height: '40px'}}>
 						<td data-bind="REC1" cell-type="tree" colSpan="2"></td>
-						<td data-bind="REC1" text-align="right" data-expr="host.avg(childrenItems, 'REC1')"></td>
-						<td data-bind="REC2" text-align="right" data-expr="host.avg(childrenItems, 'REC2')"></td>
-						<td data-bind="REC3" text-align="right" data-expr="host.avg(childrenItems, 'REC3')"></td>
+						<td data-bind="REC1" text-align="right" data-expr="provider.avg(childrenItems, 'REC1')"></td>
+						<td data-bind="REC2" text-align="right" data-expr="provider.avg(childrenItems, 'REC2')"></td>
+						<td data-bind="REC3" text-align="right" data-expr="provider.avg(childrenItems, 'REC3')"></td>
 						<td></td>
 						<td></td>
 						<td></td>

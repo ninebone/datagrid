@@ -9,6 +9,8 @@ export class DataAPI {
         this.#host = host;
     }
 
+
+
     provider = {
         // 스타일 데이터를 provider 객체 내부에서 직접 관리 (일반 메서드 축약형 사용)
         style: {
