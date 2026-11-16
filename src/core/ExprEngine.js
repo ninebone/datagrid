@@ -53,7 +53,7 @@ export class ExprEngine {
                                 if (typeof predicate === 'function') {
                                     target = children.filter(predicate);
                                 }
-                            
+                           
                                 return target
                                     .filter(r => r && (r.v || r.record?.v))
                                     .map(r => (r.v || r.record.v)[idx]);

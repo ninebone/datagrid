@@ -78,7 +78,7 @@ export class fields {
 
 			exprAttrs.forEach(attr => {
 				tbl.querySelectorAll(`[${attr}]`).forEach((el) => {
-					let expr = el.getAttribute(attr);
+					let expr = el.getAttribute(attr) || "";
 					if (!expr) return;
 
 					if (expr.indexOf("data.") < 0) {
@@ -94,7 +94,11 @@ export class fields {
 					}
 
 					expr.split("data.").forEach(v => {
-						if (v.trim() != "") {
+
+						v = v.trim();
+
+						if (!["", "provider."].includes(v) && !v.startsWith("provider.")) {
+
 							const lastIndex = v.search(/[^_A-Za-z0-9]/g);
 							let targetField = '';
 
@@ -109,6 +113,7 @@ export class fields {
 							}
 						}
 					});
+
 				});
 			});
 		}

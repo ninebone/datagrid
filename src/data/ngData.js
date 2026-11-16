@@ -65,9 +65,10 @@ export class ngData {
 	};
 
 	enhanceArray = (arr) => {
-		if (!Array.isArray(arr)) return arr;
+		if (!Array.isArray(arr)) arr = [arr];
 
 		const host = this.#host;
+
 
 		arr.extract = (colnm) => {
 			const fields = host.fields.get();
@@ -81,6 +82,8 @@ export class ngData {
 					return rowValues ? rowValues[idx] : undefined;
 				});
 		};
+
+
 		/**
 		const originalFilter = arr.filter.bind(arr);
 		arr.filter = (predicate) => {

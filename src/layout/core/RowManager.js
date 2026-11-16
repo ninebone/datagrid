@@ -81,6 +81,21 @@ export class RowManager {
 
         if (totalCount === 0) {
             this.#sheet.elements.scrollHolder.style.height = '0px';
+
+            [
+                this.#sheet.elements.left?.tbody?.body,
+                this.#sheet.elements.body?.tbody?.body,
+                this.#sheet.elements.right?.tbody?.body
+            ].forEach(($tbody) => {
+                if (!$tbody || !$tbody.trs) return;
+                $tbody.trs.forEach($tr => {
+                    $tr.style.display = 'none';
+                    $tr.dataset.matrixRow = null;
+                    $tr.dataset.row = null;
+                    $tr.dataset.index = null;
+                });
+            });
+
             return;
         }
 
@@ -1005,6 +1020,8 @@ trace.log(firstItem.groupId, siblingGroupId);
 
         const indices = groupRecord[GROUP_IDX.CHILDREN];
         const childrenRecords = indices ? indices.map(idx => this.#chchedAllRecords[idx]).filter(Boolean) : [];
+
+        //trace.log(Array.isArray(childrenRecords));
 
         $tr.dataset.virtualIndex = virtualIndex;
         $tr.dataset.index = virtualIndex;

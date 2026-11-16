@@ -32,6 +32,10 @@
         height: 28px;
     }
 
+    cell-renderer {
+        height: 28px;
+    }
+
     nine-table-sheet {
         border: none;
         overflow: hidden;
