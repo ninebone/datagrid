@@ -194,8 +194,6 @@ export class NineTableSheet extends HTMLElement {
         if (this.isAutoFitCol) {
             this.autoFit(true);
         }
-
-
     };
 
     autoFit = (enable = true) => {

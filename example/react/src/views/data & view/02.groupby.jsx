@@ -34,10 +34,13 @@ const Renderer = () => {
 				return values.reduce((acc, cur) => acc + (Number(cur) || 0), 0);
 			},
 			avg: (data, colnm) => {
-				const fields = tableRef.current.fields.get();
-				const idx = fields.indexOf(colnm);
-				if (idx < 0 || !Array.isArray(data) || data.length === 0) return 0;
-				const values = data.map(r => r.v ? r.v[idx] : 0);
+				const values = data.extract(colnm);
+				const sumVal = values.reduce((acc, cur) => acc + (Number(cur) || 0), 0);
+				return Math.round(sumVal / data.length * 100) / 100;
+			},
+			totalAvg: (colnm) => {
+				const data = tableRef.current.sheet().view.getArray();
+				const values = data.extract(colnm);
 				const sumVal = values.reduce((acc, cur) => acc + (Number(cur) || 0), 0);
 				return Math.round(sumVal / data.length * 100) / 100;
 			},
@@ -83,7 +86,7 @@ const Renderer = () => {
 					</colgroup>
 					<thead>
 					<tr>
-						<th rowSpan="2" filtering="true">NAME</th>
+						<th rowSpan="2" cell-type="tree" filtering="true">NAME</th>
 						<th rowSpan="2" filtering="true">AGE</th>
 						<th colSpan="3">text-align</th>
 						<th colSpan="5">data-expr</th>
@@ -104,7 +107,7 @@ const Renderer = () => {
 					</tr>
 					</thead>
 					<tbody>
-					<tr grouping="true" group-by="NAME" style={{height: '40px'}}>
+					<tr group-by="NAME" style={{height: '40px'}}>
 						<td data-bind="NAME" cell-type="tree" colSpan="2"></td>
 						<td data-bind="REC1" text-align="right" data-expr="provider.avg(childrenItems, 'REC1')"></td>
 						<td data-bind="REC2" text-align="right" data-expr="provider.avg(childrenItems, 'REC2')"></td>
@@ -134,9 +137,9 @@ const Renderer = () => {
 					</tr>
 					<tr style={{height: '40px'}}>
 						<td data-bind="REC1" cell-type="tree" colSpan="2"></td>
-						<td data-bind="REC1" text-align="right" data-expr="provider.avg(childrenItems, 'REC1')"></td>
-						<td data-bind="REC2" text-align="right" data-expr="provider.avg(childrenItems, 'REC2')"></td>
-						<td data-bind="REC3" text-align="right" data-expr="provider.avg(childrenItems, 'REC3')"></td>
+						<td data-bind="REC1" text-align="right"></td>
+						<td data-bind="REC2" text-align="right"></td>
+						<td data-bind="REC3" text-align="right"></td>
 						<td></td>
 						<td></td>
 						<td></td>
@@ -182,7 +185,7 @@ const Renderer = () => {
 					</colgroup>
 					<thead>
 					<tr>
-						<th rowSpan="2" filtering="true">NAME</th>
+						<th rowSpan="2" cell-type="tree" filtering="true">NAME</th>
 						<th rowSpan="2" filtering="true">AGE</th>
 						<th colSpan="3">text-align</th>
 						<th colSpan="5">data-expr</th>
@@ -203,7 +206,7 @@ const Renderer = () => {
 					</tr>
 					</thead>
 					<tbody>
-					<tr grouping="true">
+					<tr group-by="NAME">
 						<td data-bind="NAME" cell-type="tree" colSpan="2"></td>
 						<td data-bind="REC1" text-align="right" data-expr="provider.avg(childrenItems, 'REC1')"></td>
 						<td data-bind="REC2" text-align="right" data-expr="provider.avg(childrenItems, 'REC2')"></td>
@@ -253,9 +256,9 @@ const Renderer = () => {
 					<tfoot>
 					<tr>
 						<td data-bind="NAME" cell-type="tree" colSpan="2"></td>
-						<td data-bind="REC1" text-align="right" data-expr="provider.avg(childrenItems, 'REC1')"></td>
-						<td data-bind="REC2" text-align="right" data-expr="provider.avg(childrenItems, 'REC2')"></td>
-						<td data-bind="REC3" text-align="right" data-expr="provider.avg(childrenItems, 'REC3')"></td>
+						<td data-bind="REC1" text-align="right" data-expr="provider.totalAvg('REC1')"></td>
+						<td data-bind="REC2" text-align="right" data-expr="provider.totalAvg('REC2')"></td>
+						<td data-bind="REC3" text-align="right" data-expr="provider.totalAvg('REC3')"></td>
 						<td></td>
 						<td></td>
 						<td></td>

@@ -238,7 +238,6 @@ export class CellComboPanel extends HTMLElement {
 	};
 
 	#onKeydown = (e) => {
-		let index;
 		switch (e.code) {
 			case "Escape":
 				this.close();
@@ -257,8 +256,7 @@ export class CellComboPanel extends HTMLElement {
 				}
 				break;
 			case "ArrowDown":
-				index = this.#grd.row.at();
-				if (index < 0) {
+				if (this.#grd.row.at() < 0) {
 					this.#selectRow(0)
 				}
 				break;
