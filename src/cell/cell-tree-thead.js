@@ -28,6 +28,8 @@ export class CellTreeThead extends TheadCellElement {
 	}
 
 	#renderer = () => {
+		if (!this.sheet) return;
+
 		const content = this.getAttribute("content") || "";
 
 		this.innerHTML = `
@@ -35,9 +37,15 @@ export class CellTreeThead extends TheadCellElement {
 			<div class="tree-icons-container"></div>
         `;
 
-		const groupCnt = this.sheet?.source.table.querySelectorAll("tbody tr[group-by]").length;
-
-		if (groupCnt > 0) this.#renderDepthIcons(groupCnt);
+		if (this.sheet.isGroupBy) {
+			const groupCnt = this.sheet?.source.table.querySelectorAll("tbody tr[group-by]").length;
+			if (groupCnt > 0) this.#renderDepthIcons(groupCnt);
+		}
+		else {
+			setTimeout(() => {
+				this.#renderDepthIcons(this.sheet.view.treeMaxDepth);
+			}, 100);
+		}
 
 		this.#textElement = this.querySelector(".tree-text");
 	}
@@ -71,15 +79,31 @@ export class CellTreeThead extends TheadCellElement {
 			if (!target) return;
 
 			const depth = parseInt(target.dataset.targetDepth, 10);
-			const grouping = this.sheet.grouping;
 
-			if (iconOn) {
-				grouping.collapse(depth);
-			} else if (iconOff) {
-				grouping.expand(depth);
-			} else {
-				grouping.collapse(depth);
+			trace.log(depth);
+			if (this.sheet.isGroupBy) {
+				const grouping = this.sheet.grouping;
+
+				if (iconOn) {
+					grouping.collapse(depth);
+				} else if (iconOff) {
+					grouping.expand(depth);
+				} else {
+					grouping.collapse(depth);
+				}
 			}
+			else {
+				const treeManager = this.sheet.treeManager;
+
+				if (iconOn) {
+					treeManager.collapse(depth);
+				} else if (iconOff) {
+					treeManager.expand(depth);
+				} else {
+					treeManager.collapse(depth);
+				}
+			}
+
 
 			this.#updateState();
 		});
@@ -106,22 +130,28 @@ export class CellTreeThead extends TheadCellElement {
 	}
 
 	#isCollapsed(targetDepth) {
+		let targetIds = [];
 
-		let targetGroupIds = [];
-
-		for (const [groupId, isCollapsed] of this.sheet.grouping.groupMap.entries()) {
-			const depth = groupId.split('_').length - 2;
-
-			if (depth === targetDepth) {
-				targetGroupIds.push(groupId);
+		if (this.sheet.isGroupBy) {
+			// 💡 기존 그룹바이 로직
+			for (const [groupId] of this.sheet.grouping.groupMap.entries()) {
+				const depth = groupId.split('_').length - 2;
+				if (depth === targetDepth) {
+					targetIds.push(groupId);
+				}
 			}
+
+			if (targetIds.length === 0) return null;
+
+			const collapsedCount = targetIds.filter(id => {
+				return this.sheet.grouping.collapsedMap.get(id) === true;
+			}).length;
+
+			return (collapsedCount === targetIds.length) ? true : (collapsedCount === 0) ? false : null;
+
+		} else {
+			return this.sheet.treeManager?.isDepthCollapsed(targetDepth);
 		}
-
-		if (targetGroupIds.length === 0) return null;
-
-		const collapsedCount = targetGroupIds.filter(groupId => { return this.sheet.grouping.collapsedMap.get(groupId) === true; }).length;
-
-		return (collapsedCount === targetGroupIds.length) ? true : (collapsedCount === 0) ? false : null;
 	}
 }
 

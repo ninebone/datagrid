@@ -71,7 +71,7 @@ export class GroupingManager {
 
 	collapse(depth) {
 
-		trace.log(depth);
+		//trace.log(depth);
 
 		if (depth === null || depth === undefined) {
 			for (const groupId of this.#groupMap.keys()) {
@@ -178,9 +178,9 @@ export class Grouping {
 			groupRecord[GROUP_IDX.NAME] = groupKey;
 			groupRecord[GROUP_IDX.CHILDREN] = rowIds;
 
-			groupRecord.__isGroupHeader = true;
-			groupRecord.__groupId = groupId;
-			groupRecord.__collapsed = isCollapsed;
+			//groupRecord.__isGroupHeader = true;
+			//groupRecord.__groupId = groupId;
+			//groupRecord.__collapsed = isCollapsed;
 
 			resultArr.push(groupRecord);
 
@@ -198,8 +198,8 @@ export class Grouping {
 				} else {
 					const leafRecords = Grouping.#collectLeafRecords(subMapOrRecords);
 					leafRecords.forEach(record => {
-						record.__isGroupHeader = false;
-						record.__groupId = groupId;
+						//record.__isGroupHeader = false;
+						//record.__groupId = groupId;
 						resultArr.push(record);
 
 						renderItems.push({

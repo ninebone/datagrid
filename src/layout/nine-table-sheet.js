@@ -12,6 +12,7 @@ import { ColFixManager } from "@/col/ColFixManager.js";
 
 import { Filtering } from "@/data/Filtering.js";
 import { GroupingManager } from "@/data/Grouping.js";
+import { TreeManager } from "@/data/Tree.js";
 import { Sorting } from "@/data/Sorting.js";
 import { SheetView } from "@/data/SheetView.js";
 
@@ -30,6 +31,7 @@ export class NineTableSheet extends HTMLElement {
     #sorting;
     #filtering;
     #grouping;
+    #treeManager;
     #api;
 
     #view;
@@ -73,6 +75,7 @@ export class NineTableSheet extends HTMLElement {
     get colResizer() { return this.#colResizer; }
     get filtering() { return this.#filtering; }
     get grouping() { return this.#grouping; }
+    get treeManager() { return this.#treeManager; }
     get colMover() { return this.#colMover; }
     get colFix() { return this.#colFix; }
     get rowManager() { return this.#rowManager; }
@@ -83,7 +86,13 @@ export class NineTableSheet extends HTMLElement {
     get elements() { return this.#elements; }
 
     get isGroupBy() {
-        return this.source.table.querySelector("tbody tr[group-by]") ? true : false;
+        return this.source.table?.querySelector("tbody tr[group-by]") ? true : false;
+    }
+
+    get isTree() {
+        if (this.isGroupBy) return false;
+
+        return this.source.table?.querySelector("tbody cell-tree") ? true : false;
     }
 
 
@@ -520,6 +529,7 @@ export class NineTableSheet extends HTMLElement {
         this.#view = new SheetView(this);
         this.#filtering = new Filtering(this);
         this.#grouping = new GroupingManager(this);
+        this.#treeManager = new TreeManager(this);
 
         if (!this.#isSimple) {
             this.#sorting = new Sorting(this);

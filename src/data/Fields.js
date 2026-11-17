@@ -70,6 +70,14 @@ export class fields {
 				}
 			});
 
+			tbl.querySelectorAll('[cell-type="tree"]').forEach(($el) => {
+				const keyName = $el.getAttribute("key-name");
+				const parentKeyName = $el.getAttribute("parent-key-name");
+
+				if (keyName) this.#fields.push({ name: keyName, type: "string" });
+				if (parentKeyName) this.#fields.push({ name: parentKeyName, type: "string" });
+			});
+
 			const exprAttrs = [
 				"data-expr", "background-color", "color", "tooltip",
 				"visible", "readonly", "enable-button", "enable-check",

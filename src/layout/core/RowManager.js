@@ -76,6 +76,11 @@ export class RowManager {
             return;
         }
 
+        if (this.#sheet.isTree) {
+            this.#handleTreeScroll(scrollTop, force);
+            return;
+        }
+
         const viewRecords = this.#sheet.view.getArray();
         const totalCount = viewRecords.length;
 
@@ -989,6 +994,130 @@ trace.log(firstItem.groupId, siblingGroupId);
         this.#sheet.selection.refresh();
     };
 
+
+    #handleTreeScroll = (scrollTop, force = false) => {
+        const allRenderItems = this.#sheet.view.getArray() || [];
+        const totalVirtualCount = allRenderItems.length;
+
+        if (totalVirtualCount === 0) {
+            this.#sheet.elements.scrollHolder.style.height = '0px';
+            [
+                this.#sheet.elements.left?.tbody?.body,
+                this.#sheet.elements.body?.tbody?.body,
+                this.#sheet.elements.right?.tbody?.body
+            ].forEach(($tbody) => {
+                if (!$tbody || !$tbody.trs) return;
+                $tbody.trs.forEach($tr => {
+                    $tr.style.display = 'none';
+                    $tr.dataset.matrixRow = null;
+                    $tr.dataset.row = null;
+                    $tr.dataset.index = null;
+                });
+            });
+            return;
+        }
+
+        const rowHeight = this.#sheet.template.height;
+        if (!rowHeight || rowHeight <= 0) return;
+
+        // 1. 전체 가상 스크롤 높이 계산 (모든 트리 노드가 동일한 rowHeight를 공유한다고 가정)
+        const rawTotalVirtualHeight = totalVirtualCount * rowHeight;
+
+        const MAX_BROWSER_HEIGHT = 15000000;
+        const useScaling = rawTotalVirtualHeight > MAX_BROWSER_HEIGHT;
+
+        let scaleFactor = 1;
+        let totalVirtualHeight = rawTotalVirtualHeight;
+
+        if (useScaling) {
+            scaleFactor = MAX_BROWSER_HEIGHT / rawTotalVirtualHeight;
+            totalVirtualHeight = MAX_BROWSER_HEIGHT;
+        }
+
+        this.#sheet.elements.scrollHolder.style.height = `${totalVirtualHeight}px`;
+
+        const actualScrollTop = useScaling ? (scrollTop / scaleFactor) : scrollTop;
+        const clampedScrollTop = Math.min(actualScrollTop, rawTotalVirtualHeight);
+
+        // 2. GPU 가속을 위한 transform 적용 (미세 스크롤 보정)
+        this.#sheet.elements.left.tbody.body.style.transform =
+            this.#sheet.elements.body.tbody.body.style.transform =
+                this.#sheet.elements.right.tbody.body.style.transform = `translate3d(0px, -${clampedScrollTop % rowHeight}px, 0px)`;
+
+        const maxStartIndex = Math.max(0, totalVirtualCount - 1);
+        const startIndex = Math.max(0, Math.min(Math.floor(clampedScrollTop / rowHeight), maxStartIndex));
+
+        const firstTr = this.#element.firstTr;
+        const currentStartIndex = firstTr && firstTr.dataset.row !== undefined ? parseInt(firstTr.dataset.row, 10) : -1;
+
+        if (!force && currentStartIndex === startIndex) {
+            return;
+        }
+
+        const templateLength = this.#sheet.template.length || 1;
+        const targetEnd = Math.min(totalVirtualCount, startIndex + Math.ceil(this.#sheet.querySelector('.ng-sheet-body').clientHeight / rowHeight) + this.#BUFFER_ROW_COUNT);
+        const renderedItems = allRenderItems.slice(startIndex, targetEnd);
+
+        // 3. 본문 렌더링 및 트리 노드 데이터 바인딩
+        [
+            this.#sheet.elements.left.tbody.body,
+            this.#sheet.elements.body.tbody.body,
+            this.#sheet.elements.right.tbody.body
+        ].forEach(($tbody, tbodyIdx) => {
+            if (!$tbody) return;
+
+            $tbody.trs.forEach(($tr, index) => {
+                const itemIndex = Math.floor(index / templateLength);
+                const item = renderedItems[itemIndex];
+                const dataIndex = startIndex + itemIndex;
+
+                if (!item || dataIndex >= totalVirtualCount) {
+                    $tr.style.display = 'none';
+                    $tr.dataset.matrixRow = null;
+                    $tr.dataset.row = null;
+                    $tr.dataset.index = null;
+                    return;
+                }
+
+                $tr.style.display = '';
+                const rowid = item.record?.m?._?.[NINE_TABLE.META.INDEX.ROWID] || '';
+
+                //trace.log(item);
+
+                this.#bindTreeRowData($tr, item, rowid, dataIndex);
+            });
+        });
+
+        this.#sheet.selection.refresh();
+    };
+
+    #bindTreeRowData = ($tr, treeNodeItem, rowid, dataIndex) => {
+        const templateLength = this.#sheet.templateLength || 1;
+        const subRowIndex = parseInt($tr.dataset.subrow, 10) || 0;
+        const matrixRow = (dataIndex * templateLength) + subRowIndex;
+
+        $tr.dataset.index = dataIndex;
+        $tr.dataset.row = rowid;
+        $tr.dataset.matrixRow = matrixRow;
+
+        // 트리 노드 메타 정보 및 실제 레코드 연결
+        $tr.data = treeNodeItem.record;
+        $tr.dataset.nodeId = treeNodeItem.nodeId;
+        $tr.dataset.depth = treeNodeItem.depth;
+        $tr.dataset.hasChildren = treeNodeItem.hasChildren;
+
+        Array.from($tr.cells).forEach(($cell) => {
+            $cell.dataset.index = dataIndex;
+            $cell.dataset.row = rowid;
+
+            // 만약 cell-type이 tree인 셀이 있다면 뎁스 및 들여쓰기/토글 상태 갱신 필요
+            const customComp = Array.from($cell.children).find($el =>
+                $el.tagName.toLowerCase().startsWith('cell-') && typeof $el.refresh === 'function'
+            );
+
+            customComp?.refresh?.();
+        });
+    };
 
     #bindRowData = ($tr, record, rowid, dataIndex) => {
         const templateLength = this.#sheet.templateLength || 1;

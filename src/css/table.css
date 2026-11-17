@@ -21,6 +21,13 @@ table {
     table-layout: fixed;
 }
 
+
+table[row-indicator="false"] {
+    col[data-col="0"] {
+        display: none;
+    };
+}
+
 nine-table-sheet[auto-fit-col="true"] table {
     width: 100%;
     min-width: 100%;
