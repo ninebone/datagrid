@@ -1,6 +1,7 @@
 import { trace } from "@nopeer";
 import { NINE_TABLE } from "@/core/constants.js";
-import {Grouping} from "@/data/Grouping.js";
+import { Grouping } from "@/data/Grouping.js";
+import { Tree } from "@/data/Tree.js";
 
 export class SheetView {
 	#sheet;
@@ -8,6 +9,7 @@ export class SheetView {
 	#sortingColumns = [];
 	#filterRules = [];
 	#viewIndexes = [];
+	#treeMaxDepth;
 
 	#cachedVisibleRecords = null;
 
@@ -18,6 +20,8 @@ export class SheetView {
 		this.refresh();
 	}
 
+
+	get treeMaxDepth() { return this.#treeMaxDepth;}
 
 	getArray = (at, colnm) => {
 
@@ -105,11 +109,9 @@ export class SheetView {
 		this.#viewIndexes = indices;
 		const validRecords = indices.map(idx => rawRecords[idx]);
 
-		// 💡 시트별 그룹핑 설정 및 접힘 상태(collapsedMap) 가져오기
-		const groupingManager = this.#sheet.grouping;
-		const groupColumns = groupingManager?.columns || [];
-
-		if (groupColumns.length > 0) {
+		if (this.#sheet.isGroupBy) {
+			const groupingManager = this.#sheet.grouping;
+			const groupColumns = groupingManager?.columns || [];
 			// 각 시트별 그룹핑 매니저에 관리되는 collapsedMap을 전달하여 접힌 상태 유지
 			const collapsedMap = groupingManager.collapsedMap || new Map();
 			const groupResult = Grouping.apply(validRecords, groupColumns, this.#host.fields.get(), collapsedMap);
@@ -117,7 +119,25 @@ export class SheetView {
 			this.#cachedVisibleRecords = groupResult.renderItems; // 최종 렌더링 아이템 (접힌 항목 자동 제외됨)
 
 			groupingManager.setGroupMap(groupResult.groupMap); // 자식 매핑 공유
-		} else {
+		}
+		else if (this.#sheet.isTree) {
+
+			const treeManager = this.#sheet.treeManager;
+			const $cell = this.#sheet.source.table.querySelector("tbody [cell-type='tree']");
+
+			// 태그 속성명 유연하게 대처 (id-field 혹은 key-name)
+			const idField = $cell?.getAttribute("key-name");
+			const parentIdField = $cell?.getAttribute("parent-key-name");
+			const collapsedMap = treeManager?.collapsedMap || new Map();
+
+			const treeResult = Tree.apply(validRecords, collapsedMap, idField, parentIdField, this.#host.fields.get());
+
+			this.#treeMaxDepth = treeResult.maxDepth;
+
+			// 플랫하게 펼쳐진 렌더링 아이템 할당 (접힌 노드의 자식들은 자동으로 제외됨)
+			this.#cachedVisibleRecords = treeResult.renderItems;
+		}
+		else {
 			this.#cachedVisibleRecords = validRecords;
 		}
 	}

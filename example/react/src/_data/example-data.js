@@ -170,6 +170,117 @@ const exampleData = {
             });
         }
         return data;
+    },
+    generateRandomTree(totalCount) {
+        const getRandomInt = (v) => Math.floor(Math.random() * v);
+        const getRandomAmount = (min = 100000, max = 50000000, step = 10000) => {
+            const steps = Math.floor((max - min) / step);
+            return Math.floor(Math.random() * steps) * step + min;
+        };
+        const getRandomName = () => {
+            const firstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles", "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth"];
+            const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"];
+            return `${firstNames[getRandomInt(firstNames.length)]} ${lastNames[getRandomInt(lastNames.length)]}`;
+        };
+
+        let data = [];
+        let idCounter = 1;
+        let createdCount = 0;
+
+        const rootCount = Math.max(1, Math.floor(totalCount * 0.05));
+        let level0Queue = [];
+
+        for (let i = 0; i < rootCount && createdCount < totalCount; i++) {
+            const id = `node_${idCounter++}`;
+            const node = {
+                id: id,
+                parentId: null,
+                NAME: getRandomName(),
+                AGE: 30 + getRandomInt(30),
+                REC1: getRandomInt(101),
+                REC2: getRandomInt(101),
+                REC3: getRandomInt(101),
+                AMT1: getRandomAmount(),
+            };
+            data.push(node);
+            createdCount++;
+            level0Queue.push({ id, depth: 0 });
+        }
+
+        let level1Queue = [];
+        for (let root of level0Queue) {
+            if (createdCount >= totalCount) break;
+            const childCount = getRandomInt(4) + 2; // 루트당 2~5개의 자식 랜덤
+            for (let j = 0; j < childCount && createdCount < totalCount; j++) {
+                const nodeId = `node_${idCounter++}`;
+                const node = {
+                    nodeId: nodeId,
+                    parentId: root.nodeId,
+                    NAME: getRandomName(),
+                    AGE: 25 + getRandomInt(25),
+                    REC1: getRandomInt(101),
+                    REC2: getRandomInt(101),
+                    REC3: getRandomInt(101),
+                    AMT1: getRandomAmount(),
+                };
+                data.push(node);
+                createdCount++;
+                level1Queue.push({ nodeId, depth: 1 });
+            }
+        }
+
+        // 3단계: Level 1 노드들에게 손자(Level 2) 생성 (최소 3단계 완성)
+        let level2Queue = [];
+        for (let l1Node of level1Queue) {
+            if (createdCount >= totalCount) break;
+            const grandchildCount = getRandomInt(4); // 0~3개의 손자 랜덤
+            for (let k = 0; k < grandchildCount && createdCount < totalCount; k++) {
+                const nodeId = `node_${idCounter++}`;
+                const node = {
+                    nodeId: nodeId,
+                    parentId: l1Node.nodeId,
+                    NAME: getRandomName(),
+                    AGE: 20 + getRandomInt(20),
+                    REC1: getRandomInt(101),
+                    REC2: getRandomInt(101),
+                    REC3: getRandomInt(101),
+                    AMT1: getRandomAmount(),
+                };
+                data.push(node);
+                createdCount++;
+                level2Queue.push({ nodeId, depth: 2 });
+            }
+        }
+
+        let parentPool = [...level1Queue, ...level2Queue];
+
+        while (createdCount < totalCount && parentPool.length > 0) {
+            const parentIndex = getRandomInt(parentPool.length);
+            const parent = parentPool[parentIndex];
+
+            const batchCount = getRandomInt(4) + 1;
+
+            for (let m = 0; m < batchCount && createdCount < totalCount; m++) {
+                const nodeId = `node_${idCounter++}`;
+                const newDepth = parent.depth + 1;
+                const node = {
+                    nodeId: nodeId,
+                    parentId: parent.nodeId,
+                    depth: newDepth,
+                    NAME: getRandomName(),
+                    AGE: 20 + getRandomInt(40),
+                    REC1: getRandomInt(101),
+                    REC2: getRandomInt(101),
+                    REC3: getRandomInt(101),
+                    AMT1: getRandomAmount(),
+                };
+                data.push(node);
+                createdCount++;
+                parentPool.push({ nodeId, depth: newDepth });
+            }
+        }
+
+        return data;
     }
 };
 

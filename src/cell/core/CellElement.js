@@ -191,6 +191,11 @@ export class CellElement extends BasicCellElement {
 			}
 		}
 
+		if (bindKey === "id1") {
+			trace.log("111");
+			return  "a";
+		}
+
 		if (bindKey) {
 			if (this.#tr.getAttribute("group-by")) {
 				const idx = this.#host.fields.get().indexOf(bindKey);

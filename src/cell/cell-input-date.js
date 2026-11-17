@@ -52,7 +52,7 @@ class CellInputDate extends EditableCellElement
 		this.innerHTML = `
           <input
              type="${this.#type}"
-             data-placeholder="${this.cell.getAttribute('placeholder') || 'Select'}"
+             data-placeholder="${this.cell.getAttribute('placeholder') || ''}"
              ${attr.join(" ")}
              required
           />
@@ -89,7 +89,7 @@ class CellInputDate extends EditableCellElement
 		}
 
 		this.#target.value = formattedVal || "";
-		this.#target.classList.toggle("has-value", !!formattedVal); // 💡 값이 있으면 클래스 추가
+		this.#target.classList.toggle("has-value", !!formattedVal);
 
 		if (this.isValid()) {
 			this.#validate(formattedVal);
