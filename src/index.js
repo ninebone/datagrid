@@ -22,6 +22,7 @@ import "./cell/cell-tree-thead.js";
 
 import "./col/col-expand.js";
 import "./menu/nine-table-menu.js";
-import "./menu/nine-table-menu-panel.js";
+
+import "./export/Export.js"
 
 export { NINE_TABLE } from "@/core/constants.js";

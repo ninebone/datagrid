@@ -1,268 +1,291 @@
 import { trace } from "@nopeer";
 import { ColFixManager } from "@/col/ColFixManager.js";
 
+const DEFAULT_MENU_ITEMS = [
+    /**{ menuId: "sort", name: "Sort", className: "ng-menu-sort" },*/
+    /**{ menuId: "fix-column", name: "Fix Column", className: "ng-menu-fix-col" },
+    { type: "separator" },*/
+    {
+        menuId: "export",
+        name: "Export",
+        className: "export",
+        items: [
+            { menuId: "export-excel", name: "Excel", className: "export-excel" },
+            { menuId: "export-csv", name: "CSV", className: "export-csv" },
+            { menuId: "export-pdf", name: "PDF", className: "export-pdf" },
+        ],
+    },
+
+    { menuId: "filtering", name: "Filtering", className: "ng-menu-filtering", disabled: true },
+    { menuId: "maximize", name: "Maximize", className: "maximize", disabled: true },
+
+    {
+        menuId: "properties",
+        name: "Options",
+        className: "options",
+        disabled: true,
+        items: [
+            { menuId: "show-title-bar", name: "Title Bar Show/Hide", className: "show-title-bar" },
+            { menuId: "show-status-bar", name: "Status Bar Show/Hide", className: "show-status-bar" },
+            { menuId: "auto-fit-col", name: "Auto Fit Columns", className: "auto-fit-col" },
+        ],
+    },
+];
+
 export class ContextMenu extends HTMLElement {
-    #tableHost;
-    #panel;
+    #host = null;
+    #currentContext = null;
+    #closeHandler = null;
 
     connectedCallback() {
-        const root = this.getRootNode();
-        this.#tableHost = root instanceof ShadowRoot ? root.host : (this.closest('nine-table') || root.host);
+        this.#host = this.getRootNode().host;
 
-        if (!this.#tableHost) {
-            this.#tableHost = this.parentElement?.closest('nine-table') || this.assignedSlot?.closest('nine-table');
-        }
-
-        if (!this.#tableHost) return;
+        this.#init();
     }
 
-    #onContextMenu = (e) => {
-        const path = e.composedPath ? e.composedPath() : [];
-        const targetCell = path.find(el => el.tagName === 'TH' || el.tagName === 'TD');
+    #init = () => {
+        this.#renderer();
+        this.#initEvent();
+    };
+    #renderer = () => {
+        this.innerHTML = `
+            <div class="menu-wrapper">
+                <ul class="menu-container"></ul>
+            </div>
+        `;
+    };
+    #initEvent = () => {
+        this.#host.removeEventListener("contextmenu", this.#onContextMenu);
+        this.#host.addEventListener("contextmenu", this.#onContextMenu);
 
+        this.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        this.addEventListener("click", this.#onClick);
+    };
+
+    #onContextMenu = (e) => {
+        if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+
+        const path = e.composedPath ? e.composedPath() : [];
+        const targetCell = path.find((el) => el.tagName === "TH" || el.tagName === "TD");
         if (!targetCell) return;
 
-        const targetTable = path.find(el => el.tagName === 'TABLE') || targetCell.closest('table');
+        const targetTable = path.find((el) => el.tagName === "TABLE") || targetCell.closest("table");
 
         e.preventDefault();
         e.stopPropagation();
 
-        this.openMenu(e.clientX, e.clientY, targetCell, targetTable);
+        this.open(e.clientX, e.clientY, targetCell, targetTable);
     };
 
+    #onClick = (e) => {
+        const li = e.target.closest("li[menu-id]");
+        if (!li || !this.contains(li)) return;
+
+        e.stopPropagation();
+        if (li.classList.contains("disabled")) return;
+
+        this.#execute(li.getAttribute("menu-id"));
+        this.close();
+    };
+
+    open(x, y, targetCell, targetTable) {
+        const isHeaderCell = !!targetCell.closest("thead");
+        this.#currentContext = { targetCell, targetTable, isHeaderCell };
+
+        this.#renderItems();
+        this.#syncItemStates(targetTable, isHeaderCell, targetCell);
+
+        this.style.display = "block";
+        this.style.left = `${x}px`;
+        this.style.top = `${y}px`;
+
+        requestAnimationFrame(() => {
+            const wrapper = this.querySelector(".menu-wrapper");
+            if (!wrapper) return;
+            const rect = wrapper.getBoundingClientRect();
+
+            if (x + rect.width > window.innerWidth) this.style.left = `${x - rect.width}px`;
+            if (y + rect.height > window.innerHeight) this.style.top = `${y - rect.height}px`;
+        });
+
+        this.#unbindCloseHandler();
+        this.#closeHandler = (e) => {
+            const path = e.composedPath ? e.composedPath() : [];
+            if (!path.includes(this) && !this.contains(e.target)) this.close();
+        };
+        requestAnimationFrame(() => {
+            if (this.#closeHandler) window.addEventListener("click", this.#closeHandler);
+        });
+    }
+
+    close() {
+        this.style.display = "none";
+        this.#unbindCloseHandler();
+    }
+
+    #unbindCloseHandler() {
+        if (this.#closeHandler) {
+            window.removeEventListener("click", this.#closeHandler);
+            this.#closeHandler = null;
+        }
+    }
+
+    #getCustomItems() {
+        const raw = this.#host.provider?.menuItems;
+        const list = typeof raw === "function" ? raw(this.#currentContext) : raw;
+        return Array.isArray(list) ? list : [];
+    }
+
+    #renderItems() {
+        const container = this.querySelector(".menu-container");
+        if (!container) return;
+
+        const customItems = this.#getCustomItems();
+        const useDefault = this.#host.provider?.useDefaultMenu !== false;
+
+        const rawItems = [
+            ...customItems,
+            ...(customItems.length > 0 && useDefault ? [{ type: "separator" }] : []),
+            ...(useDefault ? DEFAULT_MENU_ITEMS : []),
+        ];
+
+        container.innerHTML = "";
+        this.#appendItems(container, this.#cleanSeparators(rawItems));
+    }
+
+    #syncItemStates(targetTable, isHeaderCell, targetCell) {
+        const sheet = this.#getTargetSheet(targetCell);
+        const fixManager = sheet?.colFix;
+        const sourceTable = sheet?.sourceTable || targetTable;
+
+        const fixState = fixManager?.getFixState(targetCell, sourceTable) ?? "none";
+        const isFixed = fixState === "left" || fixState === "right";
+        const canFix = isHeaderCell && (fixManager?.canFixColumn(targetCell, sourceTable) ?? false);
+
+        this.#setItemState("fix-column", {
+            text: isFixed ? "Unfix Column" : "Fix Column",
+            disabled: isFixed ? !isHeaderCell : !canFix,
+        });
+    }
+
+    #setItemState(menuId, { disabled, text, active } = {}) {
+        const li = this.querySelector(`li[menu-id="${menuId}"]`);
+        if (!li) return;
+
+        if (typeof disabled === "boolean") li.classList.toggle("disabled", disabled);
+        if (typeof text === "string") {
+            const span = li.querySelector(":scope > span");
+            if (span) span.textContent = text;
+        }
+        if (typeof active === "boolean") li.classList.toggle("on", active);
+    }
+
+    #execute(menuId) {
+        const { targetCell, targetTable } = this.#currentContext;
+
+        const matchedItem = this.#findItem(this.#getCustomItems(), menuId);
+        matchedItem?.onClick?.(this.#currentContext);
+
+        /**
+        this.#host.dispatchEvent(
+            new CustomEvent("menu-click", {
+                detail: { menuId, targetCell, targetTable, item: matchedItem || null },
+                bubbles: true,
+                composed: true,
+            })
+        ); */
+
+        const exporter = this.#host?.shadowRoot?.querySelector("nine-table-export-progress");
+
+        switch (menuId) {
+            case "export-excel":
+                exporter?.exportData({ format: "excel", showDialog: true });
+                break;
+            case "export-csv":
+                exporter?.exportData({ format: "csv", showDialog: true });
+                break;
+            case "export-pdf":
+                exporter?.exportData({ format: "pdf", showDialog: true });
+                break;
+        }
+    }
+
     #getTargetSheet(targetCell) {
-        return targetCell?.closest('nine-table-sheet') || this.#tableHost.activeSheet || this.#tableHost;
+        return targetCell.closest("nine-table-sheet") || this.#host.activeSheet || this.#host;
     }
 
     #getFixManager(targetCell) {
         const sheet = this.#getTargetSheet(targetCell);
         if (!sheet) return null;
-
-        if (!sheet.colFix) {
-            sheet.colFix = new ColFixManager(sheet);
-        }
+        if (!sheet.colFix) sheet.colFix = new ColFixManager(sheet);
         return sheet.colFix;
     }
 
-    #parseCustomMenuItems(containerElement, activeTable) {
-        const items = [];
-        const activeTableId = activeTable?.id;
-        const allUls = Array.from(containerElement.querySelectorAll(':scope > ul'));
-
-        allUls.forEach(rootUl => {
-            const targetTableAttr = rootUl.getAttribute('target-table');
-
-            if (!targetTableAttr || (activeTableId && targetTableAttr === activeTableId)) {
-                const parsedList = this.#traverseUl(rootUl);
-                items.push(...parsedList);
+    #findItem(items, menuId) {
+        for (const item of items) {
+            if (item.menuId === menuId) return item;
+            if (Array.isArray(item.items)) {
+                const found = this.#findItem(item.items, menuId);
+                if (found) return found;
             }
-        });
-
-        return items;
+        }
+        return null;
     }
 
-    #traverseUl(ulEl) {
-        const list = [];
-        Array.from(ulEl.children).forEach(child => {
-            const tagName = child.tagName.toLowerCase();
+    #cleanSeparators(items) {
+        const cleaned = [];
+        items.forEach((item) => {
+            if (item.type === "separator") {
+                if (cleaned.length === 0 || cleaned[cleaned.length - 1].type === "separator") return;
+            }
+            cleaned.push(item);
+        });
+        if (cleaned[cleaned.length - 1]?.type === "separator") cleaned.pop();
+        return cleaned;
+    }
 
-            if (tagName === 'hr' || child.classList.contains('separator')) {
-                list.push({ type: 'separator' });
+    #appendItems(parentUl, items) {
+        items.forEach((item) => {
+            if (item.type === "separator") {
+                const sep = document.createElement("li");
+                sep.className = "ng-menu-separator";
+                parentUl.appendChild(sep);
                 return;
             }
 
-            if (tagName === 'li') {
-                let name = '';
-                const spanEl = child.querySelector(':scope > span');
-                if (spanEl) {
-                    name = spanEl.textContent.trim();
-                } else {
-                    name = Array.from(child.childNodes)
-                        .filter(n => n.nodeType === Node.TEXT_NODE)
-                        .map(n => n.textContent.trim())
-                        .join('');
-                }
+            const li = document.createElement("li");
+            li.setAttribute("menu-id", item.menuId);
+            li.className = [
+                item.className || "",
+                item.items?.length ? "submenu" : "",
+                item.disabled ? "disabled" : "",
+            ].filter(Boolean).join(" ");
 
-                const subUl = child.querySelector(':scope > ul');
-                const item = {
-                    menuId: child.id || name,
-                    name: name,
-                    className: child.className || '',
-                    disabled: child.hasAttribute('disabled') || child.getAttribute('disabled') === 'true',
-                    isCustom: true
-                };
+            const span = document.createElement("span");
+            span.textContent = item.name;
+            li.appendChild(span);
 
-                if (subUl) {
-                    item.items = this.#traverseUl(subUl);
-                }
-
-                list.push(item);
+            if (item.items?.length > 0) {
+                const subUl = document.createElement("ul");
+                subUl.className = "ng-menu-sublist";
+                this.#appendItems(subUl, item.items);
+                li.appendChild(subUl);
             }
+
+            parentUl.appendChild(li);
         });
-        return list;
-    }
-
-    #buildMenuItems(activeTable, isHeaderCell, targetCell) {
-        const useDefault = this.getAttribute('use-default-menu') !== 'false';
-        let rawItems = [];
-
-        const customItems = this.#parseCustomMenuItems(this, activeTable);
-        if (customItems.length > 0) {
-            rawItems.push(...customItems);
-        }
-
-        const fixManager = this.#getFixManager(targetCell);
-        const currentFixState = fixManager?.getFixState(targetCell, activeTable) ?? 'none';
-        const isFixable = isHeaderCell && (fixManager?.canFixColumn(targetCell, activeTable) ?? false);
-
-        let fixMenuItem = null;
-        if (currentFixState === 'left' || currentFixState === 'right') {
-            fixMenuItem = {
-                menuId: 'unfix-column',
-                name: 'Unfix Column',
-                className: 'ng-menu-unfix-col',
-                disabled: !isHeaderCell
-            };
-        } else {
-            fixMenuItem = {
-                menuId: 'fix-column',
-                name: 'Fix Column',
-                className: 'ng-menu-fix-col',
-                disabled: !isFixable
-            };
-        }
-
-        if (useDefault) {
-            rawItems.push(
-                { type: 'separator' },
-                {
-                    menuId: 'sort',
-                    name: 'Sort',
-                    className: 'ng-menu-sort',
-                    disabled: !isHeaderCell
-                },
-                fixMenuItem,
-                { type: 'separator' },
-                { menuId: 'filtering', name: 'Filtering', className: 'ng-menu-filtering' },
-                { menuId: 'maximize', name: 'Maximize', className: 'maximize' },
-                {
-                    menuId: 'export',
-                    name: 'Export',
-                    className: 'export',
-                    items: [
-                        { menuId: 'export-excel', name: 'Excel', className: 'export-excel' },
-                        { menuId: 'export-pdf', name: 'PDF', className: 'export-pdf', disabled: true }
-                    ]
-                },
-                {
-                    menuId: 'properties',
-                    name: 'Options',
-                    className: 'options',
-                    items: [
-                        { menuId: 'show-title-bar', name: 'Title Bar Show/Hide', className: 'show-title-bar' },
-                        { menuId: 'show-status-bar', name: 'Status Bar Show/Hide', className: 'show-status-bar' },
-                        { menuId: 'auto-fit-col', name: 'Auto Fit Columns', className: 'auto-fit-col' }
-                    ]
-                }
-            );
-        }
-
-        const cleanedItems = [];
-        rawItems.forEach((item) => {
-            if (item.type === 'separator') {
-                if (cleanedItems.length === 0 || cleanedItems[cleanedItems.length - 1].type === 'separator') {
-                    return;
-                }
-            }
-            cleanedItems.push(item);
-        });
-
-        if (cleanedItems.length > 0 && cleanedItems[cleanedItems.length - 1].type === 'separator') {
-            cleanedItems.pop();
-        }
-
-        return cleanedItems;
-    }
-
-    openMenu(x, y, targetCell, targetTable) {
-        const targetParent = this.#tableHost.shadowRoot || this.#tableHost;
-
-        if (!this.#panel) {
-            this.#panel = document.createElement('nine-table-menu-panel');
-            targetParent.appendChild(this.#panel);
-        }
-
-        const isHeaderCell = !!targetCell.closest('thead');
-        const menuItems = this.#buildMenuItems(targetTable, isHeaderCell, targetCell);
-
-        this.#panel.render(menuItems, (e) => this.#handleMenuClick(e, targetCell, targetTable));
-
-        const targetSheet = this.#getTargetSheet(targetCell);
-        this.#syncMenuStates(targetSheet);
-
-        this.#panel.openAt(x, y);
-    }
-
-    #syncMenuStates(targetSheet) {
-        if (!this.#panel || !targetSheet) return;
-
-        const isFiltering = targetSheet.filtering?.isFiltering?.() || false;
-        this.#panel.toggleItemState('filtering', 'on', isFiltering);
-
-        const autoFit = this.#tableHost.getAttribute('auto-fit-col') === 'true';
-        this.#panel.toggleItemState('auto-fit-col', 'on', autoFit);
-
-        const showTitle = this.#tableHost.getAttribute('show-title-bar') === 'true';
-        this.#panel.toggleItemState('show-title-bar', 'on', showTitle);
-    }
-
-    #handleMenuClick(e, targetCell, targetTable) {
-        const menuId = e.menuId;
-
-        const customEvent = new CustomEvent('menu-click', {
-            detail: { menuId, targetCell, targetTable, originalEvent: e },
-            bubbles: true,
-            composed: true
-        });
-        this.dispatchEvent(customEvent);
-
-        const baseCol = parseInt(targetCell.dataset.col, 10);
-        const targetSheet = this.#getTargetSheet(targetCell);
-
-        switch (menuId) {
-            case 'fix-column':
-            case 'unfix-column':
-                const fixManager = this.#getFixManager(targetCell);
-                fixManager?.executeFixToggle(menuId, targetCell);
-                break;
-
-            case 'sort':
-                if (!isNaN(baseCol)) {
-                    targetSheet.sorting?.handleSortFromMenu?.(baseCol, targetCell);
-                }
-                break;
-
-            case 'filtering':
-                targetSheet?.filtering?.toggle();
-                break;
-
-            case 'auto-fit-col':
-                this.#tableHost.setAttribute('auto-fit-col', this.#tableHost.getAttribute('auto-fit-col') === 'true' ? 'false' : 'true');
-                break;
-
-            case 'show-title-bar':
-                this.#tableHost.setAttribute('show-title-bar', this.#tableHost.getAttribute('show-title-bar') === 'true' ? 'false' : 'true');
-                break;
-        }
-
-        this.#panel.close();
     }
 
     disconnectedCallback() {
-        this.#tableHost?.removeEventListener('contextmenu', this.#onContextMenu);
+        this.#host?.removeEventListener("contextmenu", this.#onContextMenu);
+        this.close();
     }
 }
 
-if (!customElements.get('nine-table-menu')) {
-    customElements.define('nine-table-menu', ContextMenu);
+if (!customElements.get("nine-table-menu")) {
+    customElements.define("nine-table-menu", ContextMenu);
 }

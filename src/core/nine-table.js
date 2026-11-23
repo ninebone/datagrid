@@ -88,7 +88,6 @@ export default class NineTable extends HTMLElement {
 
 
 
-
     setData(records) {
         this.#dataManager.data.set(records);
         this.refresh();
@@ -176,6 +175,16 @@ export default class NineTable extends HTMLElement {
                 }
             });
         });
+    }
+
+    exportExcel = () => {
+        this.shadowRoot.querySelector("nine-table-export-progress").exportExcel();
+    }
+    exportCsv = () => {
+        this.shadowRoot.querySelector("nine-table-export-progress").exportCsv();
+    }
+    exportPdf = () => {
+        this.shadowRoot.querySelector("nine-table-export-progress").exportPdf();
     }
 
     #bindApiMethods() {

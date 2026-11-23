@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AG Grid ::: Overview</title>
+    <script type="text/javascript" src="_data/example-data.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@ninebone/util@latest/dist/nine-util.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+</head>
+<body style="font-family: sans-serif; margin: 16px;">
+<h1>AG Grid Overview Example</h1>
+<div id="myGrid" style="height: 620px; width: 100%;"></div>
+
+<script>
+    const DATA_CNT = 1000000;
+
+    const renderers = {
+        image: (p) => p.value
+            ? `<img src="./${p.value}" style="vertical-align:middle;width:36px;height:36px;border-radius:50%;" />`
+            : "",
+        summary: (p) => {
+            const d = p.data || {};
+            const r1 = Number(d.REC1) || 0;
+            const r2 = Number(d.REC2) || 0;
+            const r3 = Number(d.REC3) || 0;
+            const avg = Math.round((r1 + r2 + r3) / 3);
+            return `<span style="color:#999;">${r1}+${r2}+${r3} (Avg.<b style="color:green;">${avg}</b>)</span>`;
+        },
+        barChart: (p) => {
+            const d = p.data || {};
+            const values = [d.REC1, d.REC2, d.REC3, d.REC4, d.REC5, d.REC6, d.REC7, d.REC8, d.REC9, d.REC10, d.REC11, d.REC12].map(v => Number(v) || 0);
+            const width = 100;
+            const height = 22;
+            const pts = values.map((v, i) => {
+                const x = (i / (values.length - 1 || 1)) * width;
+                const safeV = Math.min(Math.max(v, 0), 100);
+                const y = height - (safeV / 100) * (height - 4) - 2;
+                return `${x},${y}`;
+            });
+            return `<svg viewBox="0 0 ${width} ${height}" style="width:100%;height:22px;display:block;">
+                    <polyline fill="none" stroke="#3b82f6" stroke-width="2" points="${pts.join(" ")}" />
+                </svg>`;
+        },
+        pieChart: (p) => {
+            const d = p.data || {};
+            const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+            const nums = [d.REC1, d.REC2, d.REC3, d.REC4, d.REC5].map(v => Math.max(Number(v) || 0, 0));
+            const total = nums.reduce((a, b) => a + b, 0);
+            if (!total) return `<svg width="28" height="28"><circle cx="14" cy="14" r="13" fill="#e2e8f0"/></svg>`;
+            let angle = 0;
+            const slices = nums.map((val, idx) => {
+                if (!val) return "";
+                const deg = (val / total) * 360;
+                const a1 = (angle - 90) * Math.PI / 180;
+                const a2 = (angle + deg - 90) * Math.PI / 180;
+                angle += deg;
+                const x1 = 14 + 13 * Math.cos(a1), y1 = 14 + 13 * Math.sin(a1);
+                const x2 = 14 + 13 * Math.cos(a2), y2 = 14 + 13 * Math.sin(a2);
+                const large = deg > 180 ? 1 : 0;
+                return `<path d="M14,14 L${x1},${y1} A13,13 0 ${large},1 ${x2},${y2} Z" fill="${colors[idx % colors.length]}"/>`;
+            }).join("");
+            return `<svg width="28" height="28" viewBox="0 0 28 28">${slices}</svg>`;
+        }
+    };
+
+    const columnDefs = [
+        {
+            headerName: "Select",
+            width: 60,
+            pinned: "left",
+            checkboxSelection: true,
+            headerCheckboxSelection: true
+        },
+        { field: "NAME", headerName: "Name", width: 110, pinned: "left", editable: (p) => (p.data?.REC1 ?? 0) > 30 },
+        { field: "PIC", headerName: "Image", width: 70, cellRenderer: renderers.image },
+        { headerName: "Avg Expr", width: 150, valueGetter: (p) => p.data, cellRenderer: renderers.summary },
+        {
+            field: "DEPART",
+            headerName: "Department",
+            width: 150,
+            editable: true,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: { values: ["PLAN", "DEV", "DESIGN"] }
+        },
+        {
+            field: "SEX",
+            headerName: "Gender",
+            width: 100,
+            editable: true,
+            valueFormatter: (p) => p.value === "M" ? "Male" : p.value === "F" ? "Female" : (p.value ?? "")
+        },
+        {
+            field: "COLOR2",
+            headerName: "Color",
+            width: 90,
+            editable: (p) => (p.data?.REC1 ?? 0) > 30,
+            cellRenderer: (p) => p.value
+                ? `<span style="display:inline-flex;align-items:center;gap:6px;"><i style="width:12px;height:12px;background:${p.value};display:inline-block;border:1px solid #cbd5e1;"></i>${p.value}</span>`
+                : ""
+        },
+        { field: "BIRTH_DT", headerName: "Birth Date", width: 150, editable: true },
+        { headerName: "Trend", width: 120, valueGetter: (p) => p.data, cellRenderer: renderers.barChart },
+        { headerName: "Pie", width: 70, valueGetter: (p) => p.data, cellRenderer: renderers.pieChart }
+    ];
+
+    const gridOptions = {
+        columnDefs,
+        rowData: [],
+        rowSelection: "multiple",
+        defaultColDef: {
+            sortable: true,
+            filter: true,
+            resizable: true
+        }
+    };
+
+    const gridDiv = document.getElementById("myGrid");
+    const api = agGrid.createGrid(gridDiv, gridOptions);
+
+    setTimeout(() => {
+        const rows = exampleData.generateRandomData(DATA_CNT);
+        api.setGridOption("rowData", rows);
+    }, 0);
+</script>
+</body>
+</html>

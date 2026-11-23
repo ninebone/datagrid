@@ -62,6 +62,7 @@ export class ColFixManager {
         return true;
     }
 
+    // ColFixManager.js 의 executeFixToggle 보완
     executeFixToggle(action, targetCell, fixType = 'left') {
         if (!this.#sheet || !targetCell) return;
 
@@ -71,7 +72,6 @@ export class ColFixManager {
         const baseCol = parseInt(targetCell.dataset.col, 10);
         const colSpan = targetCell.colSpan || 1;
         const targetColIndex = baseCol + colSpan - 1;
-
         if (isNaN(targetColIndex)) return;
 
         const colgroup = sourceTable.querySelector('colgroup');
@@ -82,82 +82,50 @@ export class ColFixManager {
         if (action === 'fix-column') {
             cols.forEach(col => {
                 const idx = parseInt(col.getAttribute('data-col'), 10);
-                if (idx <= targetColIndex) {
-                    col.setAttribute('fixed', fixType);
+                if (fixType === 'left' && idx <= targetColIndex) {
+                    col.setAttribute('fixed', 'left');
+                } else if (fixType === 'right' && idx >= baseCol) {
+                    col.setAttribute('fixed', 'right');
                 }
             });
-
-            ['thead', 'tbody', 'tfoot'].forEach(group => {
-                sourceTable.querySelectorAll(`${group} tr`).forEach(tr => {
-                    Array.from(tr.children).forEach(cell => {
-                        const cIdx = parseInt(cell.dataset.col, 10);
-                        if (!isNaN(cIdx) && cIdx <= targetColIndex) {
-                            cell.setAttribute('fixed', fixType);
-                        }
-                    });
-                });
-            });
-
         } else if (action === 'unfix-column') {
-            let minBaseCol = baseCol;
-            let maxEndCol = baseCol + colSpan - 1;
-
-            ['thead', 'tbody', 'tfoot'].forEach(group => {
-                sourceTable.querySelectorAll(`${group} tr`).forEach((tr, rIdx) => {
-                    Array.from(tr.children).forEach(cell => {
-                        const cCol = parseInt(cell.dataset.col, 10);
-                        const cSpan = cell.colSpan || 1;
-                        const cEnd = cCol + cSpan - 1;
-                        const rSpan = cell.rowSpan || 1;
-                        const trIndex = tr.sectionRowIndex ?? rIdx;
-
-                        const isVerticalOverlap = !(trIndex + rSpan - 1 < cell.closest('tr').sectionRowIndex || trIndex > (cell.closest('tr').sectionRowIndex + rSpan - 1));
-
-                        const isHorizontalOverlap = !(cEnd < baseCol || cCol > targetColIndex);
-
-                        if (isHorizontalOverlap) {
-                            minBaseCol = Math.min(minBaseCol, cCol);
-                            maxEndCol = Math.max(maxEndCol, cEnd);
-                        }
-                    });
-                });
-            });
+            const currentType = this.getFixState(targetCell, sourceTable);
 
             cols.forEach(col => {
                 const idx = parseInt(col.getAttribute('data-col'), 10);
-                if (idx >= minBaseCol) {
+                if (col.getAttribute('fixed') !== currentType) return;
+
+                if (currentType === 'left' && idx >= baseCol) {
+                    col.removeAttribute('fixed');
+                } else if (currentType === 'right' && idx <= targetColIndex) {
                     col.removeAttribute('fixed');
                 }
-            });
-
-            let isBroken = false;
-            cols.forEach(col => {
-                if (isBroken) {
-                    col.removeAttribute('fixed');
-                } else if (!col.getAttribute('fixed')) {
-                    isBroken = true;
-                }
-            });
-
-            ['thead', 'tbody', 'tfoot'].forEach(group => {
-                sourceTable.querySelectorAll(`${group} tr`).forEach(tr => {
-                    Array.from(tr.children).forEach(cell => {
-                        const cIdx = parseInt(cell.dataset.col, 10);
-                        if (isNaN(cIdx)) return;
-
-                        const correspondingCol = cols.find(c => parseInt(c.getAttribute('data-col'), 10) === cIdx);
-                        const isColFixed = correspondingCol?.getAttribute('fixed');
-
-                        if (isColFixed) {
-                            cell.setAttribute('fixed', isColFixed);
-                        } else {
-                            cell.removeAttribute('fixed');
-                        }
-                    });
-                });
             });
         }
 
-        this.#sheet.recompileAndRefresh?.();
+        // colgroup의 fixed 상태를 thead, tbody, tfoot 셀에 일괄 동기화
+        const fixedMap = new Map();
+        cols.forEach(col => {
+            const idx = parseInt(col.getAttribute('data-col'), 10);
+            fixedMap.set(idx, col.getAttribute('fixed') || null);
+        });
+
+        ['thead', 'tbody', 'tfoot'].forEach(group => {
+            sourceTable.querySelectorAll(`${group} tr`).forEach(tr => {
+                Array.from(tr.children).forEach(cell => {
+                    const cIdx = parseInt(cell.dataset.col, 10);
+                    if (isNaN(cIdx)) return;
+
+                    const state = fixedMap.get(cIdx);
+                    if (state) {
+                        cell.setAttribute('fixed', state);
+                    } else {
+                        cell.removeAttribute('fixed');
+                    }
+                });
+            });
+        });
+
+        //this.#sheet.recompileAndRefresh?.();
     }
 }

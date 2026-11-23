@@ -76,9 +76,10 @@ export class LayoutManager {
                 <nine-table-analysis></nine-table-analysis>
             </nine-table-body>
             <nine-table-footer></nine-table-footer>
+            
+            <nine-table-export-progress></nine-table-export-progress>
+            <nine-table-menu></nine-table-menu>
         `;
-
-
 
         this.#host.shadowRoot.querySelectorAll('nine-table-sheet').forEach(($sheet, idx) => {
             $sheet.classList.add('active');

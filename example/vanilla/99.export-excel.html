@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>ExcelJS CDN 예제</title>
+    <!-- ExcelJS CDN 불러오기 -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+</head>
+<body>
+
+<button id="downloadBtn">엑셀 다운로드</button>
+
+<script>
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
+        // 1. 워크북(Workbook) 생성
+        const workbook = new ExcelJS.Workbook();
+
+        // 2. 워크시트 추가
+        const sheet = workbook.addWorksheet('회원목록');
+
+        // 3. 컬럼 설정 (헤더와 매핑될 키 지정)
+        sheet.columns = [
+            { header: '아이디', key: 'id', width: 15 },
+            { header: '이름', key: 'name', width: 15 },
+            { header: '이메일', key: 'email', width: 25 }
+        ];
+
+        // 4. 데이터 추가
+        sheet.addRow({ id: 'user1', name: '홍길동', email: 'hong@example.com' });
+        sheet.addRow({ id: 'user2', name: '김철수', email: 'kim@example.com' });
+
+        // 5. 스타일 주기 예시 (헤더 볼드체 처리)
+        sheet.getRow(1).font = { bold: true };
+
+        // 6. 브라우저에서 파일로 다운로드하기 위한 버퍼 생성 및 저장
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = 'members.xlsx';
+        anchor.click();
+
+        window.URL.revokeObjectURL(url);
+    });
+</script>
+
+</body>
+</html>

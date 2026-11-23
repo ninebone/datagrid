@@ -1,0 +1,286 @@
+nine-table-export-popup {
+
+    .export-popup-body {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 18px 20px;
+        min-width: 380px;
+        font-size: 13px;
+        color: #111827;
+        box-sizing: border-box;
+    }
+
+    .field-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+
+        .title {
+            font-weight: 700;
+            color: #4b5563;
+            text-align: left;
+            padding-left: 8px;
+        }
+    }
+
+    .segmented {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        padding: 3px;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 7px;
+        gap: 3px;
+
+        label {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 7px 10px;
+            border-radius: 5px;
+            font-weight: 500;
+            color: #4b5563;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+        }
+
+        input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        label:has(input:checked) {
+            background: #ffffff;
+            color: #111827;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+        }
+        .ext {
+            font-size: 11px;
+            color: #9ca3af;
+            font-weight: 400;
+        }
+        label:has(input:checked) .ext {
+            color: #2563eb;
+        }
+    }
+
+    .mode-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .mode-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding: 10px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 7px;
+        background: #ffffff;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+
+        input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .mode-title {
+            font-weight: 600;
+            font-size: 12.5px;
+            color: #1f2937;
+        }
+        .mode-desc {
+            font-size: 11px;
+            color: #6b7280;
+            line-height: 1.35;
+        }
+    }
+
+    .mode-card:has(input:checked) {
+        border-color: #2563eb;
+        background: #eff6ff;
+
+        .mode-title {
+            color: #1d4ed8;
+        }
+    }
+
+    .check-box-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 11px 12px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 7px;
+
+        label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            color: #374151;
+            user-select: none;
+        }
+        input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            accent-color: #2563eb;
+            cursor: pointer;
+            margin: 0;
+        }
+    }
+
+    label.disabled {
+        opacity: 0.42;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 12px 20px;
+        border-top: 1px solid #e5e7eb;
+        background: #fafafa;
+
+        .btn {
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            color: #374151;
+        }
+        .btn:hover {
+            background: #f3f4f6;
+        }
+        .btn-confirm {
+            border-color: #2563eb;
+            background: #2563eb;
+            color: #ffffff;
+        }
+        .btn-confirm:hover {
+            background: #1d4ed8;
+        }
+    }
+}
+
+nine-table-export-progress {
+
+    dialog:modal {
+        resize: none;
+    }
+    div.head {
+        display: none;
+    }
+    div.contents {
+        width: 100%;
+    }
+
+    .export-progress-body {
+        width: 100%;
+        padding: 8px 16px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .export-progress-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 20px;
+        padding: 0 4px;
+    }
+
+    .export-message {
+        color: #374151;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .export-sheet-steps {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+    }
+
+    .export-sheet-steps[hidden] {
+        display: none;
+    }
+
+    .export-sheet-steps .sheet-step {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 1;
+        background: #f3f4f6;
+        border: 1px solid #d1d5db;
+        color: #6b7280;
+        box-sizing: border-box;
+        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .export-sheet-steps .sheet-step.active {
+        background: green;
+        border-color: green;
+        color: #ffffff;
+    }
+
+    .export-sheet-steps .sheet-step.done {
+        background: #f0fdf4;
+        border-color: #86efac;
+        color: #15803d;
+    }
+
+    .export-progress-bar {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 10px;
+        border: none;
+        border-radius: 999px;
+        background: #e5e7eb;
+        overflow: hidden;
+    }
+
+    .export-progress-bar::-webkit-progress-bar {
+        background: #e5e7eb;
+        border-radius: 999px;
+    }
+
+    .export-progress-bar::-webkit-progress-value {
+        background: green;
+        border-radius: 999px;
+        transition: width 0.15s ease;
+    }
+
+    .export-progress-bar::-moz-progress-bar {
+        background: green;
+        border-radius: 999px;
+    }
+}
+
+
