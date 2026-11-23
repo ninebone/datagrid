@@ -52,10 +52,19 @@
     "version": "npm run build",
     "release": "npm version patch && npm publish --access public"
   },
-  "peerDependencies": {
-    "@ninebone/util": "*"
-  },
   "devDependencies": {
     "vite": "^8.3.5"
+  },
+  "peerDependencies": {
+    "@ninebone/util": "*",
+    "exceljs": "^4.4.0"
+  },
+  "peerDependenciesMeta": {
+    "exceljs": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@ninebone/util": "*"
   }
 }

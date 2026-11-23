@@ -16,13 +16,18 @@ export class DataAPI {
         style: {
             value: '',
         },
+        menuItems: [],
         add: (providerObj) => {
             if (!providerObj || typeof providerObj !== 'object') return;
 
-            const { style, ...methods } = providerObj;
+            const { style, menuItems, ...methods } = providerObj;
 
             if (style && typeof style === 'string') {
                 this.provider.style.value = style;
+            }
+
+            if (Array.isArray(menuItems) || typeof menuItems === 'function') {
+                this.provider.menuItems = menuItems;
             }
 
             if (Object.keys(methods).length > 0) {
