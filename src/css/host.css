@@ -225,6 +225,9 @@
     --radio-checked-border: green;
     --radio-dot-color: green;
 
+    input {
+        caret-color: #f9fafb;
+    }
     cell-combo {
         --cell-combo-bg: #1c1c21;
         --cell-combo-color: #f9fafb;

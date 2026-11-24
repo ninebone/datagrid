@@ -10,6 +10,12 @@
     --radio-dot-color: green;
 }
 
+input {
+    -webkit-user-select: text;
+    user-select: text;
+    caret-color: #111827;
+}
+
 input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
