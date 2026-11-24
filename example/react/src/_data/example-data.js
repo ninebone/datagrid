@@ -1,3 +1,11 @@
+const BASE_URL = import.meta.env.BASE_URL || '/';
+
+const getAssetUrl = (relativePath) => {
+    const cleanBase = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
+    const cleanPath = relativePath.replace(/^\/+/, '');
+    return `${cleanBase}${cleanPath}`;
+};
+
 const exampleData = {
     generateCommonCode(group) {
         const masterCommonCodes = [
@@ -128,7 +136,7 @@ const exampleData = {
             data.push({
                 ORDER:     i + 1,
                 NAME:      [4,13,100].includes(i) ? 'nandoo' : getRandomName(),
-                PIC:       `/images/pic/pic_${getRandomInt(20)}.jpg`,
+                PIC:       getAssetUrl(`images/pic/pic_${getRandomInt(20)}.jpg`),
                 SEX:       getRandom(["M", "F"]),
                 AGE:       20 + getRandomInt(80),
                 TEL:       getRandomTel(),
