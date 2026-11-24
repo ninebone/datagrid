@@ -228,6 +228,12 @@
     input {
         caret-color: #f9fafb;
     }
+    nine-table-filter-panel, cell-combo-panel {
+        input[type="text"] {
+            caret-color: #111827;
+        }
+    }
+
     cell-combo {
         --cell-combo-bg: #1c1c21;
         --cell-combo-color: #f9fafb;

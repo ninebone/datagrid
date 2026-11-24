@@ -16,6 +16,13 @@ input {
     caret-color: #111827;
 }
 
+nine-table-filter-panel, cell-combo-panel {
+    input[type="text"] {
+        caret-color: #111827;
+    }
+}
+
+
 input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
