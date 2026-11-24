@@ -84,6 +84,10 @@ cell-combo-panel {
     margin: 0;
     resize: both;
 
+    input[type="checkbox"] {
+        padding: 0;
+    }
+
     input {
         display: none;
         width: 100%;
