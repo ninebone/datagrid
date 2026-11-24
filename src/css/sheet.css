@@ -1,5 +1,5 @@
 nine-table-sheet {
-    --sheet-bg: #ffffff;
+    --sheet-bg: transparent;
     --sheet-nodata-color: #9ca3af;
     --sheet-fixed-brightness: 99%;
 

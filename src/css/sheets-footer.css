@@ -1,16 +1,25 @@
+nine-table-sheets-footer {
+    --sheets-footer-border-top: 1px solid #e5e7eb;
+    --sheets-footer-counter-color: #6b7280;
+    --sheets-footer-tab-item-color: #4b5563;
+    --sheets-footer-tab-item-background: #f9fafb;
+    --sheets-footer-tab-item-border: 1px solid #e5e7eb;
+    --sheets-footer-tab-item-active-color: #111827;
+    --sheets-footer-tab-item-active-background: white;
+    --sheets-footer-tab-item-active-border-bottom: 2px solid green;
+}
 
 nine-table-sheets-footer {
     display: flex;
-    height: 26px;
-    --background: #f3f4f6;
-    border-top: 1px solid #e5e7eb;
     align-items: center;
     justify-content: space-between;
+    height: 26px;
+    border-top: var(--sheets-footer-border-top);
     padding: 0 8px;
     flex-shrink: 0;
 
     .sheets-counter {
-        color: #6b7280;
+        color: var(--sheets-footer-counter-color);
         padding-left: 12px;
         flex-shrink: 0;
 
@@ -18,8 +27,6 @@ nine-table-sheets-footer {
             font-weight: 700;
         }
     }
-
-
 
     .nine-tab-bar {
         display: flex;
@@ -29,13 +36,11 @@ nine-table-sheets-footer {
         flex: 1;
         height: 100%;
 
-
-
         nt-sheets-tab-item {
             padding: 4px 12px;
-            color: #4b5563;
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
+            color: var(--sheets-footer-tab-item-color);
+            background: var(--sheets-footer-tab-item-background);
+            border: var(--sheets-footer-tab-item-border);
             border-top: none;
             border-radius: 0 0 3px 3px;
             user-select: none;
@@ -45,8 +50,9 @@ nine-table-sheets-footer {
         }
 
         nt-sheets-tab-item.active {
-            background: white;
-            color: #111827;
+            color: var(--sheets-footer-tab-item-active-color);
+            background: var(--sheets-footer-tab-item-active-background);
+            border-bottom: var(--sheets-footer-tab-item-active-border-bottom);
             font-weight: 600;
             border-bottom: 2px solid green;
         }

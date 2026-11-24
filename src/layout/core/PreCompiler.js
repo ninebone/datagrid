@@ -290,7 +290,7 @@ export class PreCompiler {
                 expandBtn.classList.add('collapsed');
                 expandBtn.classList.remove('expand');
                 expandBtn.setAttribute('collapsed', 'true');
-                cell.style.color = 'transparent';
+                //cell.style.color = 'transparent';
 
                 const targetWidth = Math.max(10, Math.floor(COLLAPSED_WIDTH / colSpan));
                 if (!isNaN(colIndex)) {
@@ -298,7 +298,7 @@ export class PreCompiler {
                         const targetCol = tbl.querySelector(`colgroup col[data-col="${colIndex + i}"]`);
                         if (targetCol) {
                             targetCol.setAttribute('width', targetWidth);
-                            targetCol.style.width = targetCol.style.minWidth = targetCol.style.maxWidth`${targetWidth}px`;
+                            //targetCol.style.width = targetCol.style.minWidth = targetCol.style.maxWidth`${targetWidth}px`;
                         }
                     }
                 }

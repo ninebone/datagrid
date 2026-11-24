@@ -78,6 +78,14 @@ nine-table-filter-panel {
         border-top: 1px solid #e5e7eb;
         background: #f9fafb;
         flex-shrink: 0;
+
+        input[type=checkbox] {
+            padding: 0;
+            background-color: transparent;
+        }
+        input[type="checkbox"]:checked {
+            background-color: green;
+        }
     }
     .footer-btns {
         display: flex;

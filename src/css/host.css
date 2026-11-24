@@ -9,8 +9,7 @@
     flex-direction: column;
     position: relative;
     overflow: hidden;
-
-    background: #fff;
+    background: transparent;
 }
 
 
@@ -202,6 +201,113 @@
     }
 }
 
+
+:host([theme="dark"]) {
+    --cell-selection-bg: rgba(59, 130, 246, 0.18);
+    --cell-selection-border-color: #3b82f6; /* 기존 green 유지를 원하시면 #22c55e 추천 */
+
+    --hscrollbar-height: 16px;
+    --vscrollbar-width: 16px;
+
+    --cell-input-border-color: #4b5563;
+    --cell-input-bg: transparent;
+    --cell-input-color: #f9fafb;
+    --cell-input-readonly-bg: #18202f;
+    --cell-input-btn-bg: #374151;
+
+    --checkbox-bg: #202026;
+    --checkbox-border-color: #5c5c6b;
+    --checkbox-checked-bg: #333;
+    --checkbox-checked-border: green;
+
+    --radio-bg: #202026;
+    --radio-border-color: #5c5c6b;
+    --radio-checked-border: green;
+    --radio-dot-color: green;
+
+    cell-combo {
+        --cell-combo-bg: #1c1c21;
+        --cell-combo-color: #f9fafb;
+        --cell-combo-button-border-color: #4b4b57;
+        --cell-combo-button-bg-color: #2e2e36;
+        --cell-combo-button-color: #e5e7eb;
+    }
+
+    nine-table-sheet {
+        --sheet-bg: #25252b;
+        --sheet-nodata-color: #9ca3af;
+        --sheet-fixed-brightness: 99%;
+    }
+
+
+    table {
+        --table-th-bg: #2e2e36;
+        --table-th-color: #f9fafb;
+        --table-td-bg: #25252b;
+        --table-td-color: #e5e7eb;
+        --table-disabled-bg: #161e2e;
+        --th-border-left: none;
+        --th-border-top: none;
+        --th-border-right: 1px solid #393939;
+        --th-border-bottom: 1px solid #393939;
+        --td-border-left: none;
+        --td-border-top: none;
+        --td-border-right: 1px solid transparent;
+        --td-border-bottom: 1px solid #2f2f2f;
+    }
+
+    nine-table-hscrollbar {
+        --hscrollbar-background: #202026;
+        --hscrollbar-border-top: 1px solid #3c3c3c;
+        --hscrollbar-button-background: #2e2e36;
+        --hscrollbar-track-background: #1d1d22;
+        --hscrollbar-thumb-background: #464652;
+        --hscrollbar-thumb-hover-background: #5c5c6b;
+    }
+
+    nine-table-vscrollbar {
+        --vscrollbar-background: #202026;
+        --vscrollbar-border-top: 2px solid #3c3c3c;
+        --vscrollbar-button-background: #2e2e36;
+        --vscrollbar-track-background: #1d1d22;
+        --vscrollbar-thumb-background: #464652;
+        --vscrollbar-thumb-hover-background: #5c5c6b;
+    }
+
+    tfoot {
+        & tr:first-child {
+            th, td {
+                border-top: 1px solid #444;
+            }
+        }
+    }
+
+    .scroll-edge {
+        background: #202026;
+        border-top: 1px solid #3c3c3c;
+    }
+
+    .col-indicator-rowgroup.collapse th {
+        background-color: darkcyan;
+    }
+
+    cell-input-date {
+        input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+    }
+
+    nine-table-sheets-footer {
+        --sheets-footer-border-top: 1px solid #3c3c3c;
+        --sheets-footer-counter-color: #9ca3af;
+        --sheets-footer-tab-item-color: #9ca3af;
+        --sheets-footer-tab-item-background: #202026;
+        --sheets-footer-tab-item-border: 1px solid #3c3c3c;
+        --sheets-footer-tab-item-active-color: #f9fafb;
+        --sheets-footer-tab-item-active-background: #2e2e36;
+        --sheets-footer-tab-item-active-border-bottom: 2px solid #22c55e;
+    }
+}
 
 :host(.loading) {
     .ng-loading-bar {

@@ -125,7 +125,7 @@ tbody.body tr.tree-collapse {
 }
 
 tbody.body tr {
-    background: white;
+    background: transparent;
     position: relative;
     transform: translateY(0);
     transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
