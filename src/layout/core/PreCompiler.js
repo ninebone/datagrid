@@ -65,6 +65,7 @@ export class PreCompiler {
             const background = cols[i].getAttribute('background');
             if (background) {
                 el.style.background = background;
+                cols[i].removeAttribute('background');
             }
         });
     }

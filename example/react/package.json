@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ninebone/datagrid": "^0.4.1",
     "@ninebone/mu": "^1.0.33",
     "@ninebone/util": "^1.0.58",
     "@ninebone/ux": "^1.0.348",
