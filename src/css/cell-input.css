@@ -77,7 +77,7 @@ cell-input-date {
         position: relative;
         margin: 0;
         width: 100%;
-        padding: 0 4px;
+        padding: 0;
         border: 1px solid var(--cell-input-border-color);
         background: var(--cell-input-bg);
         color: var(--cell-input-color);
