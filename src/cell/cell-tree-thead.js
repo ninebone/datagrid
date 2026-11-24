@@ -80,7 +80,7 @@ export class CellTreeThead extends TheadCellElement {
 
 			const depth = parseInt(target.dataset.targetDepth, 10);
 
-			trace.log(depth);
+			//trace.log(depth);
 			if (this.sheet.isGroupBy) {
 				const grouping = this.sheet.grouping;
 
