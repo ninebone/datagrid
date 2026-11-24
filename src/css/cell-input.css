@@ -70,6 +70,8 @@ cell-input-color {
     }
 }
 
+
+
 cell-input-date {
     input {
         position: relative;
@@ -80,6 +82,20 @@ cell-input-date {
         background: var(--cell-input-bg);
         color: var(--cell-input-color);
         box-sizing: border-box;
+    }
+
+    input[type="date"] {
+        color-scheme: light;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: none;
+        opacity: 0.75;
+        cursor: pointer;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
     }
 
     input:hover {
@@ -99,7 +115,8 @@ cell-input-date {
         box-sizing: border-box;
     }
 
-    input.has-value::before, input:focus::before {
+    input.has-value::before,
+    input:focus::before {
         display: none;
     }
 }

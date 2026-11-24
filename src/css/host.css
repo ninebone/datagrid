@@ -233,6 +233,21 @@
         --cell-combo-button-color: #e5e7eb;
     }
 
+    cell-input-date {
+        input[type="date"] {
+            color-scheme: light;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.9;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+    }
+
     nine-table-sheet {
         --sheet-bg: #25252b;
         --sheet-nodata-color: #9ca3af;

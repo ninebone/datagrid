@@ -80,18 +80,19 @@ export class ColResizer {
                         tbl.style.width = `${totalWidth}px`;
                         tbl.style.minWidth = `${totalWidth}px`;
                         tbl.style.maxWidth = `${totalWidth}px`;
-
+                        /**
                         Object.entries(colWidths).forEach(([colIdx, w]) => {
                             tbl.querySelectorAll(`th[data-col="${colIdx}"], td[data-col="${colIdx}"]`).forEach(cell => {
                                 //cell.style.width = `${w}px`;
                                 //cell.style.minWidth = `${w}px`;
                                 //cell.style.maxWidth = `${w}px`;
                             });
-                        });
+                        }); */
                     });
                 }
             });
         } else {
+            /**
             containers.forEach(container => {
                 const tables = container.querySelectorAll('table');
                 tables.forEach(tbl => {
@@ -99,7 +100,7 @@ export class ColResizer {
                     //tbl.style.minWidth = '100%';
                     //tbl.style.maxWidth = '';
                 });
-            });
+            }); */
         }
 
         this.#sheet.querySelector('nine-table-hscrollbar')?.refresh();
