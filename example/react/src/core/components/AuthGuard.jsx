@@ -22,8 +22,6 @@ export const AuthGuard = () => {
         setLoading(false);
     }, []);
 
-    console.log(location.pathname);
-
     if (location.pathname === "/" || location.pathname === "/datagrid" || location.pathname === "/datagrid/") {
         return <Navigate to="/overview" replace />;
     }

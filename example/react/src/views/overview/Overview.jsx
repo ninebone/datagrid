@@ -338,9 +338,9 @@ const Overview = () => {
 			<nine-table ref={tableRef} show-footer="true" theme={localStorage.getItem('nine_table_theme_dark') === 'true' ? 'dark' : undefined} style={{width: '90%', height: '80vh'}}>
 				<table row-indicator="true">
 					<colgroup>
-						<col width="50" background="red" fixed="left"/>
-						<col width="50" background="red"/>
-						<col width="100" background="red"/>
+						<col width="50" background-color="red" fixed="left"/>
+						<col width="50" background-color="red"/>
+						<col width="100" background-color="red"/>
 						<col width="80"/>
 						<col width="130"/>
 						<col width="100"/>
