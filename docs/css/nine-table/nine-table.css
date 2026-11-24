@@ -255,6 +255,7 @@
 
 
 input {
+    color-scheme: light;
     -webkit-user-select: text;
     user-select: text;
     caret-color: #111827;
