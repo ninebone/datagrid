@@ -1,0 +1,5 @@
+:host(nine-side-menu:not(.collapse)), :host(nine-side-menu.hover) {
+	nine-side-menu-body {
+		gap: 0px;
+	}
+}
