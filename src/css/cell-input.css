@@ -84,17 +84,17 @@ cell-input-date {
         box-sizing: border-box;
     }
 
-    input[type="date"] {
+    input {
         color-scheme: light;
     }
 
-    input[type="date"]::-webkit-calendar-picker-indicator {
+    input::-webkit-calendar-picker-indicator {
         filter: none;
         opacity: 0.75;
         cursor: pointer;
     }
 
-    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    input::-webkit-calendar-picker-indicator:hover {
         opacity: 1;
     }
 
