@@ -1,7 +1,7 @@
 table {
     --table-th-bg: #f9fafb;
     --table-th-color: #111827;
-    --table-td-bg: #fff;
+    --table-td-bg: white;
     --table-td-color: #111827;
     --table-disabled-bg: #f0f0f0;
     --th-border-left: none;

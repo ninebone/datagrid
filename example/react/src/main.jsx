@@ -7,14 +7,14 @@ import { nine, trace } from '@ninebone/util'
 
 
 nine.setup({
-    //cssPath: "/css/nine-table",
+    cssPath: "/css/nine",
     debug: {
         enable: true,//import.meta.env.VITE_DEBUG_ENABLE === 'true',
         //filter: ["nine-ux", "nine-util", "nine-mu", "nine-template"],
         filter: ["nine-table"],
     },
     "nine-table": {
-        cssFile: "./css/nine-table/nine-table.css",
+        cssFile: "/css/nine-table/nine-table.css",
     },
 });
 

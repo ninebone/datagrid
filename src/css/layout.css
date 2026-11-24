@@ -16,7 +16,7 @@ nine-table-sheets {
     flex-direction: column;
     overflow: hidden;
     position: relative;
-    background: #fff;
+    background: transparent;
 
     nine-table-sheets-body {
         flex: 1;

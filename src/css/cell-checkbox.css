@@ -25,7 +25,7 @@ cell-checkbox {
         display: flex;
     }
     input {
-        background-color: #ffffff;
+        background-color: transparent;
     }
 }
 .CELL-CHECKBOX[text-align='left'] {

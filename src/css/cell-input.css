@@ -71,7 +71,6 @@ cell-input-color {
 }
 
 cell-input-date {
-
     input {
         position: relative;
         margin: 0;
@@ -79,14 +78,8 @@ cell-input-date {
         padding: 0 4px;
         border: 1px solid var(--cell-input-border-color);
         background: var(--cell-input-bg);
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 4px center;
-        background-size: 14px 16px;
         color: var(--cell-input-color);
+        box-sizing: border-box;
     }
 
     input:hover {
@@ -98,19 +91,16 @@ cell-input-date {
         position: absolute;
         display: flex;
         align-items: center;
-        width: calc(100% - 22px);
+        width: calc(100% - 28px);
         height: 100%;
-        left: 1px;
-        top: 1px;
+        left: 4px;
+        top: 0;
         pointer-events: none;
+        box-sizing: border-box;
     }
 
     input.has-value::before, input:focus::before {
         display: none;
-    }
-
-    input:focus {
-
     }
 }
 

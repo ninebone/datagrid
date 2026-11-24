@@ -10,11 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ninebone/datagrid": "^0.4.0",
+    "@ninebone/mu": "^1.0.33",
     "@ninebone/util": "^1.0.58",
+    "@ninebone/ux": "^1.0.348",
     "exceljs": "^4.4.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.6"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",
