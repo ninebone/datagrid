@@ -252,11 +252,3 @@
         --sheets-footer-tab-item-active-border-bottom: 2px solid #22c55e;
     }
 }
-
-
-input {
-    color-scheme: light;
-    -webkit-user-select: text;
-    user-select: text;
-    caret-color: #111827;
-}
