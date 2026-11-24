@@ -7,6 +7,7 @@ const basename = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
 
 function App() {
 
+    console.log("basename", basename);
     return (
         <Router basename={basename}>
             <AuthGuard />
