@@ -36,18 +36,15 @@ export class ColResizer {
     }
 
     refreshLayout(containerType = 'body') {
-        const containers = Array.from(this.#sheet.querySelectorAll(`.ng-container-${containerType}`));
-        if (containers.length === 0) return;
+
+        const container = this.#sheet.querySelector(`.ng-container-${containerType}`);
 
         const isFixedContainer = containerType === 'left' || containerType === 'right';
-        const isAutoFit = !isFixedContainer && (
-            this.#sheet.isAutoFitCol ||
-            containers[0].querySelector('table')?.getAttribute('auto-fit-col') === 'true'
-        );
+        const isAutoFit = !isFixedContainer && this.#sheet.isAutoFitCol;
 
         if (!isAutoFit) {
 
-            const firstColgroup = containers[0].querySelector('table colgroup');
+            const firstColgroup = container.querySelector('table colgroup');
             if (!firstColgroup) return;
 
             let totalWidth = 0;
@@ -62,74 +59,39 @@ export class ColResizer {
                 }
             });
 
-            containers.forEach(container => {
-                const tables = container.querySelectorAll('table');
+            const table = container.querySelector('table');
 
-                if (containerType === 'body') {
-                    tables.forEach(tbl => {
-                        tbl.style.width = `${totalWidth}px`;
-                        //tbl.style.minWidth = `${totalWidth}px`;
-                    });
-                } else {
-                    container.style.flex = `0 0 ${totalWidth}px`;
-                    container.style.width = `${totalWidth}px`;
-                    container.style.minWidth = `${totalWidth}px`;
-                    container.style.maxWidth = `${totalWidth}px`;
+            if (containerType === 'body') {
+                table.style.width = `${totalWidth}px`;
+            } else {
+                container.style.flex = `0 0 ${totalWidth}px`;
+                container.style.width = `${totalWidth}px`;
+                container.style.minWidth = `${totalWidth}px`;
+                container.style.maxWidth = `${totalWidth}px`;
 
-                    tables.forEach(tbl => {
-                        tbl.style.width = `${totalWidth}px`;
-                        tbl.style.minWidth = `${totalWidth}px`;
-                        tbl.style.maxWidth = `${totalWidth}px`;
-                        /**
-                        Object.entries(colWidths).forEach(([colIdx, w]) => {
-                            tbl.querySelectorAll(`th[data-col="${colIdx}"], td[data-col="${colIdx}"]`).forEach(cell => {
-                                //cell.style.width = `${w}px`;
-                                //cell.style.minWidth = `${w}px`;
-                                //cell.style.maxWidth = `${w}px`;
-                            });
-                        }); */
-                    });
-                }
-            });
+                table.style.width = `${totalWidth}px`;
+                table.style.minWidth = `${totalWidth}px`;
+                table.style.maxWidth = `${totalWidth}px`;
+            }
         } else {
-            /**
-            containers.forEach(container => {
-                const tables = container.querySelectorAll('table');
-                tables.forEach(tbl => {
-                    //tbl.style.width = '100%';
-                    //tbl.style.minWidth = '100%';
-                    //tbl.style.maxWidth = '';
-                });
-            }); */
+            this.autoFitWidth();
         }
 
-        this.#sheet.querySelector('nine-table-hscrollbar')?.refresh();
+        this.#sheet.querySelector('nine-table-hscrollbar').refresh();
     }
 
-    setColumnWidth(globalColIndex, width, containerType = null) {
+    setColumnWidth(colIndex, width) {
 
-        let targetCols = [];
+        let targetCol = this.#sheet.querySelector(`table colgroup col[data-col="${colIndex}"]`);
+        if (!targetCol) return;
 
-        targetCols = Array.from(this.#sheet.querySelectorAll(`table colgroup col[data-col="${globalColIndex}"]`));
-
-        if (targetCols.length === 0) return;
-
-        const firstContainer = targetCols[0].closest('.ng-container-left, .ng-container-body, .ng-container-right');
-        const resolvedContainerType = containerType || (
+        const firstContainer = targetCol.closest('.ng-container-left, .ng-container-body, .ng-container-right');
+        const resolvedContainerType = (
             firstContainer?.classList.contains('ng-container-left') ? 'left' :
                 firstContainer?.classList.contains('ng-container-right') ? 'right' : 'body'
         );
 
-        targetCols.forEach(col => {
-            col.setAttribute('width', width);
-            col.style.width = col.style.minWidth = col.style.maxWidth = `${width}px`;
-        });
-
-        const sourceCol = this.#sheet.sourceTable?.querySelector(`colgroup col[data-col="${globalColIndex}"]`);
-        if (sourceCol) {
-            sourceCol.setAttribute('width', width);
-            sourceCol.style.width = sourceCol.style.minWidth = sourceCol.style.maxWidth  = `${width}px`;
-        }
+        this.#setColumnWidth(colIndex, width);
 
         this.refreshLayout(resolvedContainerType);
 
@@ -138,6 +100,95 @@ export class ColResizer {
         }
 
         this.#sheet.rowManager?.refresh();
+    }
+
+    #setColumnWidth(globalColIndex, width) {
+
+        const intWidth = Math.round(Number(width));
+
+        let targetCol = this.#sheet.querySelector(`table colgroup col[data-col="${globalColIndex}"]`);
+        if (!targetCol) return;
+
+        targetCol.setAttribute('width', intWidth);
+        targetCol.style.width = targetCol.style.minWidth = targetCol.style.maxWidth = `${intWidth}px`;
+
+        const sourceCol = this.#sheet.source.table.querySelector(`colgroup col[data-col="${globalColIndex}"]`);
+        sourceCol.setAttribute('width', intWidth);
+        sourceCol.style.width = sourceCol.style.minWidth = sourceCol.style.maxWidth  = `${intWidth}px`;
+    }
+
+    autoFitWidth = () => {
+
+        const container = this.#sheet.querySelector('.ng-sheet-body .ng-container-body');
+        if (!container) return;
+
+        const $colGroup = container.querySelector('.ng-container-body table colgroup');
+        if (!$colGroup) return;
+
+        const containerWidth = container.clientWidth;
+        if (containerWidth <= 0) return;
+
+        let totalOriginalWidth = 0;
+        const colList = [];
+
+        $colGroup.querySelectorAll('col').forEach(col => {
+            const colIndex = col.getAttribute('data-col');
+            const headerCell = container.querySelector(`thead th[data-col="${colIndex}"][collapsed="true"]`);
+
+            if (headerCell) {
+                colList.unshift({ colIndex, width: COLLAPSED_WIDTH, isCollapsed: true });
+            } else {
+                const w = parseInt(col.getAttribute('width'), 10) || 100;
+                colList.push({ colIndex, width: w, isCollapsed: false });
+                totalOriginalWidth += w;
+            }
+        });
+
+        const collapsedTotalWidth = colList
+            .filter(c => c.isCollapsed)
+            .reduce((sum, c) => sum + c.width, 0);
+
+        const availableWidth = Math.max(0, containerWidth - collapsedTotalWidth);
+
+        if (totalOriginalWidth > 0 && colList.length > 0) {
+            let allocatedTotal = 0;
+
+            const calculatedCols = colList.map(item => {
+                if (item.isCollapsed) {
+                    return { colIndex: item.colIndex, remainder: 0, width: COLLAPSED_WIDTH };
+                }
+
+                const exactWidth = (item.width * availableWidth) / totalOriginalWidth;
+                const baseWidth = Math.max(30, Math.floor(exactWidth));
+                allocatedTotal += baseWidth;
+                return {
+                    colIndex: item.colIndex,
+                    remainder: exactWidth - Math.floor(exactWidth),
+                    width: baseWidth
+                };
+            });
+
+            let remainderPixels = availableWidth - allocatedTotal;
+
+            const uncollapsedCols = calculatedCols.filter(c => !colList.find(item => item.colIndex === c.colIndex)?.isCollapsed);
+
+            if (remainderPixels > 0 && uncollapsedCols.length > 0) {
+                uncollapsedCols.sort((a, b) => b.remainder - a.remainder);
+                for (let i = 0; i < remainderPixels; i++) {
+                    uncollapsedCols[i % uncollapsedCols.length].width += 1;
+                }
+            } else if (remainderPixels < 0 && uncollapsedCols.length > 0) {
+                uncollapsedCols.sort((a, b) => a.remainder - b.remainder);
+                for (let i = 0; i < Math.abs(remainderPixels); i++) {
+                    const target = uncollapsedCols[i % uncollapsedCols.length];
+                    if (target.width > 30) target.width -= 1;
+                }
+            }
+
+            calculatedCols.forEach(({ colIndex, width }) => {
+                this.#setColumnWidth(colIndex, width);
+            });
+        }
     }
 
     #checkIsAutoFit(targetCell) {

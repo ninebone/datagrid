@@ -204,7 +204,7 @@
 
 :host([theme="dark"]) {
     --cell-selection-bg: rgba(59, 130, 246, 0.18);
-    --cell-selection-border-color: #3b82f6; /* 기존 green 유지를 원하시면 #22c55e 추천 */
+    --cell-selection-border-color: #3b82f6;
 
     --hscrollbar-height: 16px;
     --vscrollbar-width: 16px;

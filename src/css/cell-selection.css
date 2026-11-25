@@ -1,6 +1,6 @@
 :host {
     --cell-selection-bg: rgba(37, 99, 235, 0.08);
-    --cell-selection-border-color: #2563eb;
+    --cell-selection-border-color: green;
 }
 
 tbody {
