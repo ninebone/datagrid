@@ -299,7 +299,6 @@ export class PreCompiler {
                         const targetCol = tbl.querySelector(`colgroup col[data-col="${colIndex + i}"]`);
                         if (targetCol) {
                             targetCol.setAttribute('width', targetWidth);
-                            //targetCol.style.width = targetCol.style.minWidth = targetCol.style.maxWidth`${targetWidth}px`;
                         }
                     }
                 }
@@ -307,7 +306,7 @@ export class PreCompiler {
                 expandBtn.classList.remove('collapsed');
                 expandBtn.classList.add('expand');
                 expandBtn.setAttribute('collapsed', 'false');
-                cell.style.color = '';
+                //cell.style.color = '';
             }
         });
     }

@@ -10,14 +10,31 @@ export class ExprEngine {
         this.#fields = host.fields.get();
     }
 
-    #rewriteExpr(expr) {
 
+    #rewriteExpr(expr) {
         if (!expr || !this.#fields.length) return expr;
 
         return expr.replace(/data\.([a-zA-Z_$][\w$]*)/g, (match, fieldName) => {
             const idx = this.#fields.indexOf(fieldName);
             return idx >= 0 ? `rowItem.v[${idx}]` : match;
         });
+    }
+
+    #toRowObject(rowItem) {
+        const fields = this.#host?.fields?.get?.() || this.#fields || [];
+        const values = rowItem?.v;
+        if (!Array.isArray(values)) {
+            return rowItem && typeof rowItem === 'object' ? { ...rowItem } : {};
+        }
+
+        const record = {};
+        for (let i = 0; i < fields.length; i++) {
+            const fieldName = fields[i];
+            if (fieldName) {
+                record[fieldName] = values[i];
+            }
+        }
+        return record;
     }
 
     precompile(expr, isGroup) {
@@ -37,6 +54,10 @@ export class ExprEngine {
             if (compiledExpr.includes("provider.") || compiledExpr.includes("host.") || compiledExpr.includes("data.") || compiledExpr.includes("rowItem.v") || compiledExpr.includes("(")) {
 
                 let evalFn = this.#exprCache.get(compiledExpr);
+
+                if (expr === "provider.renderProfileCard(data)") {
+                    trace.log(compiledExpr);
+                }
 
                 if (isGroup) {
                     if (!evalFn) {
@@ -89,10 +110,12 @@ export class ExprEngine {
 
                         this.#exprCache.set(compiledExpr, evalFn);
                     }
+
+                    return evalFn(rowItem, row, this.#host, this.#fields);
                 } else {
                     if (!evalFn) {
-                        evalFn = new Function('rowItem', 'row', 'host', `
-                            const data = rowItem;
+                        evalFn = new Function('rowData', 'rowItem', 'row', 'host', `
+                            let data = rowData;
                             const provider = host;
     
                             if (!data && !host) return "";
@@ -101,9 +124,10 @@ export class ExprEngine {
 
                         this.#exprCache.set(compiledExpr, evalFn);
                     }
-                }
 
-                return evalFn(rowItem, row, this.#host);
+                    const rowData = this.#toRowObject(rowItem);
+                    return evalFn(rowData, rowItem, row, this.#host);
+                }
             }
 
             return compiledExpr;

@@ -2,7 +2,7 @@
 import { trace } from "@nopeer";
 
 export class NineTableHScrollBar extends HTMLElement {
-    #owner;
+    #sheet;
     #dragging = false;
     #elements;
     #interval1;
@@ -14,8 +14,8 @@ export class NineTableHScrollBar extends HTMLElement {
     }
 
     connectedCallback() {
-        this.#owner = this.closest("nine-table-sheet") || this.getRootNode().host;
-        if (!this.#owner) return;
+        this.#sheet = this.closest("nine-table-sheet");
+        if (!this.#sheet) return;
 
         this.innerHTML = `
             <button class='scroll-left' disabled><div class='scroll-icon'></div></button>
@@ -24,7 +24,7 @@ export class NineTableHScrollBar extends HTMLElement {
         `;
 
         const initWhenReady = () => {
-            const body = this.#owner.querySelector(".ng-sheet-body .ng-container-body");
+            const body = this.#sheet.querySelector(".ng-sheet-body .ng-container-body");
             if (!body) {
                 setTimeout(initWhenReady, 10);
                 return;
@@ -53,8 +53,8 @@ export class NineTableHScrollBar extends HTMLElement {
     }
 
     #observeResize = () => {
-        if (!this.#owner) return;
-        const body = this.#owner.querySelector(".ng-sheet-body .ng-container-body");
+        if (!this.#sheet) return;
+        const body = this.#sheet.querySelector(".ng-sheet-body .ng-container-body");
         if (!body) return;
 
         this.#resizeObserver = new ResizeObserver(() => {
@@ -65,7 +65,7 @@ export class NineTableHScrollBar extends HTMLElement {
 
     refresh = () => {
 
-        if (!this.#owner || !this.#elements || this.#dragging) return;
+        if (!this.#sheet || !this.#elements || this.#dragging) return;
 
         const body = this.#elements.container;
         const table = body.querySelector("table");
@@ -77,8 +77,13 @@ export class NineTableHScrollBar extends HTMLElement {
         const bodyWidth = body.clientWidth;
         const tableWidth = table.scrollWidth;
 
-        const needsHScroll = (bodyWidth !== 0 && tableWidth > bodyWidth);
-        this.#owner.classList.toggle('hscroll-visible', needsHScroll);
+        const needsHScroll = (bodyWidth !== 0 && tableWidth >= bodyWidth + 2);
+        this.#sheet.classList.toggle('hscroll-visible', needsHScroll);
+
+        if (needsHScroll && this.#sheet.isAutoFitCol) {
+            trace.log(needsHScroll, tableWidth, bodyWidth);
+        }
+
 
         if (!needsHScroll) {
             return;

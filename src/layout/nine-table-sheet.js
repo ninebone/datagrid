@@ -213,14 +213,18 @@ export class NineTableSheet extends HTMLElement {
 
     #autoFit = (enable = true) => {
 
-        const container = this.querySelector('.ng-sheet-body .ng-container-body');
-        if (!container) return;
+        //const container = this.querySelector('.ng-sheet-body .ng-container-body');
+        //if (!container) return;
 
-        const firstColgroup = this.querySelector('.ng-container-body table colgroup');
-        if (!firstColgroup) return;
+        //const firstColgroup = this.querySelector('.ng-container-body table colgroup');
+        //if (!firstColgroup) return;
 
         if (enable) {
             this.setAttribute('auto-fit-col', 'true');
+
+            this.#colResizer.autoFitWidth();
+
+            /**
             const containerWidth = container.clientWidth;
             if (containerWidth <= 0) return;
 
@@ -283,9 +287,9 @@ export class NineTableSheet extends HTMLElement {
                 }
 
                 calculatedCols.forEach(({ globalColIndex, width }) => {
-                    this.#colResizer?.setColumnWidth(globalColIndex, width, 'body');
+                    this.#colResizer.setColumnWidthAutoFit(globalColIndex, width);
                 });
-            }
+            } */
         } else {
             this.removeAttribute('auto-fit-col');
         }

@@ -22,13 +22,14 @@ export class fields {
 		return found ? found.type : 'string';
 	}
 
-	add = (arr, type = 'string') => {
-		arr.forEach(fName => {
-			if (!this.#fields.some(f => f.name === fName)) {
-				this.#fields.push({ name: fName, type: type });
+	add = (input) => {
+		const list = Array.isArray(input) ? input : [input];
+		for (const fName of list) {
+			if (fName && !this.#fields.some(f => f.name === fName)) {
+				this.#fields.push({ name: fName, type: 'string' });
 			}
-		});
-		this.#adjust();
+		}
+		//this.#adjust();
 	};
 
 	indexOf(v) {
