@@ -110,7 +110,7 @@
 
 :host([theme="dark"]) {
     --cell-selection-bg: rgba(59, 130, 246, 0.18);
-    --cell-selection-border-color: #3b82f6; /* 기존 green 유지를 원하시면 #22c55e 추천 */
+    --cell-selection-border-color: #3b82f6;
 
     --hscrollbar-height: 16px;
     --vscrollbar-width: 16px;
@@ -253,10 +253,21 @@
     }
 }
 
-
-input {
-    color-scheme: light;
-    -webkit-user-select: text;
-    user-select: text;
-    caret-color: #111827;
+/** project common custom style */
+:host(.no-vline) {
+    table {
+        --td-border-bottom: 1px solid #f0f0f0;
+        --th-border-right: 1px solid #eee;
+        --td-border-right: none;
+    }
 }
+:host([theme="dark"].no-vline) table {
+    --td-border-bottom: 1px solid #333;
+    --th-border-right: 1px solid #393939;
+    --td-border-right: none;
+}
+
+thead tr {
+    height: 32px;
+}
+
