@@ -211,7 +211,7 @@
 
     nine-table-vscrollbar {
         --vscrollbar-background: #202026;
-        --vscrollbar-border-top: 2px solid #3c3c3c;
+        --vscrollbar-border-top: 2px solid darkcyan;
         --vscrollbar-button-background: #2e2e36;
         --vscrollbar-track-background: #1d1d22;
         --vscrollbar-thumb-background: #464652;
@@ -270,4 +270,15 @@
 thead tr {
     height: 32px;
 }
+
+
+
+
+
+/**
+*:focus {
+    border: 1px solid red !important;
+} */
+
+
 
