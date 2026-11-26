@@ -22,6 +22,9 @@ nine-table-filter-panel, cell-combo-panel {
     }
 }
 
+input[type="text"] {
+    padding: 0 4px;
+}
 
 input[type="checkbox"] {
     appearance: none;

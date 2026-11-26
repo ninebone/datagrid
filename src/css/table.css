@@ -148,26 +148,3 @@ td.invalid::after {
     pointer-events: none;
 }
 
-td[disabled="true"] {
-    input, button {
-        background: var(--table-disabled-bg);
-        opacity: 0.5;
-        pointer-events: none;
-    }
-}
-
-td[text-align="left"] {
-    input {
-        text-align: left;
-    }
-}
-td[text-align="right"] {
-    input {
-        text-align: right;
-    }
-}
-td[text-align="center"] {
-    input {
-        text-align: center;
-    }
-}

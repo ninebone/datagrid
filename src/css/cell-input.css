@@ -13,7 +13,6 @@ cell-input {
         user-select: auto;
         width: 100%;
         border: 1px solid var(--cell-input-border-color);
-        padding-left: 4px;
         background: var(--cell-input-bg);
         color: var(--cell-input-color);
     }

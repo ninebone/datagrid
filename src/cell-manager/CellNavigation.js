@@ -361,10 +361,13 @@ export class CellNavigation {
 					this.moveCell(e);
 				}
 			} else {
+
 				if (["Enter", "Tab", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
 					this.moveCell(e);
 				} else if (["Space"].includes(e.code)) {
-					e.preventDefault();
+					if (!["INPUT", "TEXTAREA"].includes(e.target.tagName.toUpperCase())) {
+						e.preventDefault();
+					}
 				}
 			}
 		});

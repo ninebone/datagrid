@@ -296,7 +296,7 @@
 
     nine-table-hscrollbar {
         --hscrollbar-background: #202026;
-        --hscrollbar-border-top: 1px solid #3c3c3c;
+        --hscrollbar-border-top: 2px solid darkcyan;
         --hscrollbar-button-background: #2e2e36;
         --hscrollbar-track-background: #1d1d22;
         --hscrollbar-thumb-background: #464652;

@@ -29,7 +29,7 @@ HTMLElement.prototype.addDebounseEventListener = function(
     dblClickFn,
     pointerEvent,
     pointerFn,
-    debounceTime = 500
+    debounceTime = 300
 ) {
     const el = this;
 
@@ -38,36 +38,36 @@ HTMLElement.prototype.addDebounseEventListener = function(
     }
     const state = elementDebounceState.get(el);
 
-    el.addEventListener(pointerEvent, (e) => {
-        e.actualTarget = e.target;
-
+    const clearTimer = () => {
         if (state.timer) {
             clearTimeout(state.timer);
             state.timer = null;
         }
+    };
 
-        // 💡 500ms 동안 대기한 뒤에야 실제 pointerFn이 실행됨
+    el.addEventListener(pointerEvent, (e) => {
+        e.actualTarget = e.target;
+        clearTimer();
+
+        const onPointerUp = () => clearTimer();
+        window.addEventListener('pointerup', onPointerUp, { once: true });
+
         state.timer = setTimeout(() => {
+            window.removeEventListener('pointerup', onPointerUp);
             state.timer = null;
             state.cancelFn = pointerFn.call(el, e);
         }, debounceTime);
     });
 
     el.addEventListener(dblClickEvent, (e) => {
-        if (state.timer) {
-            clearTimeout(state.timer);
-            state.timer = null;
-        }
-
+        clearTimer();
         if (state.cancelFn) {
             state.cancelFn();
             state.cancelFn = null;
         }
-
         dblClickFn.call(el, e);
     });
 };
-
 
 nine.measureTextSize = (_text, _font = '12px sans-serif') => {
     if (typeof _text === 'number') _text = _text + "";

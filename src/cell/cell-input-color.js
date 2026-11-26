@@ -30,18 +30,21 @@ class CellInputColor extends EditableCellElement
 			this.#target.click();
 		});
 
+/**
 		this.#target.addEventListener("input", (event) => {
 			const val = event.target.value;
 			this.value = val;
 			this.#validate(val);
 
 			this.sheet.rowManager.refresh(true);
-		});
+		}); */
 
 		this.#target.addEventListener("change", (event) => {
 			const val = event.target.value;
 			this.value = val;
 			this.#validate(val);
+
+			this.cell.focus();
 
 			this.sheet.rowManager.refresh(true);
 		});
@@ -54,9 +57,46 @@ class CellInputColor extends EditableCellElement
        `;
 	};
 
-	rerenderer = () => {
-		this.refresh();
+	get displayText() {
+		return this.#target.value;
+	}
+	onEnterEdit() {
+		this.#target.focus();
+		this.#target.click();
+	}
+	onRefresh = (v) => {
+		this.#rendererColor();
+
+		this.#target.value = v !== undefined && v !== null && v !== "" ? v : "#ffffff";
+
+		if (this.isValid()) {
+			this.#validate();
+		}
 	};
+	onRenderer = () => {
+		this.onRefresh();
+	};
+
+	/**
+	refresh = () => {
+		if (!this.tr.data) return;
+
+		const v = super.refresh();
+
+		this.#rendererColor();
+
+		this.#target.value = v !== undefined && v !== null && v !== "" ? v : "#ffffff";
+
+		if (this.isValid()) {
+			this.#validate();
+		}
+	};
+	rerenderer = () => {
+	this.refresh();
+	}; */
+
+
+
 
 	#rendererColor = () => {
 
@@ -90,19 +130,7 @@ class CellInputColor extends EditableCellElement
 		}
 	};
 
-	refresh = () => {
-		if (!this.tr.data) return;
 
-		const v = super.refresh();
-
-		this.#rendererColor();
-
-		this.#target.value = v !== undefined && v !== null && v !== "" ? v : "#ffffff";
-
-		if (this.isValid()) {
-			this.#validate();
-		}
-	};
 
 	#validate = () => {
 

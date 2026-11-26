@@ -97,11 +97,14 @@ export class NineTableSheetsFooter extends HTMLElement {
         activeSheets?.forEach(sheet => {
             sheet.style.flex = (activeSheets.length > 1) ? '1 1 0%' : '1 1 100%';
 
+            sheet.refreshLayout();
+            sheet.rowManager.refresh(true);
+            /**
             if (typeof sheet.refreshLayout === 'function') {
                 sheet.refreshLayout();
             } else {
                 sheet.invalidate?.();
-            }
+            } */
         });
 
         updateSplitters();

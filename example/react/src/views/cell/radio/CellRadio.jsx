@@ -30,7 +30,9 @@ const Radio = () => {
 		<>
 			<h1>NineTable High-Performance Editable Grid & Cell Validation Showcase</h1>
 
-			<nine-table ref={tableRef} show-footer="true" theme={localStorage.getItem('nine_table_theme_dark') === 'true' ? 'dark' : undefined} style={{width: '90%', height: '80vh'}}>
+			<nine-table ref={tableRef} show-footer="true"
+						theme={localStorage.getItem('nine_table_theme_dark') === 'true' ? 'dark' : undefined}
+						style={{width: '90%', height: '80vh'}}>
 				<table row-indicator="true">
 					<colgroup>
 						<col width="80"/>
@@ -71,23 +73,23 @@ const Radio = () => {
 						<td data-bind="NAME"></td>
 
 						<td data-bind="SEX" text-align="center"
-							style={{ filter:'brightness(0.98)' }}></td>
+							style={{filter: 'brightness(0.98)'}}></td>
 						<td cell-type="radio" data-bind="SEX" text-align="center"
 							data-source="provider.getCommonCode('SEX')" key-name="code" value-name="codename"></td>
 
 						<td data-bind="STATUS" text-align="center"
-							style={{ filter:'brightness(0.98)' }}></td>
+							style={{filter: 'brightness(0.98)'}}></td>
 						<td cell-type="radio" data-bind="STATUS" text-align="center"
 							data-source="provider.getCommonCode('STATUS')" key-name="code" value-name="codename"></td>
 
 						<td data-bind="DEPART" text-align="center"
-							style={{ filter:'brightness(0.98)' }}></td>
+							style={{filter: 'brightness(0.98)'}}></td>
 						<td cell-type="radio" data-bind="DEPART" text-align="center"
 							data-source="provider.getCommonCode('DEPART')" key-name="code" value-name="codename"></td>
 
 
 						<td data-bind="DEPART1" text-align="center"
-							style={{ filter:'brightness(0.98)' }}></td>
+							style={{filter: 'brightness(0.98)'}}></td>
 						<td cell-type="radio" data-bind="DEPART1" text-align="center">
 							<datalist>
 								<option k="A" v="#AAA"/>

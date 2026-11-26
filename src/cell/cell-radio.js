@@ -13,12 +13,16 @@ class CellRadio extends EditableCellElement {
 	connectedCallback() {
 		super.connectedCallback();
 
+		this.#init();
+	}
+
+	#init = () => {
 		this.#renderer();
 
 		this.#rendererRadio();
 
 		this.#initEvent();
-	}
+	};
 
 	#initEvent = () => {
 
@@ -106,15 +110,7 @@ class CellRadio extends EditableCellElement {
 		this.#target = this.querySelector("div");
 	};
 
-	rerenderer = () => {
-		this.#rendererRadio();
-		this.refresh();
-	};
-
-	refresh = () => {
-
-		const v = super.refresh();
-
+	onRefresh = (v) => {
 		this.#radioList.forEach($el => {
 			$el.checked = (v === $el.value);
 		});
@@ -123,7 +119,11 @@ class CellRadio extends EditableCellElement {
 			this.#validate();
 		}
 	};
-
+	onRenderer = () => {
+		this.#rendererRadio();
+		this.onRefresh();
+	};
+	
 	#validate = () => {
 
 		if (this.value === null || this.value === undefined || this.value === "" || !Array.isArray(this.#dataSource)) {
