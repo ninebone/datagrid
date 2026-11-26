@@ -336,7 +336,7 @@ const Overview = () => {
 			</div>
 
 			<nine-table ref={tableRef} show-footer="true" theme={localStorage.getItem('nine_table_theme_dark') === 'true' ? 'dark' : undefined} style={{width: '90%', height: '80vh'}}>
-				<table row-indicator="true" auto-fit-col="true">
+				<table row-indicator="true" auto-fit-col="false">
 					<colgroup>
 						<col width="50" background="red" fixed="left"/>
 						<col width="50" background="red"/>
