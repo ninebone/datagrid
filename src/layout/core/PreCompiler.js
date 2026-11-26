@@ -181,7 +181,7 @@ export class PreCompiler {
         const targetAttributes = ['data-bind', 'data-expr', 'type'];
         let autoIdCounter = 0;
 
-        $tbl.querySelectorAll('tbody th,tbody td,tfoot th, tfoot td').forEach($cell => {
+        $tbl.querySelectorAll('tbody th,tbody td').forEach($cell => {
 
             const cellType = $cell.getAttribute('cell-type') || "renderer";
             const tagName = `cell-${cellType}`;
@@ -229,15 +229,16 @@ export class PreCompiler {
                 }
             });
 
+            const originalContent = $cell.innerHTML;
             const innerAttrs = targetAttributes
                 .filter(attr => $cell.hasAttribute(attr))
                 .map(attr => `${attr}="${$cell.getAttribute(attr)}"`);
 
-            $cell.innerHTML = `<${tagName} ${innerAttrs.join(' ')}></${tagName}>`;
+            $cell.innerHTML = `<${tagName} ${innerAttrs.join(' ')} content="${originalContent}"></${tagName}>`;
             $cell.setAttribute('tabindex', '0');
         });
 
-        $tbl.querySelectorAll('thead th, thead td').forEach($cell => {
+        $tbl.querySelectorAll('thead th, thead td,tfoot th, tfoot td').forEach($cell => {
             const cellType = $cell.getAttribute('cell-type') || "renderer";
             const tagName = `cell-${cellType}-thead`;
 
@@ -247,12 +248,8 @@ export class PreCompiler {
                 .map(attr => `${attr}="${$cell.getAttribute(attr)}"`);
 
             $cell.innerHTML = `<${tagName} ${innerAttrs.join(' ')} content="${originalContent}"></${tagName}>`;
-            /**
-            const expr = $cell.dataset.expr;
-            if (expr) {
-                $cell.setAttribute('data-expr', host.exprEngine.precompile(expr, false));
-            } */
         });
+
     }
 
     static #initFilterButtons(host, tbl) {

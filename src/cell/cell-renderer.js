@@ -29,9 +29,13 @@ class CellRenderer extends CellElement {
 
 	#renderer = () => {
 		this.innerHTML = `
-            <span class="wrapper"></span>
+            <span class="wrapper">${this.#content}</span>
        `;
 	};
+
+	get #content() {
+		return this.getAttribute("content") || "";
+	}
 }
 
 if (!customElements.get("cell-renderer")) {

@@ -583,11 +583,16 @@ export class EditableCellElement extends CellElement {
 
 		if (this.#cover) {
 			const expr = this.cell.dataset.expr;
+			const isHtml = this.cell.getAttribute("html") === "true";
+			const rawValue = expr
+				? this.getExprValue(expr, this.tr.data, this.tr.dataset.row)
+				: this.displayText;
+			const nextValue = rawValue ?? "";
 
-			if (expr) {
-				this.#cover.textContent = this.getExprValue(expr, this.tr.data, this.tr.dataset.row);
+			if (isHtml) {
+				this.#cover.innerHTML = nextValue;
 			} else {
-				this.#cover.textContent = this.displayText;
+				this.#cover.textContent = nextValue;
 			}
 		}
 

@@ -18,6 +18,35 @@ export class RowManager {
 
     #isProgrammaticScroll = false;
 
+    #isHandlingScroll = false;
+    #scrollQueue = [];
+
+    #enqueueScroll = (scrollTop, force = false) => {
+        // 1번 처리 중 들어온 중간 요청(2, 3)은 버리고 가장 최신(4)만 큐에 남김
+        this.#scrollQueue = [{ scrollTop, force }];
+
+        if (this.#isHandlingScroll) {
+            return;
+        }
+
+        this.#drainScrollQueue();
+    };
+
+    #drainScrollQueue = () => {
+        if (this.#isHandlingScroll) return;
+
+        this.#isHandlingScroll = true;
+        try {
+            while (this.#scrollQueue.length > 0) {
+                const latest = this.#scrollQueue.pop();
+                this.#scrollQueue.length = 0;
+                this.#handleScroll(latest.scrollTop, latest.force);
+            }
+        } finally {
+            this.#isHandlingScroll = false;
+        }
+    };
+
     constructor(sheet) {
         this.#host = sheet.getRootNode().host;
         this.#sheet = sheet;
@@ -47,7 +76,7 @@ export class RowManager {
 
         this.#chchedAllRecords = this.#host.data.getArray();
 
-        this.#handleScroll(bodyViewport.scrollTop, force);
+        this.#enqueueScroll(bodyViewport.scrollTop, force);
 
         this.#refreshFixed();
 
@@ -142,9 +171,10 @@ export class RowManager {
             this.#sheet.elements.body.tbody.body.style.transform =
                 this.#sheet.elements.right.tbody.body.style.transform = `translate3d(0px, -${clampedScrollTop % rowHeight}px, 0px)`;
 
-
         const firstTr = this.#element.firstTr;
-        const currentStartIndex = firstTr && firstTr.dataset.row !== undefined ? parseInt(firstTr.dataset.row, 10) : -1;
+        const currentStartIndex = firstTr && firstTr.dataset.index !== undefined && firstTr.dataset.index !== 'null'
+            ? parseInt(firstTr.dataset.index, 10)
+            : -1;
 
         if (!force && currentStartIndex === startIndex) {
             return;
@@ -460,6 +490,8 @@ trace.log(firstItem.groupId, siblingGroupId);
             return;
         }
 
+
+
         const findItemByGroupId = (allRenderItems, targetGroupId) => {
             return allRenderItems.find(item => item.groupId === targetGroupId && item.type === 'group');
         };
@@ -543,10 +575,7 @@ trace.log(firstItem.groupId, siblingGroupId);
 
 
         const headerGroupIds = [];//this.#getParentGroupIds(renderedItems, allRenderItems);
-
         const shouldHoldHeader = true;//this.#isShouldHoldHeader(renderedItems);
-
-        //trace.log(renderedItems[0].groupId, headerGroupIds);
 
         if (!shouldHoldHeader) {
             ['.ng-container-left', '.ng-container-body', '.ng-container-right'].forEach(selector => {
@@ -710,7 +739,9 @@ trace.log(firstItem.groupId, siblingGroupId);
         const startIndex = Math.max(0, Math.min(Math.floor(clampedScrollTop / rowHeight), maxStartIndex));
 
         const firstTr = this.#element.firstTr;
-        const currentStartIndex = firstTr && firstTr.dataset.row !== undefined ? parseInt(firstTr.dataset.row, 10) : -1;
+        const currentStartIndex = firstTr && firstTr.dataset.index !== undefined && firstTr.dataset.index !== 'null'
+            ? parseInt(firstTr.dataset.index, 10)
+            : -1;
 
         if (!force && currentStartIndex === startIndex) {
             return;
@@ -753,10 +784,48 @@ trace.log(firstItem.groupId, siblingGroupId);
         this.#sheet.selection.refresh();
     };
 
-    #bindTreeRowData = ($tr, treeNodeItem, rowid, dataIndex) => {
-        const templateLength = this.#sheet.templateLength || 1;
+
+
+    #getCellCustomComp = ($cell) => {
+        if ($cell._customComp !== undefined) {
+            return $cell._customComp;
+        }
+
+        let found = null;
+        for (let i = 0; i < $cell.children.length; i++) {
+            const $el = $cell.children[i];
+            if ($el.tagName.toLowerCase().startsWith('cell-') && typeof $el.refresh === 'function') {
+                found = $el;
+                break;
+            }
+        }
+
+        $cell._customComp = found;
+        return found;
+    };
+
+    #bindRowData = ($tr, record, rowid, dataIndex) => {
         const subRowIndex = parseInt($tr.dataset.subrow, 10) || 0;
-        const matrixRow = (dataIndex * templateLength) + subRowIndex;
+        const matrixRow = (dataIndex * this.#sheet.template.length) + subRowIndex;
+
+        $tr.dataset.index = dataIndex;
+        $tr.dataset.row = rowid;
+        $tr.dataset.matrixRow = matrixRow;
+        $tr.data = record;
+
+        Array.from($tr.cells).forEach(($cell) => {
+            $cell.dataset.index = dataIndex;
+            $cell.dataset.row = rowid;
+
+            const customComp = this.#getCellCustomComp($cell);
+            customComp?.refresh?.();
+        });
+    };
+
+    #bindTreeRowData = ($tr, treeNodeItem, rowid, dataIndex) => {
+
+        const subRowIndex = parseInt($tr.dataset.subrow, 10) || 0;
+        const matrixRow = (dataIndex * this.#sheet.template.length) + subRowIndex;
 
         $tr.dataset.index = dataIndex;
         $tr.dataset.row = rowid;
@@ -772,42 +841,15 @@ trace.log(firstItem.groupId, siblingGroupId);
             $cell.dataset.index = dataIndex;
             $cell.dataset.row = rowid;
 
-            // 만약 cell-type이 tree인 셀이 있다면 뎁스 및 들여쓰기/토글 상태 갱신 필요
-            const customComp = Array.from($cell.children).find($el =>
-                $el.tagName.toLowerCase().startsWith('cell-') && typeof $el.refresh === 'function'
-            );
-
+            const customComp = this.#getCellCustomComp($cell);
             customComp?.refresh?.();
-        });
-    };
-
-    #bindRowData = ($tr, record, rowid, dataIndex) => {
-        const templateLength = this.#sheet.templateLength || 1;
-        const subRowIndex = parseInt($tr.dataset.subrow, 10) || 0;
-        const matrixRow = (dataIndex * templateLength) + subRowIndex;
-
-        $tr.dataset.index = dataIndex;
-        $tr.dataset.row = rowid;
-        $tr.dataset.matrixRow = matrixRow;
-        $tr.data = record;
-
-        Array.from($tr.cells).forEach(($cell) => {
-            $cell.dataset.index = dataIndex;
-            $cell.dataset.row = rowid;
-
-            const customComp = Array.from($cell.children).find($el =>
-                $el.tagName.toLowerCase().startsWith('cell-') && typeof $el.refresh === 'function'
-            );
-
-            customComp?.refresh();
         });
     };
 
     #bindGroupRowData = ($tr, allRenderItems, groupRecord, virtualIndex) => {
 
-        const templateLength = this.#sheet.templateLength || 1;
         const subRowIndex = parseInt($tr.dataset.subrow, 10) || 0;
-        const matrixRow = (virtualIndex * templateLength) + subRowIndex;
+        const matrixRow = (virtualIndex * this.#sheet.template.length) + subRowIndex;
 
         const indices = groupRecord[GROUP_IDX.CHILDREN];
         const childrenRecords = indices ? indices.map(idx => this.#chchedAllRecords[idx]).filter(Boolean) : [];
@@ -824,16 +866,9 @@ trace.log(firstItem.groupId, siblingGroupId);
         Array.from($tr.cells).forEach(($cell) => {
             $cell.dataset.index = virtualIndex;
             $cell.dataset.row = virtualIndex;
-            //$cell.dataset.row = virtualIndex;
 
-            const customComp = Array.from($cell.children).find($el =>
-                $el.tagName.toLowerCase().startsWith('cell-') || typeof $el.refresh === 'function'
-            );
-
-
-            //if (customComp !== undefined && typeof customComp.refresh === 'function') {
+            const customComp = this.#getCellCustomComp($cell);
             customComp?.refresh?.();
-            //}
         });
     };
 
@@ -871,7 +906,7 @@ trace.log(firstItem.groupId, siblingGroupId);
             this.#measureAndCacheHeight();
             this.#renderAllContainers();
 
-            this.#handleScroll(bodyViewport.scrollTop, true);
+            this.#enqueueScroll(bodyViewport.scrollTop, true);
 
             bodyViewport.addEventListener('scroll', (e) => {
 
@@ -890,7 +925,7 @@ trace.log(firstItem.groupId, siblingGroupId);
                     return;
                 }
 
-                this.#handleScroll(bodyViewport.scrollTop);
+                this.#enqueueScroll(bodyViewport.scrollTop);
 
                 this.#sheet.querySelector('nine-table-vscrollbar').refresh();
 
@@ -1000,7 +1035,7 @@ trace.log(firstItem.groupId, siblingGroupId);
 
         this.#isProgrammaticScroll = true;
         bodyViewport.scrollTop = targetScrollTop;
-        this.#handleScroll(targetScrollTop);
+        this.#enqueueScroll(targetScrollTop);
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {

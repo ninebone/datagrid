@@ -23,6 +23,23 @@ export const exampleProvider = {
             ? `<span style="width: ${v}%; padding-left: 4px; display: block; background: #d1e7dd; color: #0f5132;">High</span>`
             : `<span style="width: ${v}%; padding-left: 4px; display: block; background: #f8d7da; color: #842029;">Low</span>`;
     },
+    renderBar: (count, color, max = 31, reverse = false) => {
+        const value = Number(count) || 0;
+        const pct = Math.max(0, Math.min(100, Math.round((value / max) * 100)));
+
+        const numEl = `<span style="color: ${color}; font-weight: 700; font-size: 9px; min-width: 16px; text-align: ${reverse ? 'right' : 'left'};">${value}</span>`;
+        const barEl = `
+            <div style="flex: 1; display: flex; background: rgba(148, 163, 184, 0.25); height: 6px; border-radius: 3px; overflow: hidden;">
+                <div style="width: ${pct}%; height: 100%; background: ${color}; ${reverse ? 'margin-left: auto;' : ''}"></div>
+            </div>
+        `;
+
+        return `
+            <div style="display: flex; align-items: center; gap: 6px; width: 100%;">
+                ${reverse ? `${numEl}${barEl}` : `${barEl}${numEl}`}
+            </div>
+        `;
+    },
     formatCompactAmount: (val) => {
         const num = Number(val);
         if (!Number.isFinite(num)) return '';
