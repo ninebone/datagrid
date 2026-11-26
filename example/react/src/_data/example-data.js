@@ -6,6 +6,87 @@ const getAssetUrl = (relativePath) => {
     return `${cleanBase}${cleanPath}`;
 };
 
+const getRandomString = (len, an) => {
+    an = an && an.toLowerCase();
+    var s = "", min = an == "a" ? 10 : 0, max = an == "n" ? 10 : 62;
+
+    for (var i = 0; i < len; i++) {
+        var r = Math.floor(Math.random() * (max - min) + min);
+        s += String.fromCharCode(r += r > 9 ? r < 36 ? 55 : 61 : 48);
+    }
+    return s;
+};
+
+const getRandomInt = (v) => {
+    return Math.floor(Math.random() * v);
+};
+
+const getRandomAmount = (min = 100000, max = 50000000, step = 10000) => {
+    const steps = Math.floor((max - min) / step);
+    return Math.floor(Math.random() * steps) * step + min;
+};
+
+const getRandom = (arr) => {
+    return arr[Math.floor(Math.random() * arr.length)];
+};
+
+const getRandomEmail = (name = '', index = 0) => {
+    const cleaned = String(name)
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9가-힣]+/g, '.')
+        .replace(/^\.+|\.+$/g, '');
+
+    const base = cleaned || `member${index + 1}`;
+    const domains = ['example.com', 'nine-lab.io', 'mail.test'];
+    return `${base}${index > 0 ? `.${index}` : ''}@${getRandom(domains)}`;
+};
+
+const getRandomNameKor = () => {
+    const data1 = ["김", "이", "박", "최", "정", "강", "조", "윤", "장", "임", "한", "오", "서", "신", "권", "황", "안", "송", "류", "전", "홍", "고", "문", "양", "손", "배", "조", "백", "허", "유", "남", "심", "노", "정", "하", "곽", "성", "차", "주", "우", "구", "신", "임", "나", "전", "민", "유", "진", "지", "엄", "채", "원", "천", "방", "공", "강", "현", "함", "변", "염", "양", "변", "여", "추", "노", "도", "소", "신", "석", "선", "설", "마", "길", "주", "연", "방", "위", "표", "명", "기", "반", "왕", "금", "옥", "육", "인", "맹", "제", "모", "장", "남", "탁", "국", "여", "진", "어", "은", "편", "구", "용"];
+    const data2 = ["가", "강", "건", "경", "고", "관", "광", "구", "규", "근", "기", "길", "나", "남", "노", "누", "다", "단", "달", "담", "대", "덕", "도", "동", "두", "라", "래", "로", "루", "리", "마", "만", "명", "무", "문", "미", "민", "바", "박", "백", "범", "별", "병", "보", "빛", "사", "산", "상", "새", "서", "석", "선", "설", "섭", "성", "세", "소", "솔", "수", "숙", "순", "숭", "슬", "승", "시", "신", "아", "안", "애", "엄", "여", "연", "영", "예", "오", "옥", "완", "요", "용", "우", "원", "월", "위", "유", "윤", "율", "으", "은", "의", "이", "익", "인", "일", "잎", "자", "잔", "장", "재", "전", "정", "제", "조", "종", "주", "준", "중", "지", "진", "찬", "창", "채", "천", "철", "초", "춘", "충", "치", "탐", "태", "택", "판", "하", "한", "해", "혁", "현", "형", "혜", "호", "홍", "화", "환", "회", "효", "훈", "휘", "희", "운", "모", "배", "부", "림", "봉", "혼", "황", "량", "린", "을", "비", "솜", "공", "면", "탁", "온", "디", "항", "후", "려", "균", "묵", "송", "욱", "휴", "언", "령", "섬", "들", "견", "추", "걸", "삼", "열", "웅", "분", "변", "양", "출", "타", "흥", "겸", "곤", "번", "식", "란", "더", "손", "술", "훔", "반", "빈", "실", "직", "흠", "흔", "악", "람", "뜸", "권", "복", "심", "헌", "엽", "학", "개", "롱", "평", "늘", "늬", "랑", "얀", "향", "울", "련"];
+    return getRandom(data1) + getRandom(data2) + getRandom(data2);
+};
+const getRandomName = () => {
+    const firstNames = [
+        "James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles",
+        "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen",
+        "Daniel", "Matthew", "Anthony", "Mark", "Donald", "Steven", "Paul", "Andrew", "Joshua", "Kenneth"
+    ];
+    const lastNames = [
+        "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
+        "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
+        "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson"
+    ];
+    return `${getRandom(firstNames)} ${getRandom(lastNames)}`;
+};
+
+const getRandomTel = () => {
+    return "010-****-" + (getRandomInt(9000) + 1000);
+};
+
+const getRandomHearColor = () => {
+    return "#" + nine.lpad(getRandomInt(255).toString(16), 2) + nine.lpad(getRandomInt(255).toString(16), 2) + nine.lpad(getRandomInt(255).toString(16), 2);
+};
+
+const getRandomHearColor3 = () => {
+    const arr = exampleData.generateCommonCode("COLOR3");
+    //trace.log(exampleData.generateCommonCode("COLOR3"));
+    const index = getRandomInt(arr.length);
+    return arr[index].code;
+};
+
+const getRandomRemark = () => {
+    let v = "";
+    for (var i = 0; i < getRandomInt(5); i++) {
+        for (var j = 0; j < getRandomInt(5) + 2; j++) {
+            v += getRandomString(getRandomInt(5) + 5) + " ";
+        }
+        v += "\n";
+    }
+    return v.trim();
+};
+
 const exampleData = {
     generateCommonCode(group) {
         const masterCommonCodes = [
@@ -17,6 +98,14 @@ const exampleData = {
             { group: 'DEPART', code: 'F', codename: 'HR' },
             { group: 'STATUS', code: 'C', codename: 'Completed' },
             { group: 'STATUS', code: 'W', codename: 'Wating' },
+
+            { group: 'SHIFT', code: 'D', codename: 'Day' },
+            { group: 'SHIFT', code: 'E', codename: 'Evening' },
+            { group: 'SHIFT', code: 'N', codename: 'Night' },
+            { group: 'SHIFT', code: 'O', codename: 'Off' },
+            { group: 'SHIFT', code: 'V', codename: 'Vacation' },
+            { group: 'SHIFT', code: 'S', codename: 'Standby' },
+
             { group: 'SEX', code: 'M', codename: 'Male' },
             { group: 'SEX', code: 'F', codename: 'Female' },
             { group: 'COLOR', code: '#ffffff', codename: 'white' },
@@ -62,183 +151,91 @@ const exampleData = {
         return found ? found.codename : code;
     },
     generateRandomData(cnt) {
-        const getRandomString = (len, an) => {
-            an = an && an.toLowerCase();
-            var s = "", min = an == "a" ? 10 : 0, max = an == "n" ? 10 : 62;
+        const data = [];
+        const amtRanges = [
+            [100000, 100000000, 10000],
+            [500000, 50000000, 10000],
+            [1000000, 300000000, 50000],
+        ];
 
-            for (var i = 0; i < len; i++) {
-                var r = Math.floor(Math.random() * (max - min) + min);
-                s += String.fromCharCode(r += r > 9 ? r < 36 ? 55 : 61 : 48);
+        for (let i = 0; i < cnt; i++) {
+            const name = [4, 13, 100].includes(i) ? 'nandoo' : getRandomName();
+            const row = {
+                ORDER: i + 1,
+                NAME: name,
+                PIC: getAssetUrl(`images/pic/pic_${getRandomInt(20)}.jpg`),
+                SEX: getRandom(["M", "F"]),
+                AGE: 20 + getRandomInt(80),
+                TEL: getRandomTel(),
+                EMAIL: getRandomEmail(name, i),
+                COLOR1: getRandomHearColor(),
+                COLOR2: getRandomHearColor(),
+                COLOR3: getRandomHearColor3(),
+                STATUS: getRandom(["", "C", "W"]),
+                DEPART: getRandom(["", "A", "B", "C", "D", "E", "F", "G"]),
+                DEPART1: getRandom(["", "A", "B", "C", "D", "E", "F", "G"]),
+                DEPART2: getRandom(["", "A", "B", "C", "D", "E", "F", "G"]),
+                BIRTH_YMD: `${getRandomInt(60) + 1950}-${nine.lpad(getRandomInt(12) + 1, 2)}-${nine.lpad(getRandomInt(28) + 1, 2)}`,
+                BIRTH_DT: `${getRandomInt(60) + 1950}-${nine.lpad(getRandomInt(12) + 1, 2)}-${nine.lpad(getRandomInt(28) + 1, 2)}T${nine.lpad(getRandomInt(23) + 1, 2)}:${nine.lpad(getRandomInt(59) + 1, 2)}`,
+                M: `${getRandomInt(60) + 1950}-${nine.lpad(getRandomInt(12) + 1, 2)}`,
+                W: `${getRandomInt(60) + 1950}-W${nine.lpad(getRandomInt(52) + 1, 2)}`,
+                T: `${nine.lpad(getRandomInt(23) + 1, 2)}:${nine.lpad(getRandomInt(59) + 1, 2)}`,
+                RMK: "",
+                RMK1: getRandomRemark(),
+                RMK2: getRandomRemark(),
+            };
+
+            for (let m = 1; m <= 12; m++) {
+                const [min, max, step] = amtRanges[(m - 1) % amtRanges.length];
+                row[`REC${m}`] = getRandomInt(101);
+                row[`AMT${m}`] = getRandomAmount(min, max, step);
+                row[`O_AMT${m}`] = getRandomAmount(min, max, step);
+                row[`N_AMT${m}`] = getRandomAmount(min, max, step);
             }
-            return s;
-        };
 
-        const getRandomInt = (v) => {
-            return Math.floor(Math.random() * v);
-        };
-
-        const getRandomAmount = (min = 100000, max = 50000000, step = 10000) => {
-            const steps = Math.floor((max - min) / step);
-            return Math.floor(Math.random() * steps) * step + min;
-        };
-
-        const getRandom = (arr) => {
-            return arr[Math.floor(Math.random() * arr.length)];
-        };
-
-        const getRandomEmail = (name = '', index = 0) => {
-            const cleaned = String(name)
-                .trim()
-                .toLowerCase()
-                .replace(/[^a-z0-9가-힣]+/g, '.')
-                .replace(/^\.+|\.+$/g, '');
-
-            const base = cleaned || `member${index + 1}`;
-            const domains = ['example.com', 'nine-lab.io', 'mail.test'];
-            return `${base}${index > 0 ? `.${index}` : ''}@${getRandom(domains)}`;
-        };
-
-        const getRandomNameKor = () => {
-            const data1 = ["김", "이", "박", "최", "정", "강", "조", "윤", "장", "임", "한", "오", "서", "신", "권", "황", "안", "송", "류", "전", "홍", "고", "문", "양", "손", "배", "조", "백", "허", "유", "남", "심", "노", "정", "하", "곽", "성", "차", "주", "우", "구", "신", "임", "나", "전", "민", "유", "진", "지", "엄", "채", "원", "천", "방", "공", "강", "현", "함", "변", "염", "양", "변", "여", "추", "노", "도", "소", "신", "석", "선", "설", "마", "길", "주", "연", "방", "위", "표", "명", "기", "반", "왕", "금", "옥", "육", "인", "맹", "제", "모", "장", "남", "탁", "국", "여", "진", "어", "은", "편", "구", "용"];
-            const data2 = ["가", "강", "건", "경", "고", "관", "광", "구", "규", "근", "기", "길", "나", "남", "노", "누", "다", "단", "달", "담", "대", "덕", "도", "동", "두", "라", "래", "로", "루", "리", "마", "만", "명", "무", "문", "미", "민", "바", "박", "백", "범", "별", "병", "보", "빛", "사", "산", "상", "새", "서", "석", "선", "설", "섭", "성", "세", "소", "솔", "수", "숙", "순", "숭", "슬", "승", "시", "신", "아", "안", "애", "엄", "여", "연", "영", "예", "오", "옥", "완", "요", "용", "우", "원", "월", "위", "유", "윤", "율", "으", "은", "의", "이", "익", "인", "일", "잎", "자", "잔", "장", "재", "전", "정", "제", "조", "종", "주", "준", "중", "지", "진", "찬", "창", "채", "천", "철", "초", "춘", "충", "치", "탐", "태", "택", "판", "하", "한", "해", "혁", "현", "형", "혜", "호", "홍", "화", "환", "회", "효", "훈", "휘", "희", "운", "모", "배", "부", "림", "봉", "혼", "황", "량", "린", "을", "비", "솜", "공", "면", "탁", "온", "디", "항", "후", "려", "균", "묵", "송", "욱", "휴", "언", "령", "섬", "들", "견", "추", "걸", "삼", "열", "웅", "분", "변", "양", "출", "타", "흥", "겸", "곤", "번", "식", "란", "더", "손", "술", "훔", "반", "빈", "실", "직", "흠", "흔", "악", "람", "뜸", "권", "복", "심", "헌", "엽", "학", "개", "롱", "평", "늘", "늬", "랑", "얀", "향", "울", "련"];
-            return getRandom(data1) + getRandom(data2) + getRandom(data2);
-        };
-        const getRandomName = () => {
-            const firstNames = [
-                "James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles",
-                "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen",
-                "Daniel", "Matthew", "Anthony", "Mark", "Donald", "Steven", "Paul", "Andrew", "Joshua", "Kenneth"
-            ];
-            const lastNames = [
-                "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
-                "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
-                "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson"
-            ];
-            return `${getRandom(firstNames)} ${getRandom(lastNames)}`;
-        };
-
-        const getRandomTel = () => {
-            return "010-****-" + (getRandomInt(9000) + 1000);
-        };
-
-        const getRandomHearColor = () => {
-            return "#" + nine.lpad(getRandomInt(255).toString(16), 2) + nine.lpad(getRandomInt(255).toString(16), 2) + nine.lpad(getRandomInt(255).toString(16), 2);
-        };
-
-        const getRandomHearColor3 = () => {
-            const arr = exampleData.generateCommonCode("COLOR3");
-            //trace.log(exampleData.generateCommonCode("COLOR3"));
-            const index = getRandomInt(arr.length);
-            return arr[index].code;
-        };
-
-        const getRandomRemark = () => {
-            let v = "";
-            for (var i = 0; i < getRandomInt(5); i++) {
-                for (var j = 0; j < getRandomInt(5) + 2; j++) {
-                    v += getRandomString(getRandomInt(5) + 5) + " ";
-                }
-                v += "\n";
+            for (let k = 1; k <= 3; k++) {
+                row[`MON${k}`] = Array.from({ length: 12 }, () => getRandomInt(101)).join(",");
             }
-            return v.trim();
-        };
 
-        var data = [];
-        for (var i = 0; i < cnt; i++) {
+            data.push(row);
+        }
+
+        return data;
+    },
+    generateRandomData2(cnt) { /** Monthly Summary */
+        const data = [];
+        const arrShift = ["D", "E", "N", "O", "V", "S"];
+
+        for (let i = 0; i < cnt; i++) {
+            const name = [4, 13, 100].includes(i) ? 'nandoo' : getRandomName();
+            const days = {};
+            const dayValues = [];
+
+            for (let d = 1; d <= 31; d++) {
+                const val = getRandom(arrShift);
+                days[`D${d}`] = val;
+                dayValues.push(val);
+            }
+
             data.push({
-                ORDER:     i + 1,
-                NAME:      [4,13,100].includes(i) ? 'nandoo' : getRandomName(),
-                PIC:       getAssetUrl(`images/pic/pic_${getRandomInt(20)}.jpg`),
-                SEX:       getRandom(["M", "F"]),
-                AGE:       20 + getRandomInt(80),
-                TEL:       getRandomTel(),
-                EMAIL:      getRandomEmail(name, i),
-                COLOR1:     getRandomHearColor(),
-                COLOR2:     getRandomHearColor(),
-                COLOR3:    getRandomHearColor3(),
-                REC1:      getRandomInt(101),
-                REC2:      getRandomInt(101),
-                REC3:      getRandomInt(101),
-                REC4:      getRandomInt(101),
-                REC5:      getRandomInt(101),
-                REC6:      getRandomInt(101),
-                REC7:      getRandomInt(101),
-                REC8:      getRandomInt(101),
-                REC9:      getRandomInt(101),
-                REC10:      getRandomInt(101),
-                REC11:      getRandomInt(101),
-                REC12:      getRandomInt(101),
-
-                AMT1:      getRandomAmount(100000, 100000000, 10000),
-                AMT2:      getRandomAmount(500000, 50000000, 10000),
-                AMT3:      getRandomAmount(1000000, 300000000, 50000),
-                AMT4:      getRandomAmount(100000, 100000000, 10000),
-                AMT5:      getRandomAmount(500000, 50000000, 10000),
-                AMT6:      getRandomAmount(1000000, 300000000, 50000),
-                AMT7:      getRandomAmount(100000, 100000000, 10000),
-                AMT8:      getRandomAmount(500000, 50000000, 10000),
-                AMT9:      getRandomAmount(1000000, 300000000, 50000),
-                AMT10:      getRandomAmount(100000, 100000000, 10000),
-                AMT11:      getRandomAmount(500000, 50000000, 10000),
-                AMT12:      getRandomAmount(1000000, 300000000, 50000),
-
-                O_AMT1:      getRandomAmount(100000, 100000000, 10000),
-                O_AMT2:      getRandomAmount(500000, 50000000, 10000),
-                O_AMT3:      getRandomAmount(1000000, 300000000, 50000),
-                O_AMT4:      getRandomAmount(100000, 100000000, 10000),
-                O_AMT5:      getRandomAmount(500000, 50000000, 10000),
-                O_AMT6:      getRandomAmount(1000000, 300000000, 50000),
-                O_AMT7:      getRandomAmount(100000, 100000000, 10000),
-                O_AMT8:      getRandomAmount(500000, 50000000, 10000),
-                O_AMT9:      getRandomAmount(1000000, 300000000, 50000),
-                O_AMT10:      getRandomAmount(100000, 100000000, 10000),
-                O_AMT11:      getRandomAmount(500000, 50000000, 10000),
-                O_AMT12:      getRandomAmount(1000000, 300000000, 50000),
-
-                N_AMT1:      getRandomAmount(100000, 100000000, 10000),
-                N_AMT2:      getRandomAmount(500000, 50000000, 10000),
-                N_AMT3:      getRandomAmount(1000000, 300000000, 50000),
-                N_AMT4:      getRandomAmount(100000, 100000000, 10000),
-                N_AMT5:      getRandomAmount(500000, 50000000, 10000),
-                N_AMT6:      getRandomAmount(1000000, 300000000, 50000),
-                N_AMT7:      getRandomAmount(100000, 100000000, 10000),
-                N_AMT8:      getRandomAmount(500000, 50000000, 10000),
-                N_AMT9:      getRandomAmount(1000000, 300000000, 50000),
-                N_AMT10:      getRandomAmount(100000, 100000000, 10000),
-                N_AMT11:      getRandomAmount(500000, 50000000, 10000),
-                N_AMT12:      getRandomAmount(1000000, 300000000, 50000),
-
-                STATUS:     getRandom(["", "C", "W"]),
-                DEPART:    getRandom(["", "A", "B", "C", "D", "E", "F", "G"]),
-                DEPART1:    getRandom(["", "A", "B", "C", "D", "E", "F", "G"]),
-                DEPART2:    getRandom(["", "A", "B", "C", "D", "E", "F", "G"]),
-                BIRTH_YMD:  `${getRandomInt(60)+1950}-${nine.lpad(getRandomInt(12)+1, 2)}-${nine.lpad(getRandomInt(28)+1, 2)}`,
-                BIRTH_DT:  `${getRandomInt(60)+1950}-${nine.lpad(getRandomInt(12)+1, 2)}-${nine.lpad(getRandomInt(28)+1, 2)}T${nine.lpad(getRandomInt(23)+1, 2)}:${nine.lpad(getRandomInt(59)+1, 2)}`,
-                M:         `${getRandomInt(60)+1950}-${nine.lpad(getRandomInt(12)+1, 2)}`,
-                W:         `${getRandomInt(60)+1950}-W${nine.lpad(getRandomInt(52)+1, 2)}`,
-                T:         `${nine.lpad(getRandomInt(23)+1, 2)}:${nine.lpad(getRandomInt(59)+1, 2)}`,
-                MON1:      `${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)}`,
-                MON2:      `${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)}`,
-                MON3:      `${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)},${getRandomInt(101)}`,
-                RMK:       "",
-                RMK1:      getRandomRemark(),
-                RMK2:      getRandomRemark(),
+                ORDER: i + 1,
+                NAME: name,
+                PIC: getAssetUrl(`images/pic/pic_${getRandomInt(20)}.jpg`),
+                SEX: getRandom(["M", "F"]),
+                AGE: 20 + getRandomInt(80),
+                TEL: getRandomTel(),
+                EMAIL: getRandomEmail(name, i),
+                STATUS: getRandom(["", "C", "W"]),
+                DEPART: getRandom(["", "A", "B", "C", "D", "E", "F"]),
+                //SHIFT: getRandom(["D", "E", "N", "O", "V", "S"]),
+                ...days,
+                D_CSV: dayValues.join(","),
             });
         }
+
         return data;
     },
     generateRandomTree(totalCount) {
-        const getRandomInt = (v) => Math.floor(Math.random() * v);
-        const getRandomAmount = (min = 100000, max = 50000000, step = 10000) => {
-            const steps = Math.floor((max - min) / step);
-            return Math.floor(Math.random() * steps) * step + min;
-        };
-        const getRandomName = () => {
-            const firstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles", "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth"];
-            const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"];
-            return `${firstNames[getRandomInt(firstNames.length)]} ${lastNames[getRandomInt(lastNames.length)]}`;
-        };
-
         let data = [];
         let idCounter = 1;
         let createdCount = 0;

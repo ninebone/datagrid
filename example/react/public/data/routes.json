@@ -213,5 +213,24 @@
     "desc": "Tree",
     "class": "icon-none",
     "is-nine": true
+  },
+  {
+    "level": 1,
+    "id": "sample",
+    "path": null,
+    "parentId": null,
+    "name": "sample",
+    "desc": "sample",
+    "class": "icon-folder"
+  },
+  {
+    "level": 2,
+    "id": "mon-summary",
+    "path": "/sample/mon-summary",
+    "parentId": "sample",
+    "name": "Monthly Summary",
+    "desc": "Monthly Summary",
+    "class": "icon-none",
+    "is-nine": true
   }
 ]

@@ -106,8 +106,6 @@ export class ColResizer {
         if (resolvedContainerType === 'left' || resolvedContainerType === 'right') {
             this.refreshLayout('body');
         }
-
-        this.#sheet.rowManager?.refresh();
     }
 
     #setColumnWidth(globalColIndex, width) {
@@ -359,11 +357,13 @@ export class ColResizer {
     };
 
     #onDragEnd = (e) => {
+
         window.removeEventListener('pointermove', this.#onDragMove);
 
         const diff = e.clientX - this.#startX;
         const isAutoFit = this.#checkIsAutoFit(this.#targetCell);
         let finalWidth = 0;
+
 
         if (isAutoFit && this.#nextColIndex !== null) {
             let newColWidth = Math.max(COLLAPSED_WIDTH, this.#startColWidth + diff);
