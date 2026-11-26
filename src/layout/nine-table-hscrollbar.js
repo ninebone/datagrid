@@ -80,11 +80,6 @@ export class NineTableHScrollBar extends HTMLElement {
         const needsHScroll = (bodyWidth !== 0 && tableWidth >= bodyWidth + 2);
         this.#sheet.classList.toggle('hscroll-visible', needsHScroll);
 
-        if (needsHScroll && this.#sheet.isAutoFitCol) {
-            trace.log(needsHScroll, tableWidth, bodyWidth);
-        }
-
-
         if (!needsHScroll) {
             return;
         }

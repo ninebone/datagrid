@@ -13,27 +13,55 @@ class CellInputDate extends EditableCellElement
 	connectedCallback() {
 		super.connectedCallback();
 
-		this.#renderer();
-
-		this.#target = this.querySelector("input");
-
-		this.#target.addEventListener("input", (event) => {
-			const val = event.target.value;
-			this.value = val;
-			this.#target.classList.toggle("has-value", !!val); // 💡 실시간 반영
-			this.#validate(val);
-
-			super.sheet.rowManager.refresh(true);
-		});
-
-		this.#target.addEventListener("change", (event) => {
-			const val = event.target.value;
-			this.value = val;
-			this.#validate(val);
-
-			super.sheet.rowManager.refresh(true);
-		});
+		this.#init();
 	};
+
+	get displayText() {
+		return this.#target.value;
+	}
+	onEnterEdit() {
+		this.#target.focus();
+		this.#target.showPicker?.();
+	}
+	onRefresh = (v) => {
+
+		const d = new Date(v);
+
+		let formattedVal = v;
+		if (formattedVal) {
+
+			switch (this.#type) {
+				case "date":
+					formattedVal = formattedVal.slice(0, 10);
+					break;
+				case "datetime-local":
+					formattedVal = formattedVal.slice(0, 16);
+					break;
+				case "time":
+					if (d !== "Invalid Date" && !isNaN(d)) {
+						formattedVal = ("00" + d.getHours()).slice(-2) + ":" + ("00" + d.getMinutes()).slice(-2);
+					}
+					break;
+				case "month":
+					if (d !== "Invalid Date" && !isNaN(d)) {
+						formattedVal = ("0000" + d.getFullYear()).slice(-4) + "-" + ("00" + (d.getMonth() + 1)).slice(-2);
+					}
+					break;
+			}
+		}
+
+		this.#target.value = formattedVal || "";
+		this.#target.classList.toggle("has-value", !!formattedVal);
+
+		if (this.isValid()) {
+			this.#validate(formattedVal);
+		}
+	};
+
+	#init = () => {
+		this.#renderer();
+		this.#initEvent();
+	}
 
 	#renderer = () => {
 
@@ -57,44 +85,36 @@ class CellInputDate extends EditableCellElement
              required
           />
        `;
+
+		this.#target = this.querySelector("input");
 	};
 
-	refresh = () => {
+	#initEvent = () => {
+		/**
+		this.#target.addEventListener("input", (e) => {
+			const val = e.target.value;
+			this.value = val;
+			this.#target.classList.toggle("has-value", !!val); // 💡 실시간 반영
+			this.#validate(val);
 
-		const v = super.refresh();
+			super.sheet.rowManager.refresh(true);
+		}); */
 
-		let formattedVal = v;
-		if (formattedVal) {
+		this.#target.addEventListener("change", (e) => {
+			const val = e.target.value;
+			this.value = val;
+			this.#validate(val);
 
-			switch (this.#type) {
-				case "date":
-					formattedVal = formattedVal.substr(0, 10);
-					break;
-				case "datetime-local":
-					formattedVal = formattedVal.substr(0, 16);
-					break;
-				case "time":
-					var d = new Date(v);
-					if (d != "Invalid Date" && !isNaN(d)) {
-						formattedVal = ("00" + d.getHours()).slice(-2) + ":" + ("00" + d.getMinutes()).slice(-2);
-					}
-					break;
-				case "month":
-					var d = new Date(v);
-					if (d != "Invalid Date" && !isNaN(d)) {
-						formattedVal = ("0000" + d.getFullYear()).slice(-4) + "-" + ("00" + (d.getMonth() + 1)).slice(-2);
-					}
-					break;
-			}
-		}
+			//this.cell.focus();
+			//this.sheet.rowManager.refresh(true);
+		});
 
-		this.#target.value = formattedVal || "";
-		this.#target.classList.toggle("has-value", !!formattedVal);
+		this.#target.addEventListener("blur", () => {
+			this.sheet.rowManager.refresh(true);
+		});
+	}
 
-		if (this.isValid()) {
-			this.#validate(formattedVal);
-		}
-	};
+
 
 	#validate = (val) => {
 

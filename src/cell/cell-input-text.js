@@ -20,8 +20,14 @@ class CellInputText extends EditableCellElement
 		this.#initEvent();
 	};
 
-	refresh = () => {
-		const v = super.refresh();
+	get displayText() {
+		return this.#target.value;
+	}
+
+	onEnterEdit() {
+		this.#target.focus();
+	}
+	onRefresh = (v) => {
 		this.#target.value = v;
 	};
 
@@ -41,6 +47,10 @@ class CellInputText extends EditableCellElement
 		this.#target.addEventListener("change", (event) => {
 			this.value = event.target.value;
 			this.sheet.rowManager.refresh(true);
+		});
+
+		this.#target.addEventListener("focus", (e) => {
+			e.target.select();
 		});
 	};
 

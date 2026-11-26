@@ -186,6 +186,13 @@ export class PreCompiler {
             const cellType = $cell.getAttribute('cell-type') || "renderer";
             const tagName = `cell-${cellType}`;
 
+            if (cellType === 'input-number') {
+                const attr = $cell.getAttribute("text-align");
+                if (!attr) {
+                    $cell.setAttribute("text-align", "right");
+                }
+            }
+
             const $datalist = $cell.querySelector("datalist");
 
             if ($datalist) {

@@ -23,22 +23,3 @@ cell-renderer {
     }
 }
 
-
-.CELL-RENDERER {      /* Parent cell hook */
-    text-align: left;
-    span.wrapper {
-        justify-content: flex-start;
-    }
-}
-.CELL-RENDERER[text-align="center"] {
-    text-align: center;
-    span.wrapper {
-        justify-content: center;
-    }
-}
-.CELL-RENDERER[text-align="right"] {
-    text-align: right;
-    span.wrapper {
-        justify-content: flex-end;
-    }
-}

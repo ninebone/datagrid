@@ -1,0 +1,68 @@
+
+.cell-edit-cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+    user-select: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 4px;
+}
+
+td[disabled="true"] {
+    input, button {
+        background: var(--table-disabled-bg);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    .cell-edit-cover {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+}
+
+td[text-align="left"] {
+    input {
+        text-align: left;
+    }
+    .cell-edit-cover {
+        justify-content: flex-start;
+    }
+}
+td[text-align="center"] {
+    input {
+        text-align: center;
+    }
+    .cell-edit-cover {
+        justify-content: center;
+    }
+}
+td[text-align="right"] {
+    input {
+        text-align: right;
+    }
+    .cell-edit-cover {
+        justify-content: flex-end;
+    }
+}
+.CELL-RENDERER {      /* Parent cell hook */
+    text-align: left;
+    span.wrapper {
+        justify-content: flex-start;
+    }
+}
+.CELL-RENDERER[text-align="center"] {
+    text-align: center;
+    span.wrapper {
+        justify-content: center;
+    }
+}
+.CELL-RENDERER[text-align="right"] {
+    text-align: right;
+    span.wrapper {
+        justify-content: flex-end;
+    }
+}

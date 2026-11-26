@@ -18,8 +18,19 @@ class CellInputNumber extends EditableCellElement
 		this.#target = this.querySelector("input");
 
 		this.#initEvent();
+	};
 
-
+	get displayText() {
+		return this.#target.value;
+	}
+	onEnterEdit() {
+		this.#target.focus();
+	}
+	onRefresh = (v) => {
+		this.#target.value = v;
+		if (this.isValid()) {
+			this.#validate();
+		}
 	};
 
 	#renderer = () => {
@@ -31,25 +42,20 @@ class CellInputNumber extends EditableCellElement
 	#initEvent = () => {
 		this.#target.addEventListener("keydown", this.#onKeyDown);
 
+		/**
 		this.#target.addEventListener("input", (event) => {
 			this.value = event.target.value;
 			this.sheet.rowManager.refresh(true);
-		});
+		}); */
 
 		this.#target.addEventListener("change", (event) => {
 			this.value = event.target.value;
 			this.sheet.rowManager.refresh(true);
 		});
-	};
 
-	refresh = () => {
-		const v = super.refresh();
-
-		this.#target.value = v;//v !== undefined && v !== null ? v : "";
-
-		if (this.isValid()) {
-			this.#validate();
-		}
+		this.#target.addEventListener("focus", (e) => {
+			e.target.select();
+		});
 	};
 
 	#validate = () => {
@@ -108,7 +114,7 @@ class CellInputNumber extends EditableCellElement
 			return;
 		}
 
-		if (this.#scale && isNumKey && e.target.selectionStart == e.target.selectionEnd) {
+		if (this.#scale && isNumKey && e.target.selectionStart === e.target.selectionEnd) {
 			const s = e.target.value;
 			const idx = s.indexOf(".");
 			if (idx >= 0 && e.target.selectionStart > idx) {
@@ -119,7 +125,7 @@ class CellInputNumber extends EditableCellElement
 			}
 		}
 
-		if (this.#maxbyte && nine.getByteLength(e.target.value) >= Number(this.#maxbyte) && e.target.selectionStart == e.target.selectionEnd) {
+		if (this.#maxbyte && nine.getByteLength(e.target.value) >= Number(this.#maxbyte) && e.target.selectionStart === e.target.selectionEnd) {
 			e.preventDefault();
 		}
 	}

@@ -36,8 +36,10 @@ const InputColor = () => {
 		<>
 			<h1>NineTable High-Performance Editable Grid & Cell Validation Showcase</h1>
 
-			<nine-table ref={tableRef} show-footer="true" theme={localStorage.getItem('nine_table_theme_dark') === 'true' ? 'dark' : undefined} style={{width: '90%', height: '80vh'}}>
-				<table row-indicator="true">
+			<nine-table ref={tableRef} show-footer="true"
+						theme={localStorage.getItem('nine_table_theme_dark') === 'true' ? 'dark' : undefined}
+						style={{width: '90%', height: '80vh'}}>
+				<table row-indicator="true" edit-trigger="click" caption="Edit on Click">
 					<colgroup>
 						<col width="80"/>
 						<col width="100"/>
@@ -75,8 +77,69 @@ const InputColor = () => {
 					<tbody>
 					<tr>
 						<td data-bind="NAME"></td>
-						<td data-bind="COLOR1" text-align="center" background-color="data.COLOR1" color="nine.oppositeColor(data.COLOR1)"></td>
-						<td data-bind="COLOR2" text-align="center" background-color="data.COLOR2" color="nine.oppositeColor(data.COLOR2)"></td>
+						<td data-bind="COLOR1" text-align="center" background-color="data.COLOR1"
+							color="nine.oppositeColor(data.COLOR1)"></td>
+						<td data-bind="COLOR2" text-align="center" background-color="data.COLOR2"
+							color="nine.oppositeColor(data.COLOR2)"></td>
+						<td data-bind="COLOR1" cell-type="input-color" text-align="center"></td>
+						<td data-bind="COLOR1" cell-type="input-color" enable="data.REC1 > 70 ? true : false;"></td>
+						<td data-bind="COLOR1" cell-type="input-color" visible="data.REC1 > 70 ? true : false;"></td>
+						<td data-bind="COLOR2" cell-type="input-color"></td>
+						<td data-bind="COLOR2" cell-type="input-color" enable="data.REC1 > 70 ? true : false;"></td>
+						<td data-bind="COLOR2" cell-type="input-color" visible="data.REC1 > 70 ? true : false;"></td>
+						<td data-bind="COLOR1" cell-type="input-color">
+							<datalist>
+								<option value="#00ff00"/>
+								<option value="#0000ff"/>
+							</datalist>
+						</td>
+						<td data-bind="COLOR2" cell-type="input-color"
+							data-source="provider.getColorList(data.REC1)"></td>
+					</tr>
+					</tbody>
+				</table>
+				<table row-indicator="true" caption="Always Edit Mode">
+					<colgroup>
+						<col width="80"/>
+						<col width="100"/>
+						<col width="100"/>
+						<col width="100"/>
+						<col width="100"/>
+						<col width="100"/>
+						<col width="100"/>
+						<col width="100"/>
+						<col width="100"/>
+						<col width="100"/>
+						<col width="100"/>
+					</colgroup>
+					<thead>
+					<tr>
+						<th rowSpan="2">NAME</th>
+						<th colSpan="2">SAMPLE DATA</th>
+						<th colSpan="3">COLOR1</th>
+						<th colSpan="3">COLOR2</th>
+						<th colSpan="2">data-source</th>
+					</tr>
+					<tr>
+						<th>COLOR1</th>
+						<th>COLOR2</th>
+						<th>normal</th>
+						<th>enable</th>
+						<th>visible</th>
+						<th>normal</th>
+						<th>enable</th>
+						<th>visible</th>
+						<th>datalist</th>
+						<th>data-source</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td data-bind="NAME"></td>
+						<td data-bind="COLOR1" text-align="center" background-color="data.COLOR1"
+							color="nine.oppositeColor(data.COLOR1)"></td>
+						<td data-bind="COLOR2" text-align="center" background-color="data.COLOR2"
+							color="nine.oppositeColor(data.COLOR2)"></td>
 						<td data-bind="COLOR1" cell-type="input-color"></td>
 						<td data-bind="COLOR1" cell-type="input-color" enable="data.REC1 > 70 ? true : false;"></td>
 						<td data-bind="COLOR1" cell-type="input-color" visible="data.REC1 > 70 ? true : false;"></td>
@@ -89,7 +152,8 @@ const InputColor = () => {
 								<option value="#0000ff"/>
 							</datalist>
 						</td>
-						<td data-bind="COLOR2" cell-type="input-color" data-source="provider.getColorList(data.REC1)"></td>
+						<td data-bind="COLOR2" cell-type="input-color"
+							data-source="provider.getColorList(data.REC1)"></td>
 					</tr>
 					</tbody>
 				</table>

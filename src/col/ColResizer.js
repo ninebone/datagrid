@@ -26,7 +26,15 @@ export class ColResizer {
         this.#panel = this.#sheet.querySelector('nine-table-col-resizer-panel');
 
         this.#tooltip = this.#panel.querySelector('.resizer-overlay');
-        this.bindEvents();
+        this.#bindEvents();
+    }
+
+    #bindEvents() {
+        this.#sheet.addEventListener('pointermove', this.#onPointerMove);
+        //this.#sheet.addEventListener('pointerdown', this.#onPointerDown);
+        //this.#sheet.addEventListener('dblclick', this.#onDblClick);
+
+        this.#sheet.addDebounseEventListener('dblclick', this.#onDblClick, 'pointerdown', this.#onPointerDown);
     }
 
     destroy() {
@@ -198,13 +206,7 @@ export class ColResizer {
         return false;
     }
 
-    bindEvents() {
-        this.#sheet.addEventListener('pointermove', this.#onPointerMove);
-        //this.#sheet.addEventListener('pointerdown', this.#onPointerDown);
-        //this.#sheet.addEventListener('dblclick', this.#onDblClick);
 
-        this.#sheet.addDebounseEventListener('dblclick', this.#onDblClick, 'pointerdown', this.#onPointerDown);
-    }
 
     #getContainerType(cell) {
         const container = cell.closest('.ng-container-left, .ng-container-body, .ng-container-right');

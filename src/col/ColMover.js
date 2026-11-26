@@ -17,10 +17,10 @@ export class ColMover {
         this.#sheet = sheet;
         this.#grip = this.#sheet.querySelector('.ng-col-mover-grip');
         this.#indi = this.#sheet.querySelector('.ng-col-mover-indi');
-        this.bindEvents();
+        this.#bindEvents();
     }
 
-    bindEvents() {
+    #bindEvents() {
         this.#sheet.addEventListener('pointerdown', this.#onPointerDown);
     }
 

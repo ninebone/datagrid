@@ -55,10 +55,6 @@ export class ExprEngine {
 
                 let evalFn = this.#exprCache.get(compiledExpr);
 
-                if (expr === "provider.renderProfileCard(data)") {
-                    trace.log(compiledExpr);
-                }
-
                 if (isGroup) {
                     if (!evalFn) {
                         evalFn = new Function('childrenItems', 'row', 'host', `

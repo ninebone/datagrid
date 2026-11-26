@@ -1,20 +1,22 @@
 cell-radio {
     height: 100%;
-    width: calc(100% - 8px);
+    width: 100%;
     display: flex;
     align-items: center;
-    margin-left: 4px;
-    margin-right: 4px;
+    margin-left: 0;
+    margin-right: 0;
 
     div {
         display: flex;
         flex-direction: row;
+        gap: 8px;
     }
 
     label {
         display: flex;
+        gap: 4px;
         align-items: center;
-        margin-right: 8px;
+        margin-right: 0;
         user-select: none;
     }
 
@@ -24,7 +26,7 @@ cell-radio {
     }
 
     span {
-        margin-left: 4px;
+        margin-left: 0;
     }
 }
 

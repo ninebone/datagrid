@@ -209,7 +209,12 @@ export class CellElement extends BasicCellElement {
 		return defaultValue;
 	};
 
+	onRefresh = () => {}
+	onRenderer = () => {}
 
+	rerenderer = () => {
+		this.onRenderer();
+	};
 
 	refresh() {
 
@@ -230,7 +235,19 @@ export class CellElement extends BasicCellElement {
 						this.#cell.classList.add("invalid");
 					}
 				} else if (v === "visible") {
-					this.style["display"] = result ? "" : "none";
+
+					if (this.cover) {
+						this.cover.style["display"] = result ? "" : "none";
+					}
+					else {
+						this.style["display"] = result ? "" : "none";
+					}
+
+					if (!!result) {
+						this.#cell.removeAttribute("disabled");
+					} else {
+						this.#cell.setAttribute("disabled", "true");
+					}
 				} else if (v === "enable") {
 					this.querySelectorAll("input, button, textarea, select").forEach($el => {
 						$el.disabled = !result;
@@ -246,6 +263,8 @@ export class CellElement extends BasicCellElement {
 				}
 			}
 		});
+
+		this.onRefresh(val);
 
 		return val;
 	}
@@ -382,15 +401,23 @@ export class TheadCellElement extends CellElement {
 
 export class EditableCellElement extends CellElement {
 
+	#isEditing = false;
+	#cover;
+
+	get trigger() {
+		return (
+			this.cell?.getAttribute("edit-trigger") ||
+			this.cell?.closest("table")?.getAttribute("edit-trigger") ||
+			"always"
+		).toLowerCase();
+	}
+	get cover() { return this.#cover; }
+
 	get host() { return super.host; }
 	get sheet() { return super.sheet; }
 	get cell() { return super.cell; }
 	get tr() { return super.tr; }
 	get attr() { return super.attr; }
-
-	getExprValue(expr, data, row) {
-		return super.getExprValue(expr, data, row);
-	}
 
 	constructor() {
 		super();
@@ -398,12 +425,178 @@ export class EditableCellElement extends CellElement {
 
 	connectedCallback() {
 		super.connectedCallback();
+		this.#initEditTrigger();
 	}
+
+	#initEditTrigger = () => {
+
+		const mode = this.trigger;
+
+		if (["CELL-CHECKBOX","CELL-BUTTON","CELL-RADIO"].includes(this.tagName.toUpperCase())) {
+			this.#isEditing = true;
+			return;
+		}
+
+		this.cell.addEventListener("keydown", (e) => {
+			if (this.cell.getAttribute("disabled") === "true") return;
+
+			if (e.code === "Enter") {
+				e.preventDefault();
+				e.stopPropagation();
+
+				if (["INPUT"].includes(e.target.tagName.toUpperCase())) {
+					//e.preventDefault();
+					this.cell.focus();
+
+					if (this.trigger === "always") {
+						this.onExitEdit();
+					} else {
+						this.exitEdit(true);
+					}
+				} else {
+					if (this.trigger === "always") {
+						this.onEnterEdit();
+					} else {
+						if (this.#isEditing) {
+							this.onEnterEdit();
+						} else {
+							this.enterEdit();
+						}
+					}
+				}
+			} else if (e.code === "Space") {
+				if (!["INPUT", "TEXTAREA"].includes(e.target.tagName.toUpperCase())) {
+					e.preventDefault();
+				}
+
+				if (this.trigger === "always") {
+					this.onEnterEdit();
+				} else {
+					if (this.#isEditing) {
+						this.onEnterEdit();
+					} else {
+						this.enterEdit();
+					}
+				}
+			} else if (e.code === "Escape") {
+
+				e.preventDefault();
+
+				if (["INPUT", "TEXTAREA"].includes(e.target.tagName.toUpperCase())) {
+					e.target.value = this.value;
+				}
+
+				this.cell.focus();
+
+				if (this.trigger === "always") {
+					this.onExitEdit();
+				} else {
+					this.exitEdit(true);
+				}
+			}
+		});
+
+
+		if (mode === "always") {
+			this.#isEditing = true;
+			return;
+		}
+
+		this.style.display = "none";
+
+		this.#createCover();
+
+		this.#cover.addEventListener(mode, (e) => {
+			if (this.cell.getAttribute("disabled") === "true") return;
+			this.enterEdit();
+		});
+
+
+		this.cell.addEventListener("focusout", (e) => {
+			if (!this.#isEditing) return;
+
+			if (e.relatedTarget && this.cell.contains(e.relatedTarget)) return;
+
+			if (this.sheet.navigation.currentCell === this.cell) return;
+
+			this.exitEdit();
+		});
+	}
+
+
+
+	#createCover() {
+		if (!this.cell || this.#cover) return;
+
+		this.#cover = this.cell.querySelector(".cell-edit-cover");
+		if (!this.#cover) {
+			const cover = document.createElement("div");
+			cover.className = "cell-edit-cover";
+			this.cell.appendChild(cover);
+			this.#cover = cover;
+		}
+	}
+
+	enterEdit() {
+
+		if (this.#isEditing || this.trigger === "always") return;
+
+		this.#isEditing = true;
+
+		if (this.#cover) this.#cover.style.display = "none";
+		this.style.display = "";
+
+		this.onEnterEdit();
+	}
+
+	exitEdit(cancel = false) {
+		if (!this.#isEditing || this.trigger === "always") return;
+
+		this.#isEditing = false;
+
+		this.onExitEdit?.(cancel);
+
+		if (this.#cover) {
+			this.#cover.style.display = "";
+			this.style.display = "none";
+		}
+	}
+
+	#resetEditState() {
+		if (this.trigger !== "always") {
+			this.#isEditing = false;
+
+			if (this.#cover) {
+				this.#cover.style.display = "";
+				this.style.display = "none";
+			}
+		}
+	}
+
+	onEnterEdit() {}
+	onExitEdit(cancel) {}
 
 	refresh() {
-		return super.refresh();
+		this.#resetEditState();
+
+		const v = super.refresh();
+
+		if (this.#cover) {
+			const expr = this.cell.dataset.expr;
+
+			if (expr) {
+				this.#cover.textContent = this.getExprValue(expr, this.tr.data, this.tr.dataset.row);
+			} else {
+				this.#cover.textContent = this.displayText;
+			}
+		}
+
+		return v;
 	}
 
+	getExprValue(expr, data, row) {
+		return super.getExprValue(expr, data, row);
+	}
 	getExprValue = (expr, data, row, cell) => {
 		return super.getExprValue(expr, data, row, cell);
 	}

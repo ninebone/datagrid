@@ -14,21 +14,23 @@ export class CellCombo extends EditableCellElement {
 	connectedCallback() {
 
 		super.connectedCallback();
-
 		this.#init();
 	}
 
-	rerenderer = () => {
-		this.#initData();
-		this.refresh();
-	};
+	get displayText() {
+		return this.#target.textContent;
+	}
 
-
-	refresh = () => {
-		super.refresh();
-
+	onEnterEdit = () => {
+		this.#togglePanel();
+	}
+	onRefresh = (v) => {
 		this.#target.textContent = this.#getDisplayText() || "Select";
 		this.#validateInput();
+	};
+	onRenderer = () => {
+		this.#initData();
+		this.onRefresh();
 	};
 
 	#getDisplayText = () => {
@@ -90,6 +92,8 @@ export class CellCombo extends EditableCellElement {
 		this.#target = this.querySelector(".btn1");
 	};
 
+
+
 	#initEvent = () => {
 		this.querySelectorAll("button").forEach($el => {
 			$el.addEventListener("click", (e) => {
@@ -98,12 +102,12 @@ export class CellCombo extends EditableCellElement {
 			});
 		});
 
-
+		/**
 		this.cell.addEventListener('keydown', (e) => {
 			if (["Space"].includes(e.code)) {
 				this.#togglePanel();
 			}
-		});
+		}); */
 	}
 
 	#togglePanel = () => {
