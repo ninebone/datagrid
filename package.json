@@ -59,6 +59,6 @@
     }
   },
   "dependencies": {
-    "@ninebone/util": "*"
+    "@ninebone/core": "^0.0.3"
   }
 }
