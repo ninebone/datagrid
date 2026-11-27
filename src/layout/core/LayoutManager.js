@@ -2,9 +2,11 @@ import { trace } from "@nopeer";
 import '@/layout/nine-table-sheets.js';
 import '@/layout/nine-table-sheets-footer.js';
 import '@/layout/nine-table-toolbar.js';
-import { NineTableSheet } from "@/layout/nine-table-sheet.js";
+
 import {PreCompiler} from "@/layout/core/PreCompiler.js";
 import {NINE_TABLE} from "@";
+
+import baseCss from '@/styles/nine-table.css?inline';
 
 export class LayoutManager {
     #host;
@@ -48,17 +50,16 @@ export class LayoutManager {
             return sheetTag + splitterTag;
         }).join('');
 
-        const cssImports = [
-            `@import "https://cdn.jsdelivr.net/npm/@ninebone/datagrid@${__APP_VERSION__}/dist/css/nine-table.css";`,
-        ];
-
-        if (nine["nine-table"] && nine["nine-table"].cssFile) {
-            cssImports.push(`@import "${nine["nine-table"].cssFile}";`);
-        }
+        const customCssLink = (nine["nine-table"] && nine["nine-table"].cssFile)
+            ? `<link rel="stylesheet" href="${nine["nine-table"].cssFile}">`
+            : '';
 
         this.#host.shadowRoot.innerHTML = `
             <style>
-                ${cssImports.join('\n')}
+                ${baseCss}
+            </style>
+            ${customCssLink}
+            <style>
                 ${this.#host.provider.style.value}
             </style>
             
