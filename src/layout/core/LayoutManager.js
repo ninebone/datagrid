@@ -2,7 +2,7 @@ import { trace } from "@nopeer";
 import '@/layout/nine-table-sheets.js';
 import '@/layout/nine-table-sheets-footer.js';
 import '@/layout/nine-table-toolbar.js';
-
+import { NineTableSheet } from "@/layout/nine-table-sheet.js";
 import {PreCompiler} from "@/layout/core/PreCompiler.js";
 import {NINE_TABLE} from "@";
 

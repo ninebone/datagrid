@@ -16,7 +16,7 @@ nine.setup({
         filter: ["nine-table"],
     },
     "nine-table": {
-        cssFile: withBase('/css/nine-table/nine-table1.css'),
+        cssFile: withBase('/css/nine-table/nine-table.css'),
     },
 });
 
