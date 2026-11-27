@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@ninebone/core": "^0.0.3",
-    "@ninebone/datagrid": "^0.5.1",
+    "@ninebone/datagrid": "^0.5.2",
     "@ninebone/mu": "^1.0.33",
     "@ninebone/ux": "^1.0.348",
     "exceljs": "^4.4.0",
