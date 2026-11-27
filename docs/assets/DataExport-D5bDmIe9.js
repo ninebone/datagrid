@@ -1,4 +1,4 @@
-import{a as e,i as t,r as n}from"./index-B2yAUtdw.js";import{n as r}from"./nine-table-Di2IJxLg.js";var i=e(t(),1),a=n(),o=()=>{let e=(0,i.useRef)(null),t=(t={})=>{e.current.loading=!0,setTimeout(()=>{e.current.data.set(r.generateRandomData(1e3))})},n=()=>{localStorage.setItem(`lang`,`en`),e.current.refresh()},o=()=>{localStorage.setItem(`lang`,`ko`),e.current.refresh()},c=async()=>{e.current.exportExcel()},l=async()=>{e.current.exportCsv()},u=async()=>{e.current.exportPdf()};return(0,i.useEffect)(()=>{e.current?.provider.add({style:`
+import{a as e,i as t,r as n}from"./index-BK_aUVDR.js";import{n as r}from"./nine-table-BOhXiSw4.js";var i=e(t(),1),a=n(),o=()=>{let e=(0,i.useRef)(null),t=(t={})=>{e.current.loading=!0,setTimeout(()=>{e.current.data.set(r.generateRandomData(1e3))})},n=()=>{localStorage.setItem(`lang`,`en`),e.current.refresh()},o=()=>{localStorage.setItem(`lang`,`ko`),e.current.refresh()},c=async()=>{e.current.exportExcel()},l=async()=>{e.current.exportCsv()},u=async()=>{e.current.exportPdf()};return(0,i.useEffect)(()=>{e.current?.provider.add({style:`
 				tr.first {
 					height: 36px;
 				}

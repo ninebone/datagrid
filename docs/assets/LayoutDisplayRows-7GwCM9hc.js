@@ -1,4 +1,4 @@
-import{a as e,i as t,r as n}from"./index-B2yAUtdw.js";import{n as r}from"./nine-table-Di2IJxLg.js";var i=e(t(),1),a=n(),o=()=>{let e=(0,i.useRef)(null),t=(0,i.useRef)(null),n=(0,i.useRef)(null),o=(0,i.useRef)(null),u=e=>{e.current&&e.current.provider.add({getCommonCode:e=>r.generateCommonCode(e),style:`
+import{a as e,i as t,r as n}from"./index-BK_aUVDR.js";import{n as r}from"./nine-table-BOhXiSw4.js";var i=e(t(),1),a=n(),o=()=>{let e=(0,i.useRef)(null),t=(0,i.useRef)(null),n=(0,i.useRef)(null),o=(0,i.useRef)(null),u=e=>{e.current&&e.current.provider.add({getCommonCode:e=>r.generateCommonCode(e),style:`
                 tr.first { height: 36px; }
                 tr.second { height: 36px; }
                 th.gray, td.gray {
